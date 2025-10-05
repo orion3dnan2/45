@@ -73,4 +73,28 @@ const login = (req, res) => {
   }
 };
 
-module.exports = { register, login };
+const getUsersByRole = (req, res) => {
+  try {
+    const { role } = req.query;
+    
+    let query = 'SELECT id, username, full_name, role, email, phone FROM users';
+    const params = [];
+    
+    if (role) {
+      query += ' WHERE role = ?';
+      params.push(role);
+    }
+    
+    query += ' ORDER BY full_name';
+    
+    const stmt = db.prepare(query);
+    const users = stmt.all(...params);
+    
+    res.json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'خطأ في الخادم' });
+  }
+};
+
+module.exports = { register, login, getUsersByRole };

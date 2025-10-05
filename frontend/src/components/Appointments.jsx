@@ -5,12 +5,51 @@ import { AuthContext } from '../contexts/AuthContext';
 const Appointments = () => {
   const { user } = useContext(AuthContext);
   const [appointments, setAppointments] = useState([]);
+  const [patients, setPatients] = useState([]);
+  const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [formData, setFormData] = useState({
+    patient_id: '',
+    doctor_id: '',
+    appointment_date: '',
+    duration: 30,
+    notes: ''
+  });
 
   useEffect(() => {
     loadAppointments();
+    if (user.role === 'doctor' || user.role === 'reception') {
+      loadPatients();
+      loadDoctors();
+    }
   }, [filter]);
+
+  const loadPatients = async () => {
+    try {
+      const data = await api.getPatients();
+      setPatients(data);
+    } catch (error) {
+      console.error('خطأ في تحميل المرضى:', error);
+    }
+  };
+
+  const loadDoctors = async () => {
+    try {
+      const response = await fetch('/api/auth/users?role=doctor', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await response.json();
+      setDoctors(data);
+    } catch (error) {
+      console.error('خطأ في تحميل الأطباء:', error);
+    }
+  };
 
   const loadAppointments = async () => {
     try {
@@ -38,6 +77,67 @@ const Appointments = () => {
     } catch (error) {
       console.error('خطأ في تحديث الموعد:', error);
     }
+  };
+
+  const handleAddAppointment = async (e) => {
+    e.preventDefault();
+    try {
+      await api.createAppointment(formData);
+      setShowAddModal(false);
+      setFormData({
+        patient_id: '',
+        doctor_id: '',
+        appointment_date: '',
+        duration: 30,
+        notes: ''
+      });
+      loadAppointments();
+      alert('تم إضافة الموعد بنجاح');
+    } catch (error) {
+      console.error('خطأ في إضافة الموعد:', error);
+      alert('فشل في إضافة الموعد');
+    }
+  };
+
+  const handleEditAppointment = async (e) => {
+    e.preventDefault();
+    try {
+      await api.updateAppointment(selectedAppointment.id, {
+        appointment_date: formData.appointment_date,
+        duration: formData.duration,
+        notes: formData.notes
+      });
+      setShowEditModal(false);
+      setSelectedAppointment(null);
+      loadAppointments();
+      alert('تم تحديث الموعد بنجاح');
+    } catch (error) {
+      console.error('خطأ في تحديث الموعد:', error);
+      alert('فشل في تحديث الموعد');
+    }
+  };
+
+  const openEditModal = (appointment) => {
+    setSelectedAppointment(appointment);
+    setFormData({
+      patient_id: appointment.patient_id,
+      doctor_id: appointment.doctor_id,
+      appointment_date: appointment.appointment_date,
+      duration: appointment.duration,
+      notes: appointment.notes || ''
+    });
+    setShowEditModal(true);
+  };
+
+  const openAddModal = () => {
+    setFormData({
+      patient_id: '',
+      doctor_id: user.role === 'doctor' ? user.id : '',
+      appointment_date: '',
+      duration: 30,
+      notes: ''
+    });
+    setShowAddModal(true);
   };
 
   const sendWhatsAppMessage = (appointment) => {
@@ -83,9 +183,18 @@ ${appointment.notes ? `• ملاحظات: ${appointment.notes}` : ''}
 
   if (loading) return <div style={styles.loading}>جاري التحميل...</div>;
 
+  const canAddOrEdit = user.role === 'doctor' || user.role === 'reception';
+
   return (
     <div>
-      <h1 style={styles.title}>إدارة المواعيد</h1>
+      <div style={styles.header}>
+        <h1 style={styles.title}>إدارة المواعيد</h1>
+        {canAddOrEdit && (
+          <button onClick={openAddModal} style={styles.addButton}>
+            ➕ إضافة موعد جديد
+          </button>
+        )}
+      </div>
       
       <div style={styles.filters}>
         <button onClick={() => setFilter('all')} style={filter === 'all' ? styles.activeFilter : styles.filterBtn}>
@@ -123,6 +232,11 @@ ${appointment.notes ? `• ملاحظات: ${appointment.notes}` : ''}
             <div style={styles.actionsContainer}>
               {(user.role === 'doctor' || user.role === 'reception' || user.role === 'admin') && (
                 <div style={styles.appointmentActions}>
+                  {canAddOrEdit && appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
+                    <button onClick={() => openEditModal(appointment)} style={styles.editBtn}>
+                      ✏️ تعديل
+                    </button>
+                  )}
                   {appointment.status === 'scheduled' && (
                     <button onClick={() => updateStatus(appointment.id, 'confirmed')} style={styles.confirmBtn}>
                       ✓ تأكيد
@@ -138,9 +252,11 @@ ${appointment.notes ? `• ملاحظات: ${appointment.notes}` : ''}
                       ✓ إنهاء
                     </button>
                   )}
-                  <button onClick={() => updateStatus(appointment.id, 'cancelled')} style={styles.cancelBtn}>
-                    ✕ إلغاء
-                  </button>
+                  {appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
+                    <button onClick={() => updateStatus(appointment.id, 'cancelled')} style={styles.cancelBtn}>
+                      ✕ إلغاء
+                    </button>
+                  )}
                 </div>
               )}
               
@@ -161,6 +277,158 @@ ${appointment.notes ? `• ملاحظات: ${appointment.notes}` : ''}
 
       {appointments.length === 0 && (
         <div style={styles.empty}>لا توجد مواعيد</div>
+      )}
+
+      {showAddModal && (
+        <div style={styles.modalOverlay} onClick={() => setShowAddModal(false)}>
+          <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <h2 style={styles.modalTitle}>إضافة موعد جديد</h2>
+            <form onSubmit={handleAddAppointment}>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>المريض *</label>
+                <select 
+                  value={formData.patient_id} 
+                  onChange={(e) => setFormData({...formData, patient_id: e.target.value})}
+                  style={styles.input}
+                  required
+                >
+                  <option value="">اختر المريض</option>
+                  {patients.map(patient => (
+                    <option key={patient.id} value={patient.id}>
+                      {patient.patient_name || patient.national_id}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {user.role === 'reception' && (
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>الطبيب *</label>
+                  <select 
+                    value={formData.doctor_id} 
+                    onChange={(e) => setFormData({...formData, doctor_id: e.target.value})}
+                    style={styles.input}
+                    required
+                  >
+                    <option value="">اختر الطبيب</option>
+                    {doctors.map(doctor => (
+                      <option key={doctor.id} value={doctor.id}>
+                        {doctor.full_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div style={styles.formGroup}>
+                <label style={styles.label}>التاريخ والوقت *</label>
+                <input 
+                  type="datetime-local"
+                  value={formData.appointment_date} 
+                  onChange={(e) => setFormData({...formData, appointment_date: e.target.value})}
+                  style={styles.input}
+                  required
+                />
+              </div>
+
+              <div style={styles.formGroup}>
+                <label style={styles.label}>المدة (بالدقائق) *</label>
+                <input 
+                  type="number"
+                  value={formData.duration} 
+                  onChange={(e) => setFormData({...formData, duration: e.target.value})}
+                  style={styles.input}
+                  min="15"
+                  step="15"
+                  required
+                />
+              </div>
+
+              <div style={styles.formGroup}>
+                <label style={styles.label}>ملاحظات</label>
+                <textarea 
+                  value={formData.notes} 
+                  onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                  style={styles.textarea}
+                  rows="3"
+                />
+              </div>
+
+              <div style={styles.modalActions}>
+                <button type="submit" style={styles.submitBtn}>حفظ</button>
+                <button type="button" onClick={() => setShowAddModal(false)} style={styles.cancelModalBtn}>إلغاء</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showEditModal && selectedAppointment && (
+        <div style={styles.modalOverlay} onClick={() => setShowEditModal(false)}>
+          <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <h2 style={styles.modalTitle}>تعديل الموعد</h2>
+            <form onSubmit={handleEditAppointment}>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>المريض</label>
+                <input 
+                  type="text"
+                  value={selectedAppointment.patient_name || 'غير محدد'}
+                  style={{...styles.input, backgroundColor: '#f5f5f5'}}
+                  disabled
+                />
+              </div>
+
+              <div style={styles.formGroup}>
+                <label style={styles.label}>الطبيب</label>
+                <input 
+                  type="text"
+                  value={selectedAppointment.doctor_name}
+                  style={{...styles.input, backgroundColor: '#f5f5f5'}}
+                  disabled
+                />
+              </div>
+
+              <div style={styles.formGroup}>
+                <label style={styles.label}>التاريخ والوقت *</label>
+                <input 
+                  type="datetime-local"
+                  value={formData.appointment_date} 
+                  onChange={(e) => setFormData({...formData, appointment_date: e.target.value})}
+                  style={styles.input}
+                  required
+                />
+              </div>
+
+              <div style={styles.formGroup}>
+                <label style={styles.label}>المدة (بالدقائق) *</label>
+                <input 
+                  type="number"
+                  value={formData.duration} 
+                  onChange={(e) => setFormData({...formData, duration: e.target.value})}
+                  style={styles.input}
+                  min="15"
+                  step="15"
+                  required
+                />
+              </div>
+
+              <div style={styles.formGroup}>
+                <label style={styles.label}>ملاحظات</label>
+                <textarea 
+                  value={formData.notes} 
+                  onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                  style={styles.textarea}
+                  rows="3"
+                />
+              </div>
+
+              <div style={styles.modalActions}>
+                <button type="submit" style={styles.submitBtn}>حفظ التعديلات</button>
+                <button type="button" onClick={() => setShowEditModal(false)} style={styles.cancelModalBtn}>إلغاء</button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -190,11 +458,31 @@ const getStatusStyle = (status) => {
 };
 
 const styles = {
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '20px',
+    flexWrap: 'wrap',
+    gap: '15px'
+  },
   title: {
     fontSize: '28px',
     color: '#333',
-    marginBottom: '20px',
-    fontWeight: '700'
+    fontWeight: '700',
+    margin: 0
+  },
+  addButton: {
+    padding: '12px 24px',
+    background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '10px',
+    cursor: 'pointer',
+    fontSize: '15px',
+    fontWeight: '700',
+    boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)',
+    transition: 'all 0.3s'
   },
   loading: {
     textAlign: 'center',
@@ -286,6 +574,20 @@ const styles = {
     gap: '10px',
     flexWrap: 'wrap'
   },
+  editBtn: {
+    flex: 1,
+    padding: '10px 16px',
+    background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '600',
+    transition: 'all 0.3s',
+    boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)',
+    minWidth: '80px'
+  },
   confirmBtn: {
     flex: 1,
     padding: '10px 16px',
@@ -370,6 +672,96 @@ const styles = {
     background: 'white',
     borderRadius: '16px',
     border: '2px dashed #E2E8F0'
+  },
+  modalOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'rgba(0, 0, 0, 0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+    padding: '20px'
+  },
+  modal: {
+    background: 'white',
+    borderRadius: '16px',
+    padding: '30px',
+    maxWidth: '500px',
+    width: '100%',
+    maxHeight: '90vh',
+    overflowY: 'auto',
+    boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+  },
+  modalTitle: {
+    fontSize: '24px',
+    fontWeight: '700',
+    color: '#333',
+    marginBottom: '25px',
+    textAlign: 'center'
+  },
+  formGroup: {
+    marginBottom: '20px'
+  },
+  label: {
+    display: 'block',
+    marginBottom: '8px',
+    fontSize: '15px',
+    fontWeight: '600',
+    color: '#475569'
+  },
+  input: {
+    width: '100%',
+    padding: '12px 16px',
+    border: '2px solid #E2E8F0',
+    borderRadius: '8px',
+    fontSize: '15px',
+    transition: 'border-color 0.3s',
+    boxSizing: 'border-box'
+  },
+  textarea: {
+    width: '100%',
+    padding: '12px 16px',
+    border: '2px solid #E2E8F0',
+    borderRadius: '8px',
+    fontSize: '15px',
+    resize: 'vertical',
+    fontFamily: 'inherit',
+    transition: 'border-color 0.3s',
+    boxSizing: 'border-box'
+  },
+  modalActions: {
+    display: 'flex',
+    gap: '12px',
+    marginTop: '25px'
+  },
+  submitBtn: {
+    flex: 1,
+    padding: '14px 24px',
+    background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '10px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    fontWeight: '700',
+    boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)',
+    transition: 'all 0.3s'
+  },
+  cancelModalBtn: {
+    flex: 1,
+    padding: '14px 24px',
+    background: '#E2E8F0',
+    color: '#475569',
+    border: 'none',
+    borderRadius: '10px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    fontWeight: '700',
+    transition: 'all 0.3s'
   }
 };
 

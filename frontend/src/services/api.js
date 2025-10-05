@@ -38,6 +38,15 @@ export const api = {
     return response.json();
   },
 
+  async createPatient(data) {
+    const response = await fetch(`${API_URL}/patients`, {
+      method: 'POST',
+      headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    return response.json();
+  },
+
   async updatePatient(id, data) {
     const response = await fetch(`${API_URL}/patients/${id}`, {
       method: 'PUT',

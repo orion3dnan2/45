@@ -118,4 +118,52 @@ const updatePatient = (req, res) => {
   }
 };
 
-module.exports = { getPatients, getPatientById, updatePatient };
+const createPatient = (req, res) => {
+  try {
+    const { full_name, phone, email, national_id, date_of_birth, address, medical_history, allergies, insurance_info } = req.body;
+
+    if (!full_name || !phone) {
+      return res.status(400).json({ error: 'الاسم ورقم الهاتف مطلوبان' });
+    }
+
+    const userStmt = db.prepare(`
+      INSERT INTO users (username, password, full_name, role, email, phone)
+      VALUES (?, ?, ?, 'patient', ?, ?)
+    `);
+    
+    const username = 'patient_' + Date.now();
+    const defaultPassword = require('bcryptjs').hashSync('password', 10);
+    
+    const userResult = userStmt.run(username, defaultPassword, full_name, email, phone);
+    const userId = userResult.lastInsertRowid;
+
+    const patientStmt = db.prepare(`
+      INSERT INTO patients (user_id, national_id, date_of_birth, address, medical_history, allergies, insurance_info)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    const patientResult = patientStmt.run(
+      userId,
+      national_id || null,
+      date_of_birth || null,
+      address || null,
+      medical_history || null,
+      allergies || null,
+      insurance_info || null
+    );
+
+    res.status(201).json({ 
+      message: 'تم إضافة المريض بنجاح',
+      patientId: patientResult.lastInsertRowid,
+      userId: userId
+    });
+  } catch (error) {
+    console.error(error);
+    if (error.message.includes('UNIQUE constraint failed')) {
+      return res.status(400).json({ error: 'الرقم الوطني موجود بالفعل' });
+    }
+    res.status(500).json({ error: 'خطأ في الخادم' });
+  }
+};
+
+module.exports = { getPatients, getPatientById, updatePatient, createPatient };
