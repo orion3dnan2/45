@@ -140,7 +140,7 @@ const Appointments = () => {
     setShowAddModal(true);
   };
 
-  const sendWhatsAppMessage = (appointment) => {
+  const sendWhatsAppToDoctor = (appointment) => {
     const doctorPhone = appointment.doctor_phone || '';
     
     if (!doctorPhone) {
@@ -160,19 +160,72 @@ const Appointments = () => {
     });
 
     const message = `
-🦷 *تذكير بموعد - عيادة الأسنان الحديثة*
+🦷 *إشعار موعد - عيادة الأسنان الحديثة*
 
-السلام عليكم د. ${appointment.doctor_name}
+السلام عليكم ورحمة الله وبركاته د. ${appointment.doctor_name}
+
+نود تذكيركم بموعد قادم لديكم في العيادة:
 
 📅 *تفاصيل الموعد:*
-• التاريخ والوقت: ${formattedDate}
-• المريض: ${appointment.patient_name || 'غير محدد'}
-• رقم الهاتف: ${appointment.patient_phone || 'لا يوجد'}
-• المدة المتوقعة: ${appointment.duration} دقيقة
-• الحالة: ${getStatusLabel(appointment.status)}
-${appointment.notes ? `• ملاحظات: ${appointment.notes}` : ''}
+▫️ التاريخ والوقت: ${formattedDate}
+▫️ اسم المريض: ${appointment.patient_name || 'غير محدد'}
+▫️ رقم هاتف المريض: ${appointment.patient_phone || 'لا يوجد'}
+▫️ مدة الموعد المتوقعة: ${appointment.duration} دقيقة
+▫️ حالة الموعد: ${getStatusLabel(appointment.status)}
+${appointment.notes ? `▫️ ملاحظات خاصة: ${appointment.notes}` : ''}
 
-نتمنى لكم يوماً موفقاً 🌟
+نرجو منكم الالتزام بالموعد المحدد، ونتمنى لكم التوفيق في عملكم 🌟
+
+مع تحيات إدارة العيادة
+    `.trim();
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const sendWhatsAppToPatient = (appointment) => {
+    const patientPhone = appointment.patient_phone || '';
+    
+    if (!patientPhone) {
+      alert('رقم هاتف المريض غير متوفر');
+      return;
+    }
+
+    const phoneNumber = patientPhone.replace(/[^0-9]/g, '');
+    
+    const formattedDate = new Date(appointment.appointment_date).toLocaleString('ar-SA', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    const message = `
+🦷 *تذكير بموعدك - عيادة الأسنان الحديثة*
+
+السلام عليكم ورحمة الله وبركاته
+
+عزيزي/عزيزتي ${appointment.patient_name || 'المريض الكريم'}
+
+نود تذكيركم بموعدكم القادم في عيادتنا:
+
+📅 *تفاصيل الموعد:*
+▫️ التاريخ والوقت: ${formattedDate}
+▫️ الطبيب المعالج: ${appointment.doctor_name}
+▫️ مدة الجلسة المتوقعة: ${appointment.duration} دقيقة
+${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
+
+⏰ *تنبيه مهم:*
+• يرجى الحضور قبل الموعد بـ 10 دقائق
+• في حال الرغبة بالإلغاء أو التأجيل، يرجى إبلاغنا قبل 24 ساعة
+
+نحن في انتظاركم، ونتمنى لكم دوام الصحة والعافية 💙
+
+مع تحيات فريق العيادة
     `.trim();
 
     const encodedMessage = encodeURIComponent(message);
@@ -261,14 +314,24 @@ ${appointment.notes ? `• ملاحظات: ${appointment.notes}` : ''}
               )}
               
               {(user.role === 'reception' || user.role === 'admin') && appointment.status !== 'cancelled' && (
-                <button 
-                  onClick={() => sendWhatsAppMessage(appointment)} 
-                  style={styles.whatsappBtn}
-                  title="إرسال تفاصيل الموعد للطبيب عبر واتساب"
-                >
-                  <span style={styles.whatsappIcon}>📱</span>
-                  <span>إرسال للطبيب عبر واتساب</span>
-                </button>
+                <div style={styles.whatsappButtons}>
+                  <button 
+                    onClick={() => sendWhatsAppToDoctor(appointment)} 
+                    style={styles.whatsappDoctorBtn}
+                    title="إرسال تفاصيل الموعد للطبيب عبر واتساب"
+                  >
+                    <span style={styles.whatsappIcon}>👨‍⚕️</span>
+                    <span>إرسال للطبيب</span>
+                  </button>
+                  <button 
+                    onClick={() => sendWhatsAppToPatient(appointment)} 
+                    style={styles.whatsappPatientBtn}
+                    title="إرسال تذكير للمريض عبر واتساب"
+                  >
+                    <span style={styles.whatsappIcon}>🧑‍🦱</span>
+                    <span>إرسال للمريض</span>
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -644,8 +707,30 @@ const styles = {
     boxShadow: '0 2px 8px rgba(239, 68, 68, 0.3)',
     minWidth: '80px'
   },
-  whatsappBtn: {
-    width: '100%',
+  whatsappButtons: {
+    display: 'flex',
+    gap: '10px',
+    width: '100%'
+  },
+  whatsappDoctorBtn: {
+    flex: 1,
+    padding: '14px 20px',
+    background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '12px',
+    cursor: 'pointer',
+    fontSize: '15px',
+    fontWeight: '700',
+    transition: 'all 0.3s',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
+    boxShadow: '0 4px 15px rgba(59, 130, 246, 0.3)'
+  },
+  whatsappPatientBtn: {
+    flex: 1,
     padding: '14px 20px',
     background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
     color: 'white',
@@ -658,11 +743,11 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '10px',
+    gap: '8px',
     boxShadow: '0 4px 15px rgba(37, 211, 102, 0.3)'
   },
   whatsappIcon: {
-    fontSize: '22px'
+    fontSize: '20px'
   },
   empty: {
     textAlign: 'center',
