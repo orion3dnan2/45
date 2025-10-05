@@ -225,6 +225,15 @@ export const api = {
     return response.json();
   },
 
+  async updatePayment(id, data) {
+    const response = await fetch(`${API_URL}/payments/${id}`, {
+      method: 'PUT',
+      headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    return response.json();
+  },
+
   async getPaymentStats() {
     const response = await fetch(`${API_URL}/payments/stats`, {
       headers: getAuthHeader()
