@@ -22,14 +22,14 @@ const Dashboard = () => {
   };
 
   const menuItems = [
-    { path: '/dashboard', label: 'الرئيسية', icon: '🏠', roles: ['doctor', 'reception', 'admin', 'accountant', 'patient'] },
+    { path: '/dashboard', label: 'الرئيسية', icon: '🏠', roles: ['doctor', 'reception', 'admin', 'accountant', 'patient', 'warehouse_manager'] },
     { path: '/dashboard/patients', label: 'المرضى', icon: '👥', roles: ['doctor', 'reception', 'admin'] },
     { path: '/dashboard/appointments', label: 'المواعيد', icon: '📅', roles: ['doctor', 'reception', 'admin', 'patient'] },
-    { path: '/dashboard/treatments', label: 'العلاجات', icon: '🦷', roles: ['doctor', 'admin'] },
-    { path: '/dashboard/medications', label: 'الأدوية', icon: '💊', roles: ['doctor', 'admin', 'accountant'] },
-    { path: '/dashboard/suppliers', label: 'الموردين', icon: '🚚', roles: ['admin', 'accountant'] },
+    { path: '/dashboard/treatments', label: 'العلاجات', icon: '🦷', roles: ['doctor', 'admin', 'warehouse_manager'] },
+    { path: '/dashboard/medications', label: 'الأدوية والمستلزمات', icon: '💊', roles: ['doctor', 'admin', 'accountant', 'warehouse_manager'] },
+    { path: '/dashboard/suppliers', label: 'الموردين', icon: '🚚', roles: ['admin', 'accountant', 'warehouse_manager'] },
     { path: '/dashboard/payments', label: 'المدفوعات', icon: '💰', roles: ['admin', 'accountant', 'reception'] },
-    { path: '/dashboard/notifications', label: 'الإشعارات', icon: '🔔', roles: ['doctor', 'reception', 'admin', 'accountant'] }
+    { path: '/dashboard/notifications', label: 'الإشعارات', icon: '🔔', roles: ['doctor', 'reception', 'admin', 'accountant', 'warehouse_manager'] }
   ];
 
   const filteredMenuItems = menuItems.filter(item => item.roles.includes(user?.role));

@@ -38,7 +38,7 @@ const Home = () => {
       </div>
 
       <div style={styles.grid}>
-        {user.role !== 'warehouse_manager' && (
+        {user.role !== 'warehouse_manager' && user.role !== 'patient' && (
           <>
             <div style={{...styles.card, ...styles.cardBlue}}>
               <div style={styles.cardHeader}>
@@ -60,23 +60,67 @@ const Home = () => {
           </>
         )}
 
-        <div style={{...styles.card, ...styles.cardTeal}}>
-          <div style={styles.cardHeader}>
-            <div style={styles.cardIcon}>🦷</div>
-            <div style={styles.cardBadge}>طبي</div>
-          </div>
-          <h3 style={styles.cardTitle}>العلاجات</h3>
-          <p style={styles.cardText}>تسجيل وتتبع خطط العلاج والإجراءات الطبية</p>
-        </div>
+        {user.role === 'warehouse_manager' && (
+          <>
+            <div style={{...styles.card, ...styles.cardPurple}}>
+              <div style={styles.cardHeader}>
+                <div style={styles.cardIcon}>💊</div>
+                <div style={styles.cardBadge}>مخزون</div>
+              </div>
+              <h3 style={styles.cardTitle}>الأدوية والمستلزمات</h3>
+              <p style={styles.cardText}>إضافة وإدارة الأدوية والمستلزمات الطبية</p>
+            </div>
 
-        <div style={{...styles.card, ...styles.cardPurple}}>
-          <div style={styles.cardHeader}>
-            <div style={styles.cardIcon}>💊</div>
-            <div style={styles.cardBadge}>مخزون</div>
-          </div>
-          <h3 style={styles.cardTitle}>الأدوية والمستلزمات</h3>
-          <p style={styles.cardText}>إدارة المخزون والأدوية والمستلزمات الطبية</p>
-        </div>
+            <div style={{...styles.card, ...styles.cardOrange}}>
+              <div style={styles.cardHeader}>
+                <div style={styles.cardIcon}>🚚</div>
+                <div style={styles.cardBadge}>موردين</div>
+              </div>
+              <h3 style={styles.cardTitle}>الموردين</h3>
+              <p style={styles.cardText}>متابعة الموردين والاشتراكات والطلبات</p>
+            </div>
+
+            <div style={{...styles.card, ...styles.cardTeal}}>
+              <div style={styles.cardHeader}>
+                <div style={styles.cardIcon}>🦷</div>
+                <div style={styles.cardBadge}>علاجات</div>
+              </div>
+              <h3 style={styles.cardTitle}>العلاجات</h3>
+              <p style={styles.cardText}>إدارة ومتابعة المواد المستخدمة في العلاجات</p>
+            </div>
+
+            <div style={{...styles.card, ...styles.cardRed}}>
+              <div style={styles.cardHeader}>
+                <div style={styles.cardIcon}>⚠️</div>
+                <div style={styles.cardBadge}>تنبيهات</div>
+              </div>
+              <h3 style={styles.cardTitle}>تنبيهات المخزون</h3>
+              <p style={styles.cardText}>مراقبة المخزون المنخفض والمواد المنتهية</p>
+            </div>
+          </>
+        )}
+
+        {user.role !== 'warehouse_manager' && user.role !== 'patient' && (
+          <>
+            <div style={{...styles.card, ...styles.cardTeal}}>
+              <div style={styles.cardHeader}>
+                <div style={styles.cardIcon}>🦷</div>
+                <div style={styles.cardBadge}>طبي</div>
+              </div>
+              <h3 style={styles.cardTitle}>العلاجات</h3>
+              <p style={styles.cardText}>تسجيل وتتبع خطط العلاج والإجراءات الطبية</p>
+            </div>
+
+            <div style={{...styles.card, ...styles.cardPurple}}>
+              <div style={styles.cardHeader}>
+                <div style={styles.cardIcon}>💊</div>
+                <div style={styles.cardBadge}>مخزون</div>
+              </div>
+              <h3 style={styles.cardTitle}>الأدوية والمستلزمات</h3>
+              <p style={styles.cardText}>إدارة المخزون والأدوية والمستلزمات الطبية</p>
+            </div>
+          </>
+        )}
       </div>
 
       {notifications.length > 0 && (
@@ -214,6 +258,14 @@ const styles = {
   },
   cardPurple: {
     background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
+    color: 'white'
+  },
+  cardOrange: {
+    background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+    color: 'white'
+  },
+  cardRed: {
+    background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
     color: 'white'
   },
   cardHeader: {
