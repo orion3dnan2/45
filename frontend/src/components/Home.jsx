@@ -38,23 +38,27 @@ const Home = () => {
       </div>
 
       <div style={styles.grid}>
-        <div style={{...styles.card, ...styles.cardBlue}}>
-          <div style={styles.cardHeader}>
-            <div style={styles.cardIcon}>👥</div>
-            <div style={styles.cardBadge}>متابعة</div>
-          </div>
-          <h3 style={styles.cardTitle}>إدارة المرضى</h3>
-          <p style={styles.cardText}>عرض وإدارة سجلات المرضى والملفات الطبية</p>
-        </div>
+        {user.role !== 'warehouse_manager' && (
+          <>
+            <div style={{...styles.card, ...styles.cardBlue}}>
+              <div style={styles.cardHeader}>
+                <div style={styles.cardIcon}>👥</div>
+                <div style={styles.cardBadge}>متابعة</div>
+              </div>
+              <h3 style={styles.cardTitle}>إدارة المرضى</h3>
+              <p style={styles.cardText}>عرض وإدارة سجلات المرضى والملفات الطبية</p>
+            </div>
 
-        <div style={{...styles.card, ...styles.cardGreen}}>
-          <div style={styles.cardHeader}>
-            <div style={styles.cardIcon}>📅</div>
-            <div style={styles.cardBadge}>جدولة</div>
-          </div>
-          <h3 style={styles.cardTitle}>المواعيد</h3>
-          <p style={styles.cardText}>جدولة ومتابعة المواعيد اليومية والأسبوعية</p>
-        </div>
+            <div style={{...styles.card, ...styles.cardGreen}}>
+              <div style={styles.cardHeader}>
+                <div style={styles.cardIcon}>📅</div>
+                <div style={styles.cardBadge}>جدولة</div>
+              </div>
+              <h3 style={styles.cardTitle}>المواعيد</h3>
+              <p style={styles.cardText}>جدولة ومتابعة المواعيد اليومية والأسبوعية</p>
+            </div>
+          </>
+        )}
 
         <div style={{...styles.card, ...styles.cardTeal}}>
           <div style={styles.cardHeader}>
@@ -129,7 +133,8 @@ const getRoleLabel = (role) => {
     reception: 'استقبال',
     admin: 'إداري',
     accountant: 'محاسب',
-    patient: 'مريض'
+    patient: 'مريض',
+    warehouse_manager: 'مسؤول المخزون'
   };
   return labels[role] || role;
 };
