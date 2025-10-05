@@ -4,8 +4,8 @@ const { getSuppliers, createSupplier, updateSupplier, deleteSupplier } = require
 const { authMiddleware, checkRole } = require('../middleware/auth');
 
 router.get('/', authMiddleware, getSuppliers);
-router.post('/', authMiddleware, checkRole('admin', 'accountant'), createSupplier);
-router.put('/:id', authMiddleware, checkRole('admin', 'accountant'), updateSupplier);
+router.post('/', authMiddleware, checkRole('admin', 'accountant', 'warehouse_manager'), createSupplier);
+router.put('/:id', authMiddleware, checkRole('admin', 'accountant', 'warehouse_manager'), updateSupplier);
 router.delete('/:id', authMiddleware, checkRole('admin'), deleteSupplier);
 
 module.exports = router;
