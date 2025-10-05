@@ -31,6 +31,7 @@ const createTables = async () => {
         medical_history TEXT,
         allergies TEXT,
         insurance_info TEXT,
+        diagnosis TEXT,
         archived INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -164,6 +165,8 @@ const createTables = async () => {
         FOREIGN KEY (treatment_id) REFERENCES treatments(id),
         FOREIGN KEY (medication_id) REFERENCES medications(id)
       );
+
+      ALTER TABLE patients ADD COLUMN IF NOT EXISTS diagnosis TEXT;
     `);
     
     console.log('Database initialized successfully');

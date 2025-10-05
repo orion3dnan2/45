@@ -21,7 +21,8 @@ const Patients = () => {
     address: '',
     medical_history: '',
     allergies: '',
-    insurance_info: ''
+    insurance_info: '',
+    diagnosis: ''
   });
 
   useEffect(() => {
@@ -81,7 +82,8 @@ const Patients = () => {
         address: formData.address,
         medical_history: formData.medical_history,
         allergies: formData.allergies,
-        insurance_info: formData.insurance_info
+        insurance_info: formData.insurance_info,
+        diagnosis: formData.diagnosis
       });
       setShowEditModal(false);
       viewPatientDetails(selectedPatient.id);
@@ -102,7 +104,8 @@ const Patients = () => {
       address: selectedPatient.address || '',
       medical_history: selectedPatient.medical_history || '',
       allergies: selectedPatient.allergies || '',
-      insurance_info: selectedPatient.insurance_info || ''
+      insurance_info: selectedPatient.insurance_info || '',
+      diagnosis: selectedPatient.diagnosis || ''
     });
     setShowEditModal(true);
   };
@@ -117,7 +120,8 @@ const Patients = () => {
       address: '',
       medical_history: '',
       allergies: '',
-      insurance_info: ''
+      insurance_info: '',
+      diagnosis: ''
     });
   };
 
@@ -325,6 +329,12 @@ const Patients = () => {
               {activeTab === 'medical' && (
                 <div style={styles.medicalSection}>
                   <div style={styles.medicalBlock}>
+                    <h3 style={styles.blockTitle}>🩺 التشخيص</h3>
+                    <div style={styles.medicalContent}>
+                      {selectedPatient.diagnosis || 'لا يوجد تشخيص مسجل'}
+                    </div>
+                  </div>
+                  <div style={styles.medicalBlock}>
                     <h3 style={styles.blockTitle}>⚠️ الحساسيات</h3>
                     <div style={styles.medicalContent}>
                       {selectedPatient.allergies || 'لا توجد حساسيات مسجلة'}
@@ -523,6 +533,17 @@ const Patients = () => {
                 />
               </div>
 
+              <div style={styles.formGroup}>
+                <label style={styles.label}>التشخيص</label>
+                <textarea 
+                  value={formData.diagnosis} 
+                  onChange={(e) => setFormData({...formData, diagnosis: e.target.value})}
+                  style={styles.textarea}
+                  rows="2"
+                  placeholder="مثال: تسوس الأسنان، التهاب اللثة..."
+                />
+              </div>
+
               <div style={styles.modalActions}>
                 <button type="submit" style={styles.submitBtn}>حفظ</button>
                 <button type="button" onClick={() => setShowAddModal(false)} style={styles.cancelModalBtn}>إلغاء</button>
@@ -617,6 +638,17 @@ const Patients = () => {
                   onChange={(e) => setFormData({...formData, medical_history: e.target.value})}
                   style={styles.textarea}
                   rows="3"
+                />
+              </div>
+
+              <div style={styles.formGroup}>
+                <label style={styles.label}>التشخيص</label>
+                <textarea 
+                  value={formData.diagnosis} 
+                  onChange={(e) => setFormData({...formData, diagnosis: e.target.value})}
+                  style={styles.textarea}
+                  rows="2"
+                  placeholder="مثال: تسوس الأسنان، التهاب اللثة..."
                 />
               </div>
 

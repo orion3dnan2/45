@@ -92,7 +92,7 @@ const updatePatient = async (req, res) => {
   const client = await pool.connect();
   try {
     const { id } = req.params;
-    const { national_id, date_of_birth, address, medical_history, allergies, insurance_info } = req.body;
+    const { national_id, date_of_birth, address, medical_history, allergies, insurance_info, diagnosis } = req.body;
 
     const updates = [];
     const params = [];
@@ -128,6 +128,11 @@ const updatePatient = async (req, res) => {
       params.push(insurance_info);
       paramCount++;
     }
+    if (diagnosis !== undefined) {
+      updates.push(`diagnosis = $${paramCount}`);
+      params.push(diagnosis);
+      paramCount++;
+    }
 
     updates.push('updated_at = CURRENT_TIMESTAMP');
     params.push(id);
@@ -149,7 +154,7 @@ const updatePatient = async (req, res) => {
 const createPatient = async (req, res) => {
   const client = await pool.connect();
   try {
-    const { full_name, phone, email, national_id, date_of_birth, address, medical_history, allergies, insurance_info } = req.body;
+    const { full_name, phone, email, national_id, date_of_birth, address, medical_history, allergies, insurance_info, diagnosis } = req.body;
 
     if (!full_name || !phone) {
       return res.status(400).json({ error: 'الاسم ورقم الهاتف مطلوبان' });
@@ -167,8 +172,8 @@ const createPatient = async (req, res) => {
     const userId = userResult.rows[0].id;
 
     const patientResult = await client.query(
-      `INSERT INTO patients (user_id, national_id, date_of_birth, address, medical_history, allergies, insurance_info)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO patients (user_id, national_id, date_of_birth, address, medical_history, allergies, insurance_info, diagnosis)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING id`,
       [
         userId,
@@ -177,7 +182,8 @@ const createPatient = async (req, res) => {
         address || null,
         medical_history || null,
         allergies || null,
-        insurance_info || null
+        insurance_info || null,
+        diagnosis || null
       ]
     );
 
