@@ -29,6 +29,35 @@ const Login = () => {
     }
   };
 
+  const handleDemoLogin = async (demoUsername, demoPassword) => {
+    setUsername(demoUsername);
+    setPassword(demoPassword);
+    setError('');
+    setLoading(true);
+
+    try {
+      const data = await api.login(demoUsername, demoPassword);
+      
+      if (data.error) {
+        setError(data.error);
+      } else {
+        login(data.token, data.user);
+      }
+    } catch (err) {
+      setError('حدث خطأ أثناء تسجيل الدخول');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const demoAccounts = [
+    { username: 'doctor', password: 'password', role: 'طبيب', icon: '👨‍⚕️', color: '#0EA5E9' },
+    { username: 'reception', password: 'password', role: 'استقبال', icon: '👩‍💼', color: '#10B981' },
+    { username: 'admin', password: 'password', role: 'إداري', icon: '👨‍💻', color: '#8B5CF6' },
+    { username: 'accountant', password: 'password', role: 'محاسب', icon: '💰', color: '#F59E0B' },
+    { username: 'warehouse', password: 'password', role: 'مسؤول مخزن', icon: '📦', color: '#EF4444' }
+  ];
+
   return (
     <div style={styles.container}>
       <div style={styles.leftPanel}>
@@ -101,28 +130,28 @@ const Login = () => {
           </form>
           
           <div style={styles.demoInfo}>
-            <p style={styles.demoTitle}>🔑 حسابات تجريبية متاحة:</p>
+            <p style={styles.demoTitle}>🔑 حسابات تجريبية - اضغط للدخول السريع:</p>
             <div style={styles.demoGrid}>
-              <div style={styles.demoItem}>
-                <span style={styles.demoRole}>طبيب:</span>
-                <span style={styles.demoCredentials}>doctor / password</span>
-              </div>
-              <div style={styles.demoItem}>
-                <span style={styles.demoRole}>استقبال:</span>
-                <span style={styles.demoCredentials}>reception / password</span>
-              </div>
-              <div style={styles.demoItem}>
-                <span style={styles.demoRole}>إداري:</span>
-                <span style={styles.demoCredentials}>admin / password</span>
-              </div>
-              <div style={styles.demoItem}>
-                <span style={styles.demoRole}>محاسب:</span>
-                <span style={styles.demoCredentials}>accountant / password</span>
-              </div>
-              <div style={styles.demoItem}>
-                <span style={styles.demoRole}>مسؤول مخزن:</span>
-                <span style={styles.demoCredentials}>warehouse / password</span>
-              </div>
+              {demoAccounts.map((account) => (
+                <button
+                  key={account.username}
+                  onClick={() => handleDemoLogin(account.username, account.password)}
+                  style={{
+                    ...styles.demoButton,
+                    borderLeft: `4px solid ${account.color}`
+                  }}
+                  disabled={loading}
+                >
+                  <div style={styles.demoButtonContent}>
+                    <span style={styles.demoIcon}>{account.icon}</span>
+                    <div style={styles.demoButtonText}>
+                      <span style={styles.demoRole}>{account.role}</span>
+                      <span style={styles.demoCredentials}>{account.username}</span>
+                    </div>
+                  </div>
+                  <span style={styles.arrowIcon}>←</span>
+                </button>
+              ))}
             </div>
           </div>
         </div>
@@ -135,7 +164,8 @@ const styles = {
   container: {
     display: 'flex',
     minHeight: '100vh',
-    direction: 'rtl'
+    direction: 'rtl',
+    flexWrap: 'wrap'
   },
   leftPanel: {
     flex: 1,
@@ -143,15 +173,17 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '40px',
+    padding: '40px 20px',
     position: 'relative',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    minHeight: '400px'
   },
   brandSection: {
     textAlign: 'center',
     color: 'white',
     zIndex: 1,
-    maxWidth: '500px'
+    maxWidth: '500px',
+    width: '100%'
   },
   logoCircle: {
     width: '120px',
@@ -170,13 +202,13 @@ const styles = {
     fontSize: '64px'
   },
   brandTitle: {
-    fontSize: '42px',
+    fontSize: 'clamp(28px, 5vw, 42px)',
     fontWeight: 'bold',
     marginBottom: '15px',
     textShadow: '0 2px 10px rgba(0,0,0,0.2)'
   },
   brandSubtitle: {
-    fontSize: '20px',
+    fontSize: 'clamp(16px, 3vw, 20px)',
     opacity: 0.95,
     marginBottom: '50px',
     fontWeight: '300'
@@ -187,13 +219,14 @@ const styles = {
     flexDirection: 'column',
     gap: '20px',
     maxWidth: '350px',
-    margin: '0 auto'
+    margin: '0 auto',
+    width: '100%'
   },
   feature: {
     display: 'flex',
     alignItems: 'center',
     gap: '15px',
-    fontSize: '18px',
+    fontSize: 'clamp(14px, 2.5vw, 18px)',
     background: 'rgba(255, 255, 255, 0.15)',
     backdropFilter: 'blur(10px)',
     padding: '15px 20px',
@@ -209,7 +242,8 @@ const styles = {
     borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    flexShrink: 0
   },
   rightPanel: {
     flex: 1,
@@ -217,12 +251,13 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '40px'
+    padding: '40px 20px',
+    minHeight: '100vh'
   },
   loginCard: {
     background: 'white',
     borderRadius: '20px',
-    padding: '50px',
+    padding: 'clamp(30px, 5vw, 50px)',
     boxShadow: '0 20px 60px rgba(0,0,0,0.08)',
     maxWidth: '480px',
     width: '100%',
@@ -233,13 +268,13 @@ const styles = {
     textAlign: 'center'
   },
   loginTitle: {
-    fontSize: '32px',
+    fontSize: 'clamp(24px, 5vw, 32px)',
     fontWeight: 'bold',
     color: '#0F172A',
     marginBottom: '10px'
   },
   loginSubtitle: {
-    fontSize: '16px',
+    fontSize: 'clamp(14px, 2.5vw, 16px)',
     color: '#64748B'
   },
   error: {
@@ -277,7 +312,8 @@ const styles = {
     right: '16px',
     fontSize: '20px',
     opacity: 0.5,
-    pointerEvents: 'none'
+    pointerEvents: 'none',
+    zIndex: 1
   },
   input: {
     width: '100%',
@@ -288,7 +324,8 @@ const styles = {
     transition: 'all 0.3s',
     outline: 'none',
     background: '#F8FAFC',
-    fontFamily: 'inherit'
+    fontFamily: 'inherit',
+    boxSizing: 'border-box'
   },
   button: {
     background: 'linear-gradient(135deg, #0EA5E9 0%, #10B981 100%)',
@@ -306,7 +343,7 @@ const styles = {
   },
   demoInfo: {
     marginTop: '35px',
-    padding: '25px',
+    padding: 'clamp(20px, 4vw, 25px)',
     background: 'linear-gradient(135deg, #F0F9FF 0%, #ECFDF5 100%)',
     borderRadius: '16px',
     border: '2px solid #BAE6FD'
@@ -315,30 +352,58 @@ const styles = {
     fontWeight: 'bold',
     marginBottom: '18px',
     color: '#0F172A',
-    fontSize: '15px',
+    fontSize: 'clamp(13px, 2.5vw, 15px)',
     textAlign: 'center'
   },
   demoGrid: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '12px'
+    gap: '10px'
   },
-  demoItem: {
+  demoButton: {
     display: 'flex',
     justifyContent: 'space-between',
-    padding: '10px 15px',
+    alignItems: 'center',
+    padding: '14px 18px',
     background: 'white',
-    borderRadius: '8px',
-    fontSize: '14px',
-    border: '1px solid #E0F2FE'
+    borderRadius: '12px',
+    border: 'none',
+    cursor: 'pointer',
+    transition: 'all 0.3s',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+    fontFamily: 'inherit',
+    width: '100%',
+    textAlign: 'right'
+  },
+  demoButtonContent: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px'
+  },
+  demoIcon: {
+    fontSize: '28px',
+    flexShrink: 0
+  },
+  demoButtonText: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+    alignItems: 'flex-start'
   },
   demoRole: {
-    fontWeight: '600',
-    color: '#0EA5E9'
+    fontWeight: '700',
+    color: '#0F172A',
+    fontSize: 'clamp(14px, 2.5vw, 16px)'
   },
   demoCredentials: {
     color: '#64748B',
+    fontSize: 'clamp(12px, 2vw, 14px)',
     fontFamily: 'monospace'
+  },
+  arrowIcon: {
+    fontSize: '20px',
+    color: '#94A3B8',
+    transition: 'all 0.3s'
   }
 };
 
