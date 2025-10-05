@@ -10,6 +10,7 @@ const Patients = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [activeTab, setActiveTab] = useState('info');
+  const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState({
     full_name: '',
     phone: '',
@@ -112,6 +113,16 @@ const Patients = () => {
 
   const canAddOrEdit = user.role === 'doctor' || user.role === 'reception' || user.role === 'admin';
 
+  const filteredPatients = patients.filter(patient => {
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
+    return (
+      (patient.national_id && patient.national_id.toLowerCase().includes(search)) ||
+      (patient.full_name && patient.full_name.toLowerCase().includes(search)) ||
+      (patient.phone && patient.phone.includes(search))
+    );
+  });
+
   if (loading) return <div style={styles.loading}>جاري التحميل...</div>;
 
   return (
@@ -127,16 +138,18 @@ const Patients = () => {
       
       <div style={styles.container}>
         <div style={styles.listSection}>
-          <h2 style={styles.sectionTitle}>قائمة المرضى ({patients.length})</h2>
+          <h2 style={styles.sectionTitle}>قائمة المرضى ({filteredPatients.length})</h2>
           <div style={styles.searchBox}>
             <input 
               type="text" 
-              placeholder="🔍 البحث عن مريض..."
+              placeholder="🔍 البحث بالرقم المدني أو الاسم..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               style={styles.searchInput}
             />
           </div>
           <div style={styles.list}>
-            {patients.map(patient => (
+            {filteredPatients.map(patient => (
               <div 
                 key={patient.id} 
                 style={{
@@ -148,7 +161,7 @@ const Patients = () => {
                 <div style={styles.patientInfo}>
                   <h3 style={styles.patientName}>👤 {patient.full_name || 'غير محدد'}</h3>
                   <p style={styles.patientDetail}>📞 {patient.phone || 'لا يوجد'}</p>
-                  <p style={styles.patientDetail}>🆔 {patient.national_id || 'لا يوجد'}</p>
+                  <p style={styles.patientDetail}>🆔 الرقم المدني: {patient.national_id || 'لا يوجد'}</p>
                 </div>
               </div>
             ))}
@@ -218,7 +231,7 @@ const Patients = () => {
                     <span style={styles.infoValue}>{selectedPatient.email || 'لا يوجد'}</span>
                   </div>
                   <div style={styles.infoItem}>
-                    <span style={styles.infoLabel}>الرقم الوطني:</span>
+                    <span style={styles.infoLabel}>الرقم المدني:</span>
                     <span style={styles.infoValue}>{selectedPatient.national_id || 'لا يوجد'}</span>
                   </div>
                   <div style={styles.infoItem}>
@@ -378,12 +391,13 @@ const Patients = () => {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>الرقم الوطني</label>
+                  <label style={styles.label}>الرقم المدني</label>
                   <input 
                     type="text"
                     value={formData.national_id} 
                     onChange={(e) => setFormData({...formData, national_id: e.target.value})}
                     style={styles.input}
+                    placeholder="مثال: 12345678901"
                   />
                 </div>
 
@@ -476,12 +490,13 @@ const Patients = () => {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>الرقم الوطني</label>
+                  <label style={styles.label}>الرقم المدني</label>
                   <input 
                     type="text"
                     value={formData.national_id} 
                     onChange={(e) => setFormData({...formData, national_id: e.target.value})}
                     style={styles.input}
+                    placeholder="مثال: 12345678901"
                   />
                 </div>
 
