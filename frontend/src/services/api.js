@@ -99,6 +99,14 @@ export const api = {
     return response.json();
   },
 
+  async deleteTreatment(id) {
+    const response = await fetch(`${API_URL}/treatments/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeader()
+    });
+    return response.json();
+  },
+
   async getMedications(params = {}) {
     const queryString = new URLSearchParams(params).toString();
     const response = await fetch(`${API_URL}/medications?${queryString}`, {
