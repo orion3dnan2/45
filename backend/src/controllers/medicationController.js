@@ -31,12 +31,36 @@ const createMedication = (req, res) => {
       return res.status(400).json({ error: 'الاسم والوحدة مطلوبة' });
     }
 
+    const qty = quantity_in_stock !== undefined ? parseInt(quantity_in_stock) : 0;
+    const minQty = minimum_quantity !== undefined ? parseInt(minimum_quantity) : 10;
+    const price = unit_price ? parseFloat(unit_price) : null;
+
+    if (quantity_in_stock !== undefined && (isNaN(qty) || !isFinite(qty))) {
+      return res.status(400).json({ error: 'الكمية يجب أن تكون رقماً صحيحاً' });
+    }
+
+    if (minimum_quantity !== undefined && (isNaN(minQty) || !isFinite(minQty))) {
+      return res.status(400).json({ error: 'الحد الأدنى يجب أن يكون رقماً صحيحاً' });
+    }
+
+    if (price !== null && (isNaN(price) || !isFinite(price))) {
+      return res.status(400).json({ error: 'السعر يجب أن يكون رقماً صحيحاً' });
+    }
+
+    if (qty < 0 || minQty < 0) {
+      return res.status(400).json({ error: 'الكمية لا يمكن أن تكون سالبة' });
+    }
+
+    if (price !== null && price < 0) {
+      return res.status(400).json({ error: 'السعر لا يمكن أن يكون سالباً' });
+    }
+
     const stmt = db.prepare(`
       INSERT INTO medications (name, description, unit, quantity_in_stock, minimum_quantity, unit_price, expiry_date, category)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    const result = stmt.run(name, description, unit, quantity_in_stock || 0, minimum_quantity || 10, unit_price, expiry_date, category);
+    const result = stmt.run(name, description, unit, qty, minQty, price, expiry_date, category);
 
     res.status(201).json({ message: 'تم إضافة الدواء بنجاح', medicationId: result.lastInsertRowid });
   } catch (error) {
@@ -66,16 +90,37 @@ const updateMedication = (req, res) => {
       params.push(unit);
     }
     if (quantity_in_stock !== undefined) {
+      const qty = parseInt(quantity_in_stock);
+      if (isNaN(qty) || !isFinite(qty)) {
+        return res.status(400).json({ error: 'الكمية يجب أن تكون رقماً صحيحاً' });
+      }
+      if (qty < 0) {
+        return res.status(400).json({ error: 'الكمية لا يمكن أن تكون سالبة' });
+      }
       updates.push('quantity_in_stock = ?');
-      params.push(quantity_in_stock);
+      params.push(qty);
     }
     if (minimum_quantity !== undefined) {
+      const minQty = parseInt(minimum_quantity);
+      if (isNaN(minQty) || !isFinite(minQty)) {
+        return res.status(400).json({ error: 'الحد الأدنى يجب أن يكون رقماً صحيحاً' });
+      }
+      if (minQty < 0) {
+        return res.status(400).json({ error: 'الحد الأدنى لا يمكن أن يكون سالباً' });
+      }
       updates.push('minimum_quantity = ?');
-      params.push(minimum_quantity);
+      params.push(minQty);
     }
     if (unit_price !== undefined) {
+      const price = unit_price ? parseFloat(unit_price) : null;
+      if (price !== null && (isNaN(price) || !isFinite(price))) {
+        return res.status(400).json({ error: 'السعر يجب أن يكون رقماً صحيحاً' });
+      }
+      if (price !== null && price < 0) {
+        return res.status(400).json({ error: 'السعر لا يمكن أن يكون سالباً' });
+      }
       updates.push('unit_price = ?');
-      params.push(unit_price);
+      params.push(price);
     }
     if (expiry_date !== undefined) {
       updates.push('expiry_date = ?');

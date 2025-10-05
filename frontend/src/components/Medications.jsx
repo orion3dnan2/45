@@ -242,7 +242,7 @@ const Medications = () => {
                   <button onClick={() => handleEdit(medication)} style={styles.editBtn}>
                     ✏️ تعديل
                   </button>
-                  {['admin', 'warehouse_manager'].includes(user.role) && (
+                  {['admin', 'warehouse_manager', 'accountant'].includes(user.role) && (
                     <button onClick={() => handleDelete(medication.id, medication.name)} style={styles.deleteBtn}>
                       🗑️ حذف
                     </button>

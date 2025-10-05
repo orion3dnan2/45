@@ -119,6 +119,10 @@ const Login = () => {
                 <span style={styles.demoRole}>محاسب:</span>
                 <span style={styles.demoCredentials}>accountant / password</span>
               </div>
+              <div style={styles.demoItem}>
+                <span style={styles.demoRole}>مسؤول مخزن:</span>
+                <span style={styles.demoCredentials}>warehouse / password</span>
+              </div>
             </div>
           </div>
         </div>
