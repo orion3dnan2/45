@@ -4,7 +4,7 @@ const db = require('./src/models/database');
 console.log('إنشاء بيانات تجريبية...');
 
 const users = [
-  { username: 'doctor', password: 'password', full_name: 'د. أحمد محمد', role: 'doctor', email: 'doctor@clinic.com', phone: '0501234567' },
+  { username: 'doctor', password: 'password', full_name: 'د. أحمد محمد', role: 'doctor', email: 'doctor@clinic.com', phone: '+96551325559' },
   { username: 'reception', password: 'password', full_name: 'فاطمة علي', role: 'reception', email: 'reception@clinic.com', phone: '0501234568' },
   { username: 'admin', password: 'password', full_name: 'محمد حسن', role: 'admin', email: 'admin@clinic.com', phone: '0501234569' },
   { username: 'accountant', password: 'password', full_name: 'سارة خالد', role: 'accountant', email: 'accountant@clinic.com', phone: '0501234570' },
