@@ -1,6 +1,7 @@
-const db = require('../models/database');
+const pool = require('../models/database');
 
-const createAppointment = (req, res) => {
+const createAppointment = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { patient_id, doctor_id, appointment_date, duration, notes } = req.body;
 
@@ -8,34 +9,43 @@ const createAppointment = (req, res) => {
       return res.status(400).json({ error: 'جميع الحقول المطلوبة يجب ملؤها' });
     }
 
-    const stmt = db.prepare(`
-      INSERT INTO appointments (patient_id, doctor_id, appointment_date, duration, notes, created_by)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `);
+    const result = await client.query(
+      `INSERT INTO appointments (patient_id, doctor_id, appointment_date, duration, notes, created_by)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id`,
+      [patient_id, doctor_id, appointment_date, duration || 30, notes, req.user.id]
+    );
 
-    const result = stmt.run(patient_id, doctor_id, appointment_date, duration || 30, notes, req.user.id);
+    const appointmentId = result.rows[0].id;
 
-    const notification = db.prepare(`
-      INSERT INTO notifications (user_id, type, title, message, related_id)
-      VALUES (?, 'appointment_reminder', 'موعد جديد', ?, ?)
-    `);
-    
-    const patientStmt = db.prepare('SELECT user_id FROM patients WHERE id = ?');
-    const patient = patientStmt.get(patient_id);
+    const patientResult = await client.query('SELECT user_id FROM patients WHERE id = $1', [patient_id]);
+    const patient = patientResult.rows[0];
     
     if (patient && patient.user_id) {
-      notification.run(patient.user_id, `لديك موعد جديد في ${appointment_date}`, result.lastInsertRowid);
+      await client.query(
+        `INSERT INTO notifications (user_id, type, title, message, related_id)
+         VALUES ($1, 'appointment_reminder', 'موعد جديد', $2, $3)`,
+        [patient.user_id, `لديك موعد جديد في ${appointment_date}`, appointmentId]
+      );
     }
-    notification.run(doctor_id, `موعد جديد في ${appointment_date}`, result.lastInsertRowid);
+    
+    await client.query(
+      `INSERT INTO notifications (user_id, type, title, message, related_id)
+       VALUES ($1, 'appointment_reminder', 'موعد جديد', $2, $3)`,
+      [doctor_id, `موعد جديد في ${appointment_date}`, appointmentId]
+    );
 
-    res.status(201).json({ message: 'تم حجز الموعد بنجاح', appointmentId: result.lastInsertRowid });
+    res.status(201).json({ message: 'تم حجز الموعد بنجاح', appointmentId });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'خطأ في الخادم' });
+  } finally {
+    client.release();
   }
 };
 
-const getAppointments = (req, res) => {
+const getAppointments = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { status, doctor_id, patient_id, date } = req.query;
     
@@ -54,77 +64,91 @@ const getAppointments = (req, res) => {
     `;
     
     const params = [];
+    let paramCount = 1;
     
     if (status) {
-      query += ' AND a.status = ?';
+      query += ` AND a.status = $${paramCount}`;
       params.push(status);
+      paramCount++;
     }
     
     if (doctor_id) {
-      query += ' AND a.doctor_id = ?';
+      query += ` AND a.doctor_id = $${paramCount}`;
       params.push(doctor_id);
+      paramCount++;
     }
     
     if (patient_id) {
-      query += ' AND a.patient_id = ?';
+      query += ` AND a.patient_id = $${paramCount}`;
       params.push(patient_id);
+      paramCount++;
     }
     
     if (date) {
-      query += ' AND DATE(a.appointment_date) = DATE(?)';
+      query += ` AND DATE(a.appointment_date) = DATE($${paramCount})`;
       params.push(date);
+      paramCount++;
     }
     
     query += ' ORDER BY a.appointment_date DESC';
     
-    const stmt = db.prepare(query);
-    const appointments = stmt.all(...params);
+    const result = await client.query(query, params);
+    const appointments = result.rows;
     
     res.json(appointments);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'خطأ في الخادم' });
+  } finally {
+    client.release();
   }
 };
 
-const updateAppointment = (req, res) => {
+const updateAppointment = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { id } = req.params;
     const { status, appointment_date, duration, notes } = req.body;
 
     const updates = [];
     const params = [];
+    let paramCount = 1;
 
     if (status) {
-      updates.push('status = ?');
+      updates.push(`status = $${paramCount}`);
       params.push(status);
+      paramCount++;
     }
     if (appointment_date) {
-      updates.push('appointment_date = ?');
+      updates.push(`appointment_date = $${paramCount}`);
       params.push(appointment_date);
+      paramCount++;
     }
     if (duration) {
-      updates.push('duration = ?');
+      updates.push(`duration = $${paramCount}`);
       params.push(duration);
+      paramCount++;
     }
     if (notes !== undefined) {
-      updates.push('notes = ?');
+      updates.push(`notes = $${paramCount}`);
       params.push(notes);
+      paramCount++;
     }
 
     updates.push('updated_at = CURRENT_TIMESTAMP');
     params.push(id);
 
-    const stmt = db.prepare(`
-      UPDATE appointments SET ${updates.join(', ')} WHERE id = ?
-    `);
-
-    stmt.run(...params);
+    await client.query(
+      `UPDATE appointments SET ${updates.join(', ')} WHERE id = $${paramCount}`,
+      params
+    );
 
     res.json({ message: 'تم تحديث الموعد بنجاح' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'خطأ في الخادم' });
+  } finally {
+    client.release();
   }
 };
 

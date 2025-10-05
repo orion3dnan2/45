@@ -1,6 +1,7 @@
-const db = require('../models/database');
+const pool = require('../models/database');
 
-const getPatients = (req, res) => {
+const getPatients = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { archived } = req.query;
     
@@ -13,7 +14,7 @@ const getPatients = (req, res) => {
     const params = [];
     
     if (archived !== undefined) {
-      query += ' WHERE p.archived = ?';
+      query += ' WHERE p.archived = $1';
       params.push(archived === 'true' ? 1 : 0);
     } else {
       query += ' WHERE p.archived = 0';
@@ -21,54 +22,57 @@ const getPatients = (req, res) => {
     
     query += ' ORDER BY p.created_at DESC';
     
-    const stmt = db.prepare(query);
-    const patients = stmt.all(...params);
+    const result = await client.query(query, params);
+    const patients = result.rows;
     res.json(patients);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'خطأ في الخادم' });
+  } finally {
+    client.release();
   }
 };
 
-const getPatientById = (req, res) => {
+const getPatientById = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { id } = req.params;
     
-    const stmt = db.prepare(`
+    const patientResult = await client.query(`
       SELECT p.*, u.full_name, u.email, u.phone, u.username
       FROM patients p
       LEFT JOIN users u ON p.user_id = u.id
-      WHERE p.id = ?
-    `);
+      WHERE p.id = $1
+    `, [id]);
     
-    const patient = stmt.get(id);
+    const patient = patientResult.rows[0];
     
     if (!patient) {
       return res.status(404).json({ error: 'المريض غير موجود' });
     }
 
-    const appointmentsStmt = db.prepare(`
+    const appointmentsResult = await client.query(`
       SELECT a.*, u.full_name as doctor_name
       FROM appointments a
       JOIN users u ON a.doctor_id = u.id
-      WHERE a.patient_id = ?
+      WHERE a.patient_id = $1
       ORDER BY a.appointment_date DESC
-    `);
-    const appointments = appointmentsStmt.all(id);
+    `, [id]);
+    const appointments = appointmentsResult.rows;
 
-    const treatmentsStmt = db.prepare(`
+    const treatmentsResult = await client.query(`
       SELECT t.*, u.full_name as doctor_name
       FROM treatments t
       JOIN users u ON t.doctor_id = u.id
-      WHERE t.patient_id = ?
+      WHERE t.patient_id = $1
       ORDER BY t.treatment_date DESC
-    `);
-    const treatments = treatmentsStmt.all(id);
+    `, [id]);
+    const treatments = treatmentsResult.rows;
 
-    const paymentsStmt = db.prepare(`
-      SELECT * FROM payments WHERE patient_id = ? ORDER BY payment_date DESC
-    `);
-    const payments = paymentsStmt.all(id);
+    const paymentsResult = await client.query(`
+      SELECT * FROM payments WHERE patient_id = $1 ORDER BY payment_date DESC
+    `, [id]);
+    const payments = paymentsResult.rows;
 
     res.json({
       ...patient,
@@ -79,59 +83,71 @@ const getPatientById = (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'خطأ في الخادم' });
+  } finally {
+    client.release();
   }
 };
 
-const updatePatient = (req, res) => {
+const updatePatient = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { id } = req.params;
     const { national_id, date_of_birth, address, medical_history, allergies, insurance_info } = req.body;
 
     const updates = [];
     const params = [];
+    let paramCount = 1;
 
     if (national_id) {
-      updates.push('national_id = ?');
+      updates.push(`national_id = $${paramCount}`);
       params.push(national_id);
+      paramCount++;
     }
     if (date_of_birth) {
-      updates.push('date_of_birth = ?');
+      updates.push(`date_of_birth = $${paramCount}`);
       params.push(date_of_birth);
+      paramCount++;
     }
     if (address !== undefined) {
-      updates.push('address = ?');
+      updates.push(`address = $${paramCount}`);
       params.push(address);
+      paramCount++;
     }
     if (medical_history !== undefined) {
-      updates.push('medical_history = ?');
+      updates.push(`medical_history = $${paramCount}`);
       params.push(medical_history);
+      paramCount++;
     }
     if (allergies !== undefined) {
-      updates.push('allergies = ?');
+      updates.push(`allergies = $${paramCount}`);
       params.push(allergies);
+      paramCount++;
     }
     if (insurance_info !== undefined) {
-      updates.push('insurance_info = ?');
+      updates.push(`insurance_info = $${paramCount}`);
       params.push(insurance_info);
+      paramCount++;
     }
 
     updates.push('updated_at = CURRENT_TIMESTAMP');
     params.push(id);
 
-    const stmt = db.prepare(`
-      UPDATE patients SET ${updates.join(', ')} WHERE id = ?
-    `);
-
-    stmt.run(...params);
+    await client.query(
+      `UPDATE patients SET ${updates.join(', ')} WHERE id = $${paramCount}`,
+      params
+    );
 
     res.json({ message: 'تم تحديث بيانات المريض بنجاح' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'خطأ في الخادم' });
+  } finally {
+    client.release();
   }
 };
 
-const createPatient = (req, res) => {
+const createPatient = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { full_name, phone, email, national_id, date_of_birth, address, medical_history, allergies, insurance_info } = req.body;
 
@@ -139,75 +155,81 @@ const createPatient = (req, res) => {
       return res.status(400).json({ error: 'الاسم ورقم الهاتف مطلوبان' });
     }
 
-    const userStmt = db.prepare(`
-      INSERT INTO users (username, password, full_name, role, email, phone)
-      VALUES (?, ?, ?, 'patient', ?, ?)
-    `);
-    
     const username = 'patient_' + Date.now();
     const defaultPassword = require('bcryptjs').hashSync('password', 10);
     
-    const userResult = userStmt.run(username, defaultPassword, full_name, email, phone);
-    const userId = userResult.lastInsertRowid;
+    const userResult = await client.query(
+      `INSERT INTO users (username, password, full_name, role, email, phone)
+       VALUES ($1, $2, $3, 'patient', $4, $5)
+       RETURNING id`,
+      [username, defaultPassword, full_name, email, phone]
+    );
+    const userId = userResult.rows[0].id;
 
-    const patientStmt = db.prepare(`
-      INSERT INTO patients (user_id, national_id, date_of_birth, address, medical_history, allergies, insurance_info)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    const patientResult = patientStmt.run(
-      userId,
-      national_id || null,
-      date_of_birth || null,
-      address || null,
-      medical_history || null,
-      allergies || null,
-      insurance_info || null
+    const patientResult = await client.query(
+      `INSERT INTO patients (user_id, national_id, date_of_birth, address, medical_history, allergies, insurance_info)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING id`,
+      [
+        userId,
+        national_id || null,
+        date_of_birth || null,
+        address || null,
+        medical_history || null,
+        allergies || null,
+        insurance_info || null
+      ]
     );
 
     res.status(201).json({ 
       message: 'تم إضافة المريض بنجاح',
-      patientId: patientResult.lastInsertRowid,
+      patientId: patientResult.rows[0].id,
       userId: userId
     });
   } catch (error) {
     console.error(error);
-    if (error.message.includes('UNIQUE constraint failed')) {
+    if (error.message.includes('duplicate key') || error.code === '23505') {
       return res.status(400).json({ error: 'الرقم الوطني موجود بالفعل' });
     }
     res.status(500).json({ error: 'خطأ في الخادم' });
+  } finally {
+    client.release();
   }
 };
 
-const deletePatient = (req, res) => {
+const deletePatient = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { id } = req.params;
 
-    const stmt = db.prepare('DELETE FROM patients WHERE id = ?');
-    stmt.run(id);
+    await client.query('DELETE FROM patients WHERE id = $1', [id]);
 
     res.json({ message: 'تم حذف المريض بنجاح' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'خطأ في الخادم' });
+  } finally {
+    client.release();
   }
 };
 
-const archivePatient = (req, res) => {
+const archivePatient = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { id } = req.params;
     const { archived } = req.body;
 
-    const stmt = db.prepare(`
-      UPDATE patients SET archived = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
-    `);
-
-    stmt.run(archived ? 1 : 0, id);
+    await client.query(
+      `UPDATE patients SET archived = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2`,
+      [archived ? 1 : 0, id]
+    );
 
     res.json({ message: archived ? 'تم أرشفة المريض بنجاح' : 'تم إلغاء أرشفة المريض بنجاح' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'خطأ في الخادم' });
+  } finally {
+    client.release();
   }
 };
 

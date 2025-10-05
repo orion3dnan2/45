@@ -1,6 +1,7 @@
-const db = require('../models/database');
+const pool = require('../models/database');
 
-const createTreatment = (req, res) => {
+const createTreatment = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { patient_id, doctor_id, appointment_id, treatment_date, diagnosis, procedure_done, tooth_number, cost, notes, medications } = req.body;
 
@@ -8,48 +9,52 @@ const createTreatment = (req, res) => {
       return res.status(400).json({ error: 'جميع الحقول المطلوبة يجب ملؤها' });
     }
 
-    const stmt = db.prepare(`
-      INSERT INTO treatments (patient_id, doctor_id, appointment_id, treatment_date, diagnosis, procedure_done, tooth_number, cost, notes)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
+    const result = await client.query(
+      `INSERT INTO treatments (patient_id, doctor_id, appointment_id, treatment_date, diagnosis, procedure_done, tooth_number, cost, notes)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       RETURNING id`,
+      [patient_id, doctor_id, appointment_id, treatment_date, diagnosis, procedure_done, tooth_number, cost, notes]
+    );
 
-    const result = stmt.run(patient_id, doctor_id, appointment_id, treatment_date, diagnosis, procedure_done, tooth_number, cost, notes);
+    const treatmentId = result.rows[0].id;
 
     if (medications && medications.length > 0) {
-      const usageStmt = db.prepare(`
-        INSERT INTO medication_usage (treatment_id, medication_id, quantity_used, usage_date)
-        VALUES (?, ?, ?, ?)
-      `);
-
-      const updateStockStmt = db.prepare(`
-        UPDATE medications SET quantity_in_stock = quantity_in_stock - ? WHERE id = ?
-      `);
-
       for (const med of medications) {
-        usageStmt.run(result.lastInsertRowid, med.medication_id, med.quantity_used, treatment_date);
-        updateStockStmt.run(med.quantity_used, med.medication_id);
+        await client.query(
+          `INSERT INTO medication_usage (treatment_id, medication_id, quantity_used, usage_date)
+           VALUES ($1, $2, $3, $4)`,
+          [treatmentId, med.medication_id, med.quantity_used, treatment_date]
+        );
 
-        const checkStockStmt = db.prepare('SELECT * FROM medications WHERE id = ?');
-        const medication = checkStockStmt.get(med.medication_id);
+        await client.query(
+          `UPDATE medications SET quantity_in_stock = quantity_in_stock - $1 WHERE id = $2`,
+          [med.quantity_used, med.medication_id]
+        );
+
+        const medResult = await client.query('SELECT * FROM medications WHERE id = $1', [med.medication_id]);
+        const medication = medResult.rows[0];
 
         if (medication && medication.quantity_in_stock <= medication.minimum_quantity) {
-          const notifStmt = db.prepare(`
-            INSERT INTO notifications (type, title, message, related_id)
-            VALUES ('low_stock', 'نفاذ كمية دواء', ?, ?)
-          `);
-          notifStmt.run(`الدواء ${medication.name} أوشك على النفاذ. الكمية المتبقية: ${medication.quantity_in_stock}`, medication.id);
+          await client.query(
+            `INSERT INTO notifications (type, title, message, related_id)
+             VALUES ('low_stock', 'نفاذ كمية دواء', $1, $2)`,
+            [`الدواء ${medication.name} أوشك على النفاذ. الكمية المتبقية: ${medication.quantity_in_stock}`, medication.id]
+          );
         }
       }
     }
 
-    res.status(201).json({ message: 'تم إضافة العلاج بنجاح', treatmentId: result.lastInsertRowid });
+    res.status(201).json({ message: 'تم إضافة العلاج بنجاح', treatmentId });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'خطأ في الخادم' });
+  } finally {
+    client.release();
   }
 };
 
-const getTreatments = (req, res) => {
+const getTreatments = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { patient_id, doctor_id, status } = req.query;
     
@@ -66,80 +71,95 @@ const getTreatments = (req, res) => {
     `;
     
     const params = [];
+    let paramCount = 1;
     
     if (patient_id) {
-      query += ' AND t.patient_id = ?';
+      query += ` AND t.patient_id = $${paramCount}`;
       params.push(patient_id);
+      paramCount++;
     }
     
     if (doctor_id) {
-      query += ' AND t.doctor_id = ?';
+      query += ` AND t.doctor_id = $${paramCount}`;
       params.push(doctor_id);
+      paramCount++;
     }
     
     if (status) {
-      query += ' AND t.status = ?';
+      query += ` AND t.status = $${paramCount}`;
       params.push(status);
+      paramCount++;
     }
     
     query += ' ORDER BY t.treatment_date DESC';
     
-    const stmt = db.prepare(query);
-    const treatments = stmt.all(...params);
+    const result = await client.query(query, params);
+    const treatments = result.rows;
     
     res.json(treatments);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'خطأ في الخادم' });
+  } finally {
+    client.release();
   }
 };
 
-const updateTreatment = (req, res) => {
+const updateTreatment = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { id } = req.params;
     const { status, diagnosis, procedure_done, tooth_number, cost, notes } = req.body;
 
     const updates = [];
     const params = [];
+    let paramCount = 1;
 
     if (status) {
-      updates.push('status = ?');
+      updates.push(`status = $${paramCount}`);
       params.push(status);
+      paramCount++;
     }
     if (diagnosis !== undefined) {
-      updates.push('diagnosis = ?');
+      updates.push(`diagnosis = $${paramCount}`);
       params.push(diagnosis);
+      paramCount++;
     }
     if (procedure_done !== undefined) {
-      updates.push('procedure_done = ?');
+      updates.push(`procedure_done = $${paramCount}`);
       params.push(procedure_done);
+      paramCount++;
     }
     if (tooth_number !== undefined) {
-      updates.push('tooth_number = ?');
+      updates.push(`tooth_number = $${paramCount}`);
       params.push(tooth_number);
+      paramCount++;
     }
     if (cost !== undefined) {
-      updates.push('cost = ?');
+      updates.push(`cost = $${paramCount}`);
       params.push(cost);
+      paramCount++;
     }
     if (notes !== undefined) {
-      updates.push('notes = ?');
+      updates.push(`notes = $${paramCount}`);
       params.push(notes);
+      paramCount++;
     }
 
     updates.push('updated_at = CURRENT_TIMESTAMP');
     params.push(id);
 
-    const stmt = db.prepare(`
-      UPDATE treatments SET ${updates.join(', ')} WHERE id = ?
-    `);
-
-    stmt.run(...params);
+    await client.query(
+      `UPDATE treatments SET ${updates.join(', ')} WHERE id = $${paramCount}`,
+      params
+    );
 
     res.json({ message: 'تم تحديث العلاج بنجاح' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'خطأ في الخادم' });
+  } finally {
+    client.release();
   }
 };
 

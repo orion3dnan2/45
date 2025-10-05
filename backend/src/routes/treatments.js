@@ -6,16 +6,18 @@ const { authMiddleware, checkRole } = require('../middleware/auth');
 router.post('/', authMiddleware, checkRole('doctor', 'warehouse_manager'), createTreatment);
 router.get('/', authMiddleware, getTreatments);
 router.put('/:id', authMiddleware, checkRole('doctor', 'warehouse_manager'), updateTreatment);
-router.delete('/:id', authMiddleware, checkRole('doctor', 'warehouse_manager', 'admin'), (req, res) => {
+router.delete('/:id', authMiddleware, checkRole('doctor', 'warehouse_manager', 'admin'), async (req, res) => {
+  const pool = require('../models/database');
+  const client = await pool.connect();
   try {
     const { id } = req.params;
-    const db = require('../models/database');
-    const stmt = db.prepare('DELETE FROM treatments WHERE id = ?');
-    stmt.run(id);
+    await client.query('DELETE FROM treatments WHERE id = $1', [id]);
     res.json({ message: 'تم حذف العلاج بنجاح' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'خطأ في الخادم' });
+  } finally {
+    client.release();
   }
 });
 

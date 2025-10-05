@@ -1,6 +1,7 @@
-const db = require('../models/database');
+const pool = require('../models/database');
 
-const getMedications = (req, res) => {
+const getMedications = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { low_stock } = req.query;
     
@@ -13,17 +14,20 @@ const getMedications = (req, res) => {
     
     query += ' ORDER BY name ASC';
     
-    const stmt = db.prepare(query);
-    const medications = stmt.all(...params);
+    const result = await client.query(query, params);
+    const medications = result.rows;
     
     res.json(medications);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'خطأ في الخادم' });
+  } finally {
+    client.release();
   }
 };
 
-const createMedication = (req, res) => {
+const createMedication = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { name, description, unit, quantity_in_stock, minimum_quantity, unit_price, expiry_date, category } = req.body;
 
@@ -55,39 +59,46 @@ const createMedication = (req, res) => {
       return res.status(400).json({ error: 'السعر لا يمكن أن يكون سالباً' });
     }
 
-    const stmt = db.prepare(`
-      INSERT INTO medications (name, description, unit, quantity_in_stock, minimum_quantity, unit_price, expiry_date, category)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `);
+    const result = await client.query(
+      `INSERT INTO medications (name, description, unit, quantity_in_stock, minimum_quantity, unit_price, expiry_date, category)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING id`,
+      [name, description, unit, qty, minQty, price, expiry_date, category]
+    );
 
-    const result = stmt.run(name, description, unit, qty, minQty, price, expiry_date, category);
-
-    res.status(201).json({ message: 'تم إضافة الدواء بنجاح', medicationId: result.lastInsertRowid });
+    res.status(201).json({ message: 'تم إضافة الدواء بنجاح', medicationId: result.rows[0].id });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'خطأ في الخادم' });
+  } finally {
+    client.release();
   }
 };
 
-const updateMedication = (req, res) => {
+const updateMedication = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { id } = req.params;
     const { name, description, unit, quantity_in_stock, minimum_quantity, unit_price, expiry_date, category } = req.body;
 
     const updates = [];
     const params = [];
+    let paramCount = 1;
 
     if (name) {
-      updates.push('name = ?');
+      updates.push(`name = $${paramCount}`);
       params.push(name);
+      paramCount++;
     }
     if (description !== undefined) {
-      updates.push('description = ?');
+      updates.push(`description = $${paramCount}`);
       params.push(description);
+      paramCount++;
     }
     if (unit) {
-      updates.push('unit = ?');
+      updates.push(`unit = $${paramCount}`);
       params.push(unit);
+      paramCount++;
     }
     if (quantity_in_stock !== undefined) {
       const qty = parseInt(quantity_in_stock);
@@ -97,8 +108,9 @@ const updateMedication = (req, res) => {
       if (qty < 0) {
         return res.status(400).json({ error: 'الكمية لا يمكن أن تكون سالبة' });
       }
-      updates.push('quantity_in_stock = ?');
+      updates.push(`quantity_in_stock = $${paramCount}`);
       params.push(qty);
+      paramCount++;
     }
     if (minimum_quantity !== undefined) {
       const minQty = parseInt(minimum_quantity);
@@ -108,8 +120,9 @@ const updateMedication = (req, res) => {
       if (minQty < 0) {
         return res.status(400).json({ error: 'الحد الأدنى لا يمكن أن يكون سالباً' });
       }
-      updates.push('minimum_quantity = ?');
+      updates.push(`minimum_quantity = $${paramCount}`);
       params.push(minQty);
+      paramCount++;
     }
     if (unit_price !== undefined) {
       const price = unit_price ? parseFloat(unit_price) : null;
@@ -119,37 +132,39 @@ const updateMedication = (req, res) => {
       if (price !== null && price < 0) {
         return res.status(400).json({ error: 'السعر لا يمكن أن يكون سالباً' });
       }
-      updates.push('unit_price = ?');
+      updates.push(`unit_price = $${paramCount}`);
       params.push(price);
+      paramCount++;
     }
     if (expiry_date !== undefined) {
-      updates.push('expiry_date = ?');
+      updates.push(`expiry_date = $${paramCount}`);
       params.push(expiry_date);
+      paramCount++;
     }
     if (category !== undefined) {
-      updates.push('category = ?');
+      updates.push(`category = $${paramCount}`);
       params.push(category);
+      paramCount++;
     }
 
     updates.push('updated_at = CURRENT_TIMESTAMP');
     params.push(id);
 
-    const stmt = db.prepare(`
-      UPDATE medications SET ${updates.join(', ')} WHERE id = ?
-    `);
-
-    const result = stmt.run(...params);
+    await client.query(
+      `UPDATE medications SET ${updates.join(', ')} WHERE id = $${paramCount}`,
+      params
+    );
 
     if (quantity_in_stock !== undefined) {
-      const checkStmt = db.prepare('SELECT * FROM medications WHERE id = ?');
-      const medication = checkStmt.get(id);
+      const medResult = await client.query('SELECT * FROM medications WHERE id = $1', [id]);
+      const medication = medResult.rows[0];
 
       if (medication && medication.quantity_in_stock <= medication.minimum_quantity) {
-        const notifStmt = db.prepare(`
-          INSERT INTO notifications (type, title, message, related_id)
-          VALUES ('low_stock', 'نفاذ كمية دواء', ?, ?)
-        `);
-        notifStmt.run(`الدواء ${medication.name} أوشك على النفاذ. الكمية المتبقية: ${medication.quantity_in_stock}`, medication.id);
+        await client.query(
+          `INSERT INTO notifications (type, title, message, related_id)
+           VALUES ('low_stock', 'نفاذ كمية دواء', $1, $2)`,
+          [`الدواء ${medication.name} أوشك على النفاذ. الكمية المتبقية: ${medication.quantity_in_stock}`, medication.id]
+        );
       }
     }
 
@@ -157,20 +172,24 @@ const updateMedication = (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'خطأ في الخادم' });
+  } finally {
+    client.release();
   }
 };
 
-const deleteMedication = (req, res) => {
+const deleteMedication = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { id } = req.params;
 
-    const stmt = db.prepare('DELETE FROM medications WHERE id = ?');
-    stmt.run(id);
+    await client.query('DELETE FROM medications WHERE id = $1', [id]);
 
     res.json({ message: 'تم حذف الدواء بنجاح' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'خطأ في الخادم' });
+  } finally {
+    client.release();
   }
 };
 
