@@ -9,7 +9,7 @@ db.exec(`
     username TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
     full_name TEXT NOT NULL,
-    role TEXT NOT NULL CHECK(role IN ('doctor', 'reception', 'admin', 'accountant', 'patient')),
+    role TEXT NOT NULL CHECK(role IN ('doctor', 'reception', 'admin', 'accountant', 'patient', 'warehouse_manager')),
     email TEXT,
     phone TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

@@ -8,6 +8,7 @@ const users = [
   { username: 'reception', password: 'password', full_name: 'فاطمة علي', role: 'reception', email: 'reception@clinic.com', phone: '0501234568' },
   { username: 'admin', password: 'password', full_name: 'محمد حسن', role: 'admin', email: 'admin@clinic.com', phone: '0501234569' },
   { username: 'accountant', password: 'password', full_name: 'سارة خالد', role: 'accountant', email: 'accountant@clinic.com', phone: '0501234570' },
+  { username: 'warehouse', password: 'password', full_name: 'يوسف المخزني', role: 'warehouse_manager', email: 'warehouse@clinic.com', phone: '0501234573' },
   { username: 'patient1', password: 'password', full_name: 'عمر عبدالله', role: 'patient', email: 'patient1@test.com', phone: '0501234571' },
   { username: 'patient2', password: 'password', full_name: 'نورة إبراهيم', role: 'patient', email: 'patient2@test.com', phone: '0501234572' }
 ];
@@ -178,4 +179,5 @@ console.log('- طبيب: doctor / password');
 console.log('- استقبال: reception / password');
 console.log('- إداري: admin / password');
 console.log('- محاسب: accountant / password');
+console.log('- مسؤول مخزن: warehouse / password');
 console.log('- مريض: patient1 / password');
