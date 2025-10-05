@@ -2,14 +2,27 @@ const db = require('../models/database');
 
 const getPatients = (req, res) => {
   try {
-    const stmt = db.prepare(`
+    const { archived } = req.query;
+    
+    let query = `
       SELECT p.*, u.full_name, u.email, u.phone, u.username
       FROM patients p
       LEFT JOIN users u ON p.user_id = u.id
-      ORDER BY p.created_at DESC
-    `);
+    `;
     
-    const patients = stmt.all();
+    const params = [];
+    
+    if (archived !== undefined) {
+      query += ' WHERE p.archived = ?';
+      params.push(archived === 'true' ? 1 : 0);
+    } else {
+      query += ' WHERE p.archived = 0';
+    }
+    
+    query += ' ORDER BY p.created_at DESC';
+    
+    const stmt = db.prepare(query);
+    const patients = stmt.all(...params);
     res.json(patients);
   } catch (error) {
     console.error(error);
@@ -166,4 +179,36 @@ const createPatient = (req, res) => {
   }
 };
 
-module.exports = { getPatients, getPatientById, updatePatient, createPatient };
+const deletePatient = (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const stmt = db.prepare('DELETE FROM patients WHERE id = ?');
+    stmt.run(id);
+
+    res.json({ message: 'تم حذف المريض بنجاح' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'خطأ في الخادم' });
+  }
+};
+
+const archivePatient = (req, res) => {
+  try {
+    const { id } = req.params;
+    const { archived } = req.body;
+
+    const stmt = db.prepare(`
+      UPDATE patients SET archived = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+    `);
+
+    stmt.run(archived ? 1 : 0, id);
+
+    res.json({ message: archived ? 'تم أرشفة المريض بنجاح' : 'تم إلغاء أرشفة المريض بنجاح' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'خطأ في الخادم' });
+  }
+};
+
+module.exports = { getPatients, getPatientById, updatePatient, createPatient, deletePatient, archivePatient };

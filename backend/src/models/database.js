@@ -25,6 +25,7 @@ db.exec(`
     medical_history TEXT,
     allergies TEXT,
     insurance_info TEXT,
+    archived INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)

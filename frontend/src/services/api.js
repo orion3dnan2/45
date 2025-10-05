@@ -56,6 +56,23 @@ export const api = {
     return response.json();
   },
 
+  async deletePatient(id) {
+    const response = await fetch(`${API_URL}/patients/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeader()
+    });
+    return response.json();
+  },
+
+  async archivePatient(id, archived) {
+    const response = await fetch(`${API_URL}/patients/${id}/archive`, {
+      method: 'PUT',
+      headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ archived })
+    });
+    return response.json();
+  },
+
   async getAppointments(params = {}) {
     const queryString = new URLSearchParams(params).toString();
     const response = await fetch(`${API_URL}/appointments?${queryString}`, {

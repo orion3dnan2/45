@@ -11,6 +11,7 @@ const Patients = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [activeTab, setActiveTab] = useState('info');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showArchived, setShowArchived] = useState(false);
   const [formData, setFormData] = useState({
     full_name: '',
     phone: '',
@@ -25,11 +26,20 @@ const Patients = () => {
 
   useEffect(() => {
     loadPatients();
-  }, []);
+  }, [showArchived]);
 
   const loadPatients = async () => {
     try {
-      const data = await api.getPatients();
+      const params = {};
+      if (showArchived) {
+        params.archived = 'true';
+      }
+      const response = await fetch(`/api/patients?${new URLSearchParams(params)}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await response.json();
       setPatients(data);
     } catch (error) {
       console.error('خطأ في تحميل المرضى:', error);
@@ -111,7 +121,44 @@ const Patients = () => {
     });
   };
 
+  const handleArchivePatient = async () => {
+    if (!window.confirm(selectedPatient.archived ? 'هل تريد إلغاء أرشفة هذا المريض؟' : 'هل تريد أرشفة هذا المريض؟')) {
+      return;
+    }
+    
+    try {
+      await api.archivePatient(selectedPatient.id, !selectedPatient.archived);
+      setSelectedPatient(null);
+      loadPatients();
+      alert(selectedPatient.archived ? 'تم إلغاء أرشفة المريض بنجاح' : 'تم أرشفة المريض بنجاح');
+    } catch (error) {
+      console.error('خطأ في أرشفة المريض:', error);
+      alert('فشل في تنفيذ العملية');
+    }
+  };
+
+  const handleDeletePatient = async () => {
+    if (!window.confirm('⚠️ تحذير: هل أنت متأكد من حذف هذا المريض؟\n\nسيتم حذف جميع بيانات المريض بما في ذلك المواعيد والعلاجات والمدفوعات بشكل نهائي ولا يمكن استرجاعها.')) {
+      return;
+    }
+
+    if (!window.confirm('تأكيد نهائي: هذا الإجراء لا يمكن التراجع عنه!')) {
+      return;
+    }
+    
+    try {
+      await api.deletePatient(selectedPatient.id);
+      setSelectedPatient(null);
+      loadPatients();
+      alert('تم حذف المريض بنجاح');
+    } catch (error) {
+      console.error('خطأ في حذف المريض:', error);
+      alert('فشل في حذف المريض');
+    }
+  };
+
   const canAddOrEdit = user.role === 'doctor' || user.role === 'reception' || user.role === 'admin';
+  const canDelete = user.role === 'admin';
 
   const filteredPatients = patients.filter(patient => {
     if (!searchTerm) return true;
@@ -129,11 +176,19 @@ const Patients = () => {
     <div>
       <div style={styles.header}>
         <h1 style={styles.title}>إدارة المرضى</h1>
-        {canAddOrEdit && (
-          <button onClick={() => { resetForm(); setShowAddModal(true); }} style={styles.addButton}>
-            ➕ إضافة مريض جديد
+        <div style={styles.headerActions}>
+          <button 
+            onClick={() => setShowArchived(!showArchived)} 
+            style={showArchived ? styles.archiveActiveButton : styles.archiveButton}
+          >
+            {showArchived ? '👥 عرض المرضى النشطين' : '📦 عرض الأرشيف'}
           </button>
-        )}
+          {canAddOrEdit && (
+            <button onClick={() => { resetForm(); setShowAddModal(true); }} style={styles.addButton}>
+              ➕ إضافة مريض جديد
+            </button>
+          )}
+        </div>
       </div>
       
       <div style={styles.container}>
@@ -174,8 +229,22 @@ const Patients = () => {
               <h2 style={styles.sectionTitle}>ملف المريض: {selectedPatient.full_name}</h2>
               <div style={styles.headerActions}>
                 {canAddOrEdit && (
-                  <button onClick={openEditModal} style={styles.editButton}>
-                    ✏️ تعديل
+                  <>
+                    <button onClick={openEditModal} style={styles.editButton}>
+                      ✏️ تعديل
+                    </button>
+                    <button 
+                      onClick={handleArchivePatient} 
+                      style={selectedPatient.archived ? styles.unarchiveButton : styles.archivePatientButton}
+                      title={selectedPatient.archived ? 'إلغاء الأرشفة' : 'أرشفة المريض'}
+                    >
+                      {selectedPatient.archived ? '📤 إلغاء الأرشفة' : '📦 أرشفة'}
+                    </button>
+                  </>
+                )}
+                {canDelete && (
+                  <button onClick={handleDeletePatient} style={styles.deleteButton}>
+                    🗑️ حذف
                   </button>
                 )}
                 <button onClick={() => setSelectedPatient(null)} style={styles.closeBtn}>✕</button>
@@ -606,6 +675,11 @@ const styles = {
     fontWeight: '700',
     margin: 0
   },
+  headerActions: {
+    display: 'flex',
+    gap: '10px',
+    flexWrap: 'wrap'
+  },
   addButton: {
     padding: '12px 24px',
     background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
@@ -616,6 +690,29 @@ const styles = {
     fontSize: '15px',
     fontWeight: '700',
     boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)',
+    transition: 'all 0.3s'
+  },
+  archiveButton: {
+    padding: '12px 24px',
+    background: 'white',
+    color: '#64748B',
+    border: '2px solid #E2E8F0',
+    borderRadius: '10px',
+    cursor: 'pointer',
+    fontSize: '15px',
+    fontWeight: '700',
+    transition: 'all 0.3s'
+  },
+  archiveActiveButton: {
+    padding: '12px 24px',
+    background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '10px',
+    cursor: 'pointer',
+    fontSize: '15px',
+    fontWeight: '700',
+    boxShadow: '0 4px 15px rgba(245, 158, 11, 0.3)',
     transition: 'all 0.3s'
   },
   loading: {
@@ -711,11 +808,18 @@ const styles = {
     paddingBottom: '15px',
     borderBottom: '2px solid #F1F5F9'
   },
-  headerActions: {
-    display: 'flex',
-    gap: '10px'
-  },
   editButton: {
+    padding: '10px 20px',
+    background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '600',
+    boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)'
+  },
+  archivePatientButton: {
     padding: '10px 20px',
     background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
     color: 'white',
@@ -726,8 +830,30 @@ const styles = {
     fontWeight: '600',
     boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)'
   },
+  unarchiveButton: {
+    padding: '10px 20px',
+    background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '600',
+    boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)'
+  },
+  deleteButton: {
+    padding: '10px 20px',
+    background: 'linear-gradient(135deg, #DC2626 0%, #991B1B 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '600',
+    boxShadow: '0 2px 8px rgba(220, 38, 38, 0.3)'
+  },
   closeBtn: {
-    background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
+    background: '#64748B',
     color: 'white',
     border: 'none',
     padding: '10px 16px',
@@ -735,7 +861,7 @@ const styles = {
     cursor: 'pointer',
     fontSize: '16px',
     fontWeight: '700',
-    boxShadow: '0 2px 8px rgba(239, 68, 68, 0.3)'
+    boxShadow: '0 2px 8px rgba(100, 116, 139, 0.3)'
   },
   tabs: {
     display: 'flex',
