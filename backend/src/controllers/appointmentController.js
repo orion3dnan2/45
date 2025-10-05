@@ -42,6 +42,7 @@ const getAppointments = (req, res) => {
     let query = `
       SELECT a.*, 
              u.full_name as doctor_name,
+             u.phone as doctor_phone,
              p.id as patient_id,
              pu.full_name as patient_name,
              pu.phone as patient_phone
