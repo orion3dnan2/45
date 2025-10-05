@@ -4,9 +4,9 @@
   "main": "index.js",
   "scripts": {
     "backend": "node backend/server.js",
-    "frontend": "vite",
+    "frontend": "npx vite",
     "seed": "node backend/seed.js",
-    "dev": "node backend/server.js & vite"
+    "dev": "node backend/server.js & npx vite"
   },
   "keywords": [],
   "author": "",
