@@ -239,9 +239,9 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
   const canAddOrEdit = user.role === 'doctor' || user.role === 'reception';
 
   return (
-    <div>
+    <div style={styles.container}>
       <div style={styles.header}>
-        <h1 style={styles.title}>إدارة المواعيد</h1>
+        <h1 style={styles.title}>📅 إدارة المواعيد</h1>
         {canAddOrEdit && (
           <button onClick={openAddModal} style={styles.addButton}>
             ➕ إضافة موعد جديد
@@ -264,82 +264,118 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
         </button>
       </div>
 
-      <div style={styles.appointmentsList}>
-        {appointments.map(appointment => (
-          <div key={appointment.id} style={styles.appointmentCard}>
-            <div style={styles.appointmentHeader}>
-              <h3 style={styles.appointmentTitle}>
-                📅 {new Date(appointment.appointment_date).toLocaleString('ar-EG')}
-              </h3>
-              <span style={getStatusStyle(appointment.status)}>{getStatusLabel(appointment.status)}</span>
-            </div>
-            
-            <div style={styles.appointmentBody}>
-              <p><strong>المريض:</strong> {appointment.patient_name || 'غير محدد'}</p>
-              <p><strong>الطبيب:</strong> {appointment.doctor_name}</p>
-              <p><strong>الهاتف:</strong> {appointment.patient_phone || 'لا يوجد'}</p>
-              <p><strong>المدة:</strong> {appointment.duration} دقيقة</p>
-              {appointment.notes && <p><strong>ملاحظات:</strong> {appointment.notes}</p>}
-            </div>
-
-            <div style={styles.actionsContainer}>
-              {(user.role === 'doctor' || user.role === 'reception' || user.role === 'admin') && (
-                <div style={styles.appointmentActions}>
-                  {canAddOrEdit && appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
-                    <button onClick={() => openEditModal(appointment)} style={styles.editBtn}>
-                      ✏️ تعديل
-                    </button>
-                  )}
-                  {appointment.status === 'scheduled' && (
-                    <button onClick={() => updateStatus(appointment.id, 'confirmed')} style={styles.confirmBtn}>
-                      ✓ تأكيد
-                    </button>
-                  )}
-                  {appointment.status === 'confirmed' && (
-                    <button onClick={() => updateStatus(appointment.id, 'in_progress')} style={styles.startBtn}>
-                      ▶ بدء
-                    </button>
-                  )}
-                  {appointment.status === 'in_progress' && (
-                    <button onClick={() => updateStatus(appointment.id, 'completed')} style={styles.completeBtn}>
-                      ✓ إنهاء
-                    </button>
-                  )}
-                  {appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
-                    <button onClick={() => updateStatus(appointment.id, 'cancelled')} style={styles.cancelBtn}>
-                      ✕ إلغاء
-                    </button>
-                  )}
-                </div>
-              )}
-              
-              {(user.role === 'reception' || user.role === 'admin') && appointment.status !== 'cancelled' && (
-                <div style={styles.whatsappButtons}>
-                  <button 
-                    onClick={() => sendWhatsAppToDoctor(appointment)} 
-                    style={styles.whatsappDoctorBtn}
-                    title="إرسال تفاصيل الموعد للطبيب عبر واتساب"
-                  >
-                    <span style={styles.whatsappIcon}>👨‍⚕️</span>
-                    <span>إرسال للطبيب</span>
-                  </button>
-                  <button 
-                    onClick={() => sendWhatsAppToPatient(appointment)} 
-                    style={styles.whatsappPatientBtn}
-                    title="إرسال تذكير للمريض عبر واتساب"
-                  >
-                    <span style={styles.whatsappIcon}>🧑‍🦱</span>
-                    <span>إرسال للمريض</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
+      <div style={styles.tableContainer}>
+        <table style={styles.table}>
+          <thead>
+            <tr style={styles.tableHeaderRow}>
+              <th style={styles.th}>التاريخ والوقت</th>
+              <th style={styles.th}>اسم المريض</th>
+              <th style={styles.th}>الطبيب</th>
+              <th style={styles.th}>رقم الهاتف</th>
+              <th style={styles.th}>المدة</th>
+              <th style={styles.th}>الحالة</th>
+              <th style={styles.th}>الملاحظات</th>
+              <th style={styles.th}>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            {appointments.map((appointment, index) => (
+              <tr key={appointment.id} style={index % 2 === 0 ? styles.tableRowEven : styles.tableRowOdd}>
+                <td style={styles.td}>
+                  <div style={styles.dateCell}>
+                    <span style={styles.dateIcon}>🗓️</span>
+                    <div>
+                      <div style={styles.dateText}>
+                        {new Date(appointment.appointment_date).toLocaleDateString('ar-SA', {
+                          weekday: 'short',
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </div>
+                      <div style={styles.timeText}>
+                        {new Date(appointment.appointment_date).toLocaleTimeString('ar-SA', {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td style={styles.td}>
+                  <div style={styles.patientCell}>
+                    <span style={styles.patientIcon}>👤</span>
+                    <span style={styles.boldText}>{appointment.patient_name || 'غير محدد'}</span>
+                  </div>
+                </td>
+                <td style={styles.td}>
+                  <div style={styles.doctorCell}>
+                    <span style={styles.doctorIcon}>👨‍⚕️</span>
+                    <span>{appointment.doctor_name}</span>
+                  </div>
+                </td>
+                <td style={styles.td}>
+                  <span style={styles.phoneText}>{appointment.patient_phone || 'لا يوجد'}</span>
+                </td>
+                <td style={styles.td}>
+                  <span style={styles.durationBadge}>{appointment.duration} دقيقة</span>
+                </td>
+                <td style={styles.td}>
+                  <span style={getStatusStyle(appointment.status)}>{getStatusLabel(appointment.status)}</span>
+                </td>
+                <td style={styles.td}>
+                  <span style={styles.notesText}>{appointment.notes || '-'}</span>
+                </td>
+                <td style={styles.td}>
+                  <div style={styles.actionButtons}>
+                    {canAddOrEdit && appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
+                      <button onClick={() => openEditModal(appointment)} style={styles.editBtn} title="تعديل">
+                        ✏️
+                      </button>
+                    )}
+                    {appointment.status === 'scheduled' && (
+                      <button onClick={() => updateStatus(appointment.id, 'confirmed')} style={styles.confirmBtn} title="تأكيد">
+                        ✓
+                      </button>
+                    )}
+                    {appointment.status === 'confirmed' && (
+                      <button onClick={() => updateStatus(appointment.id, 'in_progress')} style={styles.startBtn} title="بدء">
+                        ▶
+                      </button>
+                    )}
+                    {appointment.status === 'in_progress' && (
+                      <button onClick={() => updateStatus(appointment.id, 'completed')} style={styles.completeBtn} title="إنهاء">
+                        ✓
+                      </button>
+                    )}
+                    {appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
+                      <button onClick={() => updateStatus(appointment.id, 'cancelled')} style={styles.cancelBtn} title="إلغاء">
+                        ✕
+                      </button>
+                    )}
+                    {(user.role === 'reception' || user.role === 'admin') && appointment.status !== 'cancelled' && (
+                      <>
+                        <button onClick={() => sendWhatsAppToDoctor(appointment)} style={styles.whatsappBtn} title="إرسال للطبيب">
+                          👨‍⚕️
+                        </button>
+                        <button onClick={() => sendWhatsAppToPatient(appointment)} style={styles.whatsappBtn} title="إرسال للمريض">
+                          🧑
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {appointments.length === 0 && (
-        <div style={styles.empty}>لا توجد مواعيد</div>
+        <div style={styles.empty}>
+          <div style={styles.emptyIcon}>📋</div>
+          <div style={styles.emptyText}>لا توجد مواعيد</div>
+        </div>
       )}
 
       {showAddModal && (
@@ -509,66 +545,93 @@ const getStatusLabel = (status) => {
 };
 
 const getStatusStyle = (status) => {
-  const baseStyle = { ...styles.statusBadge };
-  const colors = {
-    scheduled: { background: '#FFF3CD', color: '#856404' },
-    confirmed: { background: '#D1ECF1', color: '#0C5460' },
-    in_progress: { background: '#CCE5FF', color: '#004085' },
-    completed: { background: '#D4EDDA', color: '#155724' },
-    cancelled: { background: '#F8D7DA', color: '#721C24' }
+  const baseStyle = { 
+    padding: '6px 14px',
+    borderRadius: '20px',
+    fontSize: '12px',
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+    display: 'inline-block',
+    whiteSpace: 'nowrap'
   };
+  
+  const colors = {
+    scheduled: { background: '#FEF3C7', color: '#92400E' },
+    confirmed: { background: '#DBEAFE', color: '#1E40AF' },
+    in_progress: { background: '#E0E7FF', color: '#4338CA' },
+    completed: { background: '#D1FAE5', color: '#065F46' },
+    cancelled: { background: '#FEE2E2', color: '#991B1B' }
+  };
+  
   return { ...baseStyle, ...colors[status] };
 };
 
 const styles = {
+  container: {
+    padding: '20px',
+    maxWidth: '100%',
+    direction: 'rtl'
+  },
   header: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '20px',
+    marginBottom: '30px',
     flexWrap: 'wrap',
     gap: '15px'
   },
   title: {
-    fontSize: '28px',
-    color: '#333',
-    fontWeight: '700',
-    margin: 0
+    fontSize: '32px',
+    color: '#1F2937',
+    fontWeight: '800',
+    margin: 0,
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent'
   },
   addButton: {
-    padding: '12px 24px',
+    padding: '12px 28px',
     background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
     color: 'white',
     border: 'none',
-    borderRadius: '10px',
+    borderRadius: '12px',
     cursor: 'pointer',
     fontSize: '15px',
     fontWeight: '700',
-    boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)',
-    transition: 'all 0.3s'
+    boxShadow: '0 4px 20px rgba(16, 185, 129, 0.4)',
+    transition: 'all 0.3s',
+    ':hover': {
+      transform: 'translateY(-2px)',
+      boxShadow: '0 6px 25px rgba(16, 185, 129, 0.5)'
+    }
   },
   loading: {
     textAlign: 'center',
-    padding: '50px',
-    fontSize: '18px',
-    color: '#666'
+    padding: '80px',
+    fontSize: '20px',
+    color: '#6B7280',
+    fontWeight: '600'
   },
   filters: {
     display: 'flex',
-    gap: '10px',
-    marginBottom: '25px',
-    flexWrap: 'wrap'
+    gap: '12px',
+    marginBottom: '30px',
+    flexWrap: 'wrap',
+    padding: '10px',
+    background: '#F9FAFB',
+    borderRadius: '16px'
   },
   filterBtn: {
     padding: '12px 24px',
     background: 'white',
-    border: '2px solid #E2E8F0',
+    border: '2px solid #E5E7EB',
     borderRadius: '10px',
     cursor: 'pointer',
     fontSize: '15px',
     transition: 'all 0.3s',
     fontWeight: '600',
-    color: '#64748B'
+    color: '#6B7280'
   },
   activeFilter: {
     padding: '12px 24px',
@@ -579,67 +642,121 @@ const styles = {
     cursor: 'pointer',
     fontSize: '15px',
     fontWeight: '700',
-    boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)'
+    boxShadow: '0 4px 20px rgba(102, 126, 234, 0.4)'
   },
-  appointmentsList: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))',
-    gap: '20px'
-  },
-  appointmentCard: {
+  tableContainer: {
     background: 'white',
     borderRadius: '16px',
-    padding: '24px',
-    boxShadow: '0 4px 15px rgba(0,0,0,0.08)',
-    border: '1px solid #E2E8F0',
-    transition: 'all 0.3s'
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+    overflow: 'hidden',
+    border: '1px solid #E5E7EB'
   },
-  appointmentHeader: {
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse',
+    fontSize: '14px'
+  },
+  tableHeaderRow: {
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    color: 'white'
+  },
+  th: {
+    padding: '18px 16px',
+    textAlign: 'right',
+    fontWeight: '700',
+    fontSize: '14px',
+    letterSpacing: '0.5px',
+    whiteSpace: 'nowrap'
+  },
+  tableRowEven: {
+    background: '#FFFFFF',
+    transition: 'all 0.2s',
+    ':hover': {
+      background: '#F9FAFB'
+    }
+  },
+  tableRowOdd: {
+    background: '#F9FAFB',
+    transition: 'all 0.2s',
+    ':hover': {
+      background: '#F3F4F6'
+    }
+  },
+  td: {
+    padding: '16px',
+    borderBottom: '1px solid #E5E7EB',
+    color: '#374151',
+    verticalAlign: 'middle'
+  },
+  dateCell: {
     display: 'flex',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '18px',
-    paddingBottom: '12px',
-    borderBottom: '2px solid #F1F5F9'
+    gap: '10px'
   },
-  appointmentTitle: {
-    fontSize: '17px',
-    color: '#0F172A',
-    fontWeight: '700',
-    margin: 0
+  dateIcon: {
+    fontSize: '20px'
   },
-  statusBadge: {
-    padding: '6px 14px',
-    borderRadius: '20px',
+  dateText: {
+    fontWeight: '600',
+    color: '#1F2937',
+    fontSize: '13px'
+  },
+  timeText: {
+    color: '#6B7280',
+    fontSize: '12px',
+    marginTop: '2px'
+  },
+  patientCell: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px'
+  },
+  patientIcon: {
+    fontSize: '18px'
+  },
+  boldText: {
+    fontWeight: '600',
+    color: '#1F2937'
+  },
+  doctorCell: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px'
+  },
+  doctorIcon: {
+    fontSize: '18px'
+  },
+  phoneText: {
+    color: '#6B7280',
+    direction: 'ltr',
+    textAlign: 'right'
+  },
+  durationBadge: {
+    background: '#EDE9FE',
+    color: '#6D28D9',
+    padding: '4px 12px',
+    borderRadius: '12px',
+    fontSize: '12px',
+    fontWeight: '600',
+    display: 'inline-block'
+  },
+  notesText: {
+    color: '#6B7280',
     fontSize: '13px',
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px'
+    maxWidth: '150px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    display: 'inline-block'
   },
-  appointmentBody: {
+  actionButtons: {
     display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
-    marginBottom: '18px',
-    fontSize: '15px',
-    color: '#475569'
-  },
-  actionsContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-    marginTop: '18px',
-    paddingTop: '18px',
-    borderTop: '2px solid #F1F5F9'
-  },
-  appointmentActions: {
-    display: 'flex',
-    gap: '10px',
-    flexWrap: 'wrap'
+    gap: '6px',
+    flexWrap: 'wrap',
+    justifyContent: 'center'
   },
   editBtn: {
-    flex: 1,
-    padding: '10px 16px',
+    padding: '8px 12px',
     background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
     color: 'white',
     border: 'none',
@@ -647,13 +764,35 @@ const styles = {
     cursor: 'pointer',
     fontSize: '14px',
     fontWeight: '600',
-    transition: 'all 0.3s',
-    boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)',
-    minWidth: '80px'
+    transition: 'all 0.2s',
+    boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)'
   },
   confirmBtn: {
-    flex: 1,
-    padding: '10px 16px',
+    padding: '8px 12px',
+    background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '600',
+    transition: 'all 0.2s',
+    boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)'
+  },
+  startBtn: {
+    padding: '8px 12px',
+    background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '600',
+    transition: 'all 0.2s',
+    boxShadow: '0 2px 8px rgba(139, 92, 246, 0.3)'
+  },
+  completeBtn: {
+    padding: '8px 12px',
     background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
     color: 'white',
     border: 'none',
@@ -661,41 +800,11 @@ const styles = {
     cursor: 'pointer',
     fontSize: '14px',
     fontWeight: '600',
-    transition: 'all 0.3s',
-    boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)',
-    minWidth: '80px'
-  },
-  startBtn: {
-    flex: 1,
-    padding: '10px 16px',
-    background: 'linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)',
-    color: 'white',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: '600',
-    transition: 'all 0.3s',
-    boxShadow: '0 2px 8px rgba(14, 165, 233, 0.3)',
-    minWidth: '80px'
-  },
-  completeBtn: {
-    flex: 1,
-    padding: '10px 16px',
-    background: 'linear-gradient(135deg, #06B6D4 0%, #0891B2 100%)',
-    color: 'white',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: '600',
-    transition: 'all 0.3s',
-    boxShadow: '0 2px 8px rgba(6, 182, 212, 0.3)',
-    minWidth: '80px'
+    transition: 'all 0.2s',
+    boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)'
   },
   cancelBtn: {
-    flex: 1,
-    padding: '10px 16px',
+    padding: '8px 12px',
     background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
     color: 'white',
     border: 'none',
@@ -703,60 +812,37 @@ const styles = {
     cursor: 'pointer',
     fontSize: '14px',
     fontWeight: '600',
-    transition: 'all 0.3s',
-    boxShadow: '0 2px 8px rgba(239, 68, 68, 0.3)',
-    minWidth: '80px'
+    transition: 'all 0.2s',
+    boxShadow: '0 2px 8px rgba(239, 68, 68, 0.3)'
   },
-  whatsappButtons: {
-    display: 'flex',
-    gap: '10px',
-    width: '100%'
-  },
-  whatsappDoctorBtn: {
-    flex: 1,
-    padding: '14px 20px',
-    background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
-    color: 'white',
-    border: 'none',
-    borderRadius: '12px',
-    cursor: 'pointer',
-    fontSize: '15px',
-    fontWeight: '700',
-    transition: 'all 0.3s',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px',
-    boxShadow: '0 4px 15px rgba(59, 130, 246, 0.3)'
-  },
-  whatsappPatientBtn: {
-    flex: 1,
-    padding: '14px 20px',
+  whatsappBtn: {
+    padding: '8px 12px',
     background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
     color: 'white',
     border: 'none',
-    borderRadius: '12px',
+    borderRadius: '8px',
     cursor: 'pointer',
-    fontSize: '15px',
-    fontWeight: '700',
-    transition: 'all 0.3s',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px',
-    boxShadow: '0 4px 15px rgba(37, 211, 102, 0.3)'
-  },
-  whatsappIcon: {
-    fontSize: '20px'
+    fontSize: '14px',
+    transition: 'all 0.2s',
+    boxShadow: '0 2px 8px rgba(37, 211, 102, 0.3)'
   },
   empty: {
     textAlign: 'center',
-    padding: '50px',
-    fontSize: '18px',
-    color: '#999',
+    padding: '80px 20px',
     background: 'white',
     borderRadius: '16px',
-    border: '2px dashed #E2E8F0'
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+    marginTop: '20px'
+  },
+  emptyIcon: {
+    fontSize: '64px',
+    marginBottom: '20px',
+    opacity: 0.5
+  },
+  emptyText: {
+    fontSize: '18px',
+    color: '#6B7280',
+    fontWeight: '600'
   },
   modalOverlay: {
     position: 'fixed',
@@ -764,28 +850,28 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    background: 'rgba(0, 0, 0, 0.5)',
+    background: 'rgba(0, 0, 0, 0.6)',
     display: 'flex',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
     zIndex: 1000,
-    padding: '20px'
+    backdropFilter: 'blur(4px)'
   },
   modal: {
     background: 'white',
-    borderRadius: '16px',
-    padding: '30px',
+    borderRadius: '20px',
+    padding: '32px',
     maxWidth: '500px',
-    width: '100%',
+    width: '90%',
     maxHeight: '90vh',
-    overflowY: 'auto',
-    boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+    overflow: 'auto',
+    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
   },
   modalTitle: {
     fontSize: '24px',
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: '25px',
+    fontWeight: '800',
+    marginBottom: '24px',
+    color: '#1F2937',
     textAlign: 'center'
   },
   formGroup: {
@@ -794,53 +880,59 @@ const styles = {
   label: {
     display: 'block',
     marginBottom: '8px',
-    fontSize: '15px',
     fontWeight: '600',
-    color: '#475569'
+    color: '#374151',
+    fontSize: '14px'
   },
   input: {
     width: '100%',
     padding: '12px 16px',
-    border: '2px solid #E2E8F0',
-    borderRadius: '8px',
+    border: '2px solid #E5E7EB',
+    borderRadius: '10px',
     fontSize: '15px',
-    transition: 'border-color 0.3s',
-    boxSizing: 'border-box'
+    transition: 'all 0.3s',
+    boxSizing: 'border-box',
+    outline: 'none',
+    ':focus': {
+      borderColor: '#667eea',
+      boxShadow: '0 0 0 3px rgba(102, 126, 234, 0.1)'
+    }
   },
   textarea: {
     width: '100%',
     padding: '12px 16px',
-    border: '2px solid #E2E8F0',
-    borderRadius: '8px',
+    border: '2px solid #E5E7EB',
+    borderRadius: '10px',
     fontSize: '15px',
+    transition: 'all 0.3s',
+    boxSizing: 'border-box',
+    outline: 'none',
     resize: 'vertical',
-    fontFamily: 'inherit',
-    transition: 'border-color 0.3s',
-    boxSizing: 'border-box'
+    fontFamily: 'inherit'
   },
   modalActions: {
     display: 'flex',
     gap: '12px',
-    marginTop: '25px'
+    marginTop: '24px'
   },
   submitBtn: {
     flex: 1,
-    padding: '14px 24px',
-    background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+    padding: '14px',
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     color: 'white',
     border: 'none',
     borderRadius: '10px',
     cursor: 'pointer',
     fontSize: '16px',
     fontWeight: '700',
-    boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)',
+    boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
     transition: 'all 0.3s'
   },
   cancelModalBtn: {
     flex: 1,
-    padding: '14px 24px',
-    background: '#E2E8F0',
-    color: '#475569',
+    padding: '14px',
+    background: '#F3F4F6',
+    color: '#374151',
     border: 'none',
     borderRadius: '10px',
     cursor: 'pointer',
