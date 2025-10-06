@@ -8,10 +8,8 @@
     "frontend": "cd frontend && npm run dev",
     "seed": "cd backend && node seed.js",
     "dev": "cd backend && node server.js & cd frontend && npm run dev",
-    "build:frontend": "cd frontend && npm install && npm run build",
-    "build:backend": "cd backend && npm install",
-    "build": "npm run build:backend && npm run build:frontend",
-    "start": "cd backend && node server.js",
+    "build": "cd frontend && npx vite build --outDir ../backend/public",
+    "start": "node backend/server.js",
     "install:all": "cd backend && npm install && cd ../frontend && npm install"
   },
   "keywords": ["clinic", "dental", "management", "healthcare"],

@@ -40,11 +40,14 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'نظام عيادة الأسنان يعمل بشكل صحيح' });
 });
 
+// في وضع الإنتاج، نخدم ملفات الواجهة الثابتة من backend/public
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+  app.use(express.static(path.join(__dirname, 'public')));
   
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
+  // استخدام app.use بدلاً من app.get('*') لتجنب PathError في Express 5
+  // هذا catch-all route يجب أن يكون في النهاية لخدمة SPA
+  app.use((req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
   });
 }
 
