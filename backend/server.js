@@ -12,7 +12,6 @@ const treatmentRoutes = require('./src/routes/treatments');
 const medicationRoutes = require('./src/routes/medications');
 const supplierRoutes = require('./src/routes/suppliers');
 const notificationRoutes = require('./src/routes/notifications');
-const paymentRoutes = require('./src/routes/payments');
 const locationRoutes = require('./src/routes/locations');
 const invoiceRoutes = require('./src/routes/invoices');
 
@@ -36,7 +35,6 @@ app.use('/api/treatments', treatmentRoutes);
 app.use('/api/medications', medicationRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/notifications', notificationRoutes);
-app.use('/api/payments', paymentRoutes);
 app.use('/api/locations', locationRoutes);
 app.use('/api/invoices', invoiceRoutes);
 

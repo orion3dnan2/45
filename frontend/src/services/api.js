@@ -225,46 +225,6 @@ export const api = {
     return response.json();
   },
 
-  async getPayments(params = {}) {
-    const queryString = new URLSearchParams(params).toString();
-    const response = await fetch(`${API_URL}/payments?${queryString}`, {
-      headers: getAuthHeader()
-    });
-    return response.json();
-  },
-
-  async createPayment(data) {
-    const response = await fetch(`${API_URL}/payments`, {
-      method: 'POST',
-      headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    return response.json();
-  },
-
-  async updatePayment(id, data) {
-    const response = await fetch(`${API_URL}/payments/${id}`, {
-      method: 'PUT',
-      headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    return response.json();
-  },
-
-  async getPaymentStats() {
-    const response = await fetch(`${API_URL}/payments/stats`, {
-      headers: getAuthHeader()
-    });
-    return response.json();
-  },
-
-  async getPendingTreatments() {
-    const response = await fetch(`${API_URL}/payments/pending-treatments`, {
-      headers: getAuthHeader()
-    });
-    return response.json();
-  },
-
   async getGovernorates() {
     const response = await fetch(`${API_URL}/locations/governorates`, {
       headers: getAuthHeader()

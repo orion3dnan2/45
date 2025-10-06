@@ -8,7 +8,6 @@ import Medications from '../components/Medications';
 import Suppliers from '../components/Suppliers';
 import Notifications from '../components/Notifications';
 import Invoices from '../components/Invoices';
-import Payments from '../components/Payments';
 import Home from '../components/Home';
 
 const Dashboard = () => {
@@ -30,7 +29,6 @@ const Dashboard = () => {
     { path: '/dashboard/medications', label: 'الأدوية والمستلزمات', icon: '💊', roles: ['doctor', 'reception', 'admin'] },
     { path: '/dashboard/suppliers', label: 'الموردين', icon: '🚚', roles: ['reception', 'admin'] },
     { path: '/dashboard/invoices', label: 'الفواتير', icon: '📋', roles: ['reception', 'admin', 'accountant'] },
-    { path: '/dashboard/payments', label: 'المدفوعات', icon: '💰', roles: ['reception', 'admin', 'accountant'] },
     { path: '/dashboard/notifications', label: 'الإشعارات', icon: '🔔', roles: ['doctor', 'reception', 'admin', 'accountant'] }
   ];
 
@@ -94,7 +92,6 @@ const Dashboard = () => {
           <Route path="/medications" element={<Medications />} />
           <Route path="/suppliers" element={<Suppliers />} />
           <Route path="/invoices" element={<Invoices />} />
-          <Route path="/payments" element={<Payments />} />
           <Route path="/notifications" element={<Notifications />} />
         </Routes>
       </div>

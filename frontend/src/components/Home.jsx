@@ -27,11 +27,6 @@ const Home = () => {
         setAppointments(appointmentsData.slice(0, 5));
       }
 
-      // تحميل الإحصائيات للإداريين والمحاسبين
-      if (user.role === 'admin' || user.role === 'accountant') {
-        const paymentStats = await api.getPaymentStats();
-        setStats(paymentStats);
-      }
     } catch (error) {
       console.error('خطأ في تحميل البيانات:', error);
     }
@@ -99,23 +94,13 @@ const Home = () => {
         )}
 
         {(user.role === 'reception' || user.role === 'admin' || user.role === 'accountant') && (
-          <>
-            <div 
-              style={styles.tab}
-              onClick={() => navigateTo('/dashboard/invoices')}
-            >
-              <span style={styles.tabIcon}>📋</span>
-              <span style={styles.tabLabel}>الفواتير</span>
-            </div>
-
-            <div 
-              style={styles.tab}
-              onClick={() => navigateTo('/dashboard/payments')}
-            >
-              <span style={styles.tabIcon}>💰</span>
-              <span style={styles.tabLabel}>المدفوعات</span>
-            </div>
-          </>
+          <div 
+            style={styles.tab}
+            onClick={() => navigateTo('/dashboard/invoices')}
+          >
+            <span style={styles.tabIcon}>📋</span>
+            <span style={styles.tabLabel}>الفواتير</span>
+          </div>
         )}
       </div>
 
