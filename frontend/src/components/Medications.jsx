@@ -25,7 +25,7 @@ const Medications = () => {
     category: ''
   });
 
-  const canManage = user && ['admin', 'accountant', 'warehouse_manager'].includes(user.role);
+  const canManage = user && ['admin', 'reception'].includes(user.role);
 
   useEffect(() => {
     loadMedications();

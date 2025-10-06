@@ -20,7 +20,7 @@ const Suppliers = () => {
     payment_terms: ''
   });
 
-  const canManage = user && ['admin', 'accountant', 'warehouse_manager'].includes(user.role);
+  const canManage = user && ['admin', 'reception'].includes(user.role);
 
   useEffect(() => {
     loadSuppliers();

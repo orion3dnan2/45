@@ -23,7 +23,7 @@ const Treatments = () => {
     notes: ''
   });
 
-  const canManage = user && ['doctor', 'warehouse_manager', 'admin'].includes(user.role);
+  const canManage = user && ['doctor', 'admin'].includes(user.role);
 
   useEffect(() => {
     loadData();

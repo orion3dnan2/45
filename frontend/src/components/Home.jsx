@@ -28,7 +28,7 @@ const Home = () => {
       }
 
       // تحميل الإحصائيات للإداريين
-      if (user.role === 'admin' || user.role === 'accountant') {
+      if (user.role === 'admin') {
         const paymentStats = await api.getPaymentStats();
         setStats(paymentStats);
       }
@@ -56,36 +56,40 @@ const Home = () => {
 
       {/* شريط التبويبات الأفقي */}
       <div style={styles.tabsContainer}>
-        {user.role !== 'warehouse_manager' && user.role !== 'patient' && (
+        <div 
+          style={styles.tab}
+          onClick={() => navigateTo('/dashboard/patients')}
+        >
+          <span style={styles.tabIcon}>👥</span>
+          <span style={styles.tabLabel}>إدارة المرضى</span>
+        </div>
+
+        <div 
+          style={styles.tab}
+          onClick={() => navigateTo('/dashboard/appointments')}
+        >
+          <span style={styles.tabIcon}>📅</span>
+          <span style={styles.tabLabel}>المواعيد</span>
+        </div>
+
+        <div 
+          style={styles.tab}
+          onClick={() => navigateTo('/dashboard/treatments')}
+        >
+          <span style={styles.tabIcon}>🦷</span>
+          <span style={styles.tabLabel}>العلاجات</span>
+        </div>
+
+        <div 
+          style={styles.tab}
+          onClick={() => navigateTo('/dashboard/medications')}
+        >
+          <span style={styles.tabIcon}>💊</span>
+          <span style={styles.tabLabel}>الأدوية والمستلزمات</span>
+        </div>
+
+        {(user.role === 'reception' || user.role === 'admin') && (
           <>
-            <div 
-              style={styles.tab}
-              onClick={() => navigateTo('/dashboard/patients')}
-            >
-              <span style={styles.tabIcon}>👥</span>
-              <span style={styles.tabLabel}>إدارة المرضى</span>
-            </div>
-
-            <div 
-              style={styles.tab}
-              onClick={() => navigateTo('/dashboard/appointments')}
-            >
-              <span style={styles.tabIcon}>📅</span>
-              <span style={styles.tabLabel}>المواعيد</span>
-            </div>
-          </>
-        )}
-
-        {user.role === 'warehouse_manager' && (
-          <>
-            <div 
-              style={styles.tab}
-              onClick={() => navigateTo('/dashboard/medications')}
-            >
-              <span style={styles.tabIcon}>💊</span>
-              <span style={styles.tabLabel}>الأدوية والمستلزمات</span>
-            </div>
-
             <div 
               style={styles.tab}
               onClick={() => navigateTo('/dashboard/suppliers')}
@@ -96,59 +100,11 @@ const Home = () => {
 
             <div 
               style={styles.tab}
-              onClick={() => navigateTo('/dashboard/treatments')}
+              onClick={() => navigateTo('/dashboard/invoices')}
             >
-              <span style={styles.tabIcon}>🦷</span>
-              <span style={styles.tabLabel}>العلاجات</span>
+              <span style={styles.tabIcon}>📋</span>
+              <span style={styles.tabLabel}>الفواتير</span>
             </div>
-
-            <div 
-              style={styles.tab}
-              onClick={() => navigateTo('/dashboard/notifications')}
-            >
-              <span style={styles.tabIcon}>⚠️</span>
-              <span style={styles.tabLabel}>التنبيهات</span>
-            </div>
-          </>
-        )}
-
-        {user.role !== 'warehouse_manager' && user.role !== 'patient' && (
-          <>
-            <div 
-              style={styles.tab}
-              onClick={() => navigateTo('/dashboard/treatments')}
-            >
-              <span style={styles.tabIcon}>🦷</span>
-              <span style={styles.tabLabel}>العلاجات</span>
-            </div>
-
-            <div 
-              style={styles.tab}
-              onClick={() => navigateTo('/dashboard/medications')}
-            >
-              <span style={styles.tabIcon}>💊</span>
-              <span style={styles.tabLabel}>الأدوية والمستلزمات</span>
-            </div>
-
-            {(user.role === 'reception' || user.role === 'admin') && (
-              <>
-                <div 
-                  style={styles.tab}
-                  onClick={() => navigateTo('/dashboard/suppliers')}
-                >
-                  <span style={styles.tabIcon}>🚚</span>
-                  <span style={styles.tabLabel}>الموردين</span>
-                </div>
-
-                <div 
-                  style={styles.tab}
-                  onClick={() => navigateTo('/dashboard/payments')}
-                >
-                  <span style={styles.tabIcon}>💰</span>
-                  <span style={styles.tabLabel}>المدفوعات</span>
-                </div>
-              </>
-            )}
           </>
         )}
       </div>
@@ -259,10 +215,7 @@ const getRoleLabel = (role) => {
   const labels = {
     doctor: 'طبيب',
     reception: 'استقبال',
-    admin: 'إداري',
-    accountant: 'محاسب',
-    patient: 'مريض',
-    warehouse_manager: 'مسؤول المخزون'
+    admin: 'إداري'
   };
   return labels[role] || role;
 };
