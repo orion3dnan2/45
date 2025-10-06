@@ -1,12 +1,11 @@
 services:
-  # Backend Service
   - type: web
-    name: clinic-backend
+    name: clinic-system
     env: node
     region: oregon
     plan: free
-    buildCommand: cd backend && npm install
-    startCommand: cd backend && node server.js
+    buildCommand: npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
@@ -16,26 +15,7 @@ services:
           property: connectionString
       - key: JWT_SECRET
         generateValue: true
-      - key: PORT
-        value: 10000
 
-  # Frontend Service (Static Site)
-  - type: web
-    name: clinic-frontend
-    env: static
-    region: oregon
-    plan: free
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: ./frontend/dist
-    envVars:
-      - key: VITE_API_URL
-        value: https://clinic-backend.onrender.com
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-
-# PostgreSQL Database
 databases:
   - name: clinic-postgres
     databaseName: clinic_db
