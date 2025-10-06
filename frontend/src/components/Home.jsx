@@ -54,31 +54,24 @@ const Home = () => {
         </div>
       </div>
 
-      <div style={styles.grid}>
+      {/* شريط التبويبات الأفقي */}
+      <div style={styles.tabsContainer}>
         {user.role !== 'warehouse_manager' && user.role !== 'patient' && (
           <>
             <div 
-              style={{...styles.card, ...styles.cardBlue}}
+              style={styles.tab}
               onClick={() => navigateTo('/dashboard/patients')}
             >
-              <div style={styles.cardHeader}>
-                <div style={styles.cardIcon}>👥</div>
-                <div style={styles.cardBadge}>متابعة</div>
-              </div>
-              <h3 style={styles.cardTitle}>إدارة المرضى</h3>
-              <p style={styles.cardText}>عرض وإدارة سجلات المرضى والملفات الطبية</p>
+              <span style={styles.tabIcon}>👥</span>
+              <span style={styles.tabLabel}>إدارة المرضى</span>
             </div>
 
             <div 
-              style={{...styles.card, ...styles.cardGreen}}
+              style={styles.tab}
               onClick={() => navigateTo('/dashboard/appointments')}
             >
-              <div style={styles.cardHeader}>
-                <div style={styles.cardIcon}>📅</div>
-                <div style={styles.cardBadge}>جدولة</div>
-              </div>
-              <h3 style={styles.cardTitle}>المواعيد</h3>
-              <p style={styles.cardText}>جدولة ومتابعة المواعيد اليومية والأسبوعية</p>
+              <span style={styles.tabIcon}>📅</span>
+              <span style={styles.tabLabel}>المواعيد</span>
             </div>
           </>
         )}
@@ -86,51 +79,35 @@ const Home = () => {
         {user.role === 'warehouse_manager' && (
           <>
             <div 
-              style={{...styles.card, ...styles.cardPurple}}
+              style={styles.tab}
               onClick={() => navigateTo('/dashboard/medications')}
             >
-              <div style={styles.cardHeader}>
-                <div style={styles.cardIcon}>💊</div>
-                <div style={styles.cardBadge}>مخزون</div>
-              </div>
-              <h3 style={styles.cardTitle}>الأدوية والمستلزمات</h3>
-              <p style={styles.cardText}>إضافة وإدارة الأدوية والمستلزمات الطبية</p>
+              <span style={styles.tabIcon}>💊</span>
+              <span style={styles.tabLabel}>الأدوية والمستلزمات</span>
             </div>
 
             <div 
-              style={{...styles.card, ...styles.cardOrange}}
+              style={styles.tab}
               onClick={() => navigateTo('/dashboard/suppliers')}
             >
-              <div style={styles.cardHeader}>
-                <div style={styles.cardIcon}>🚚</div>
-                <div style={styles.cardBadge}>موردين</div>
-              </div>
-              <h3 style={styles.cardTitle}>الموردين</h3>
-              <p style={styles.cardText}>متابعة الموردين والاشتراكات والطلبات</p>
+              <span style={styles.tabIcon}>🚚</span>
+              <span style={styles.tabLabel}>الموردين</span>
             </div>
 
             <div 
-              style={{...styles.card, ...styles.cardTeal}}
+              style={styles.tab}
               onClick={() => navigateTo('/dashboard/treatments')}
             >
-              <div style={styles.cardHeader}>
-                <div style={styles.cardIcon}>🦷</div>
-                <div style={styles.cardBadge}>علاجات</div>
-              </div>
-              <h3 style={styles.cardTitle}>العلاجات</h3>
-              <p style={styles.cardText}>إدارة ومتابعة المواد المستخدمة في العلاجات</p>
+              <span style={styles.tabIcon}>🦷</span>
+              <span style={styles.tabLabel}>العلاجات</span>
             </div>
 
             <div 
-              style={{...styles.card, ...styles.cardRed}}
+              style={styles.tab}
               onClick={() => navigateTo('/dashboard/notifications')}
             >
-              <div style={styles.cardHeader}>
-                <div style={styles.cardIcon}>⚠️</div>
-                <div style={styles.cardBadge}>تنبيهات</div>
-              </div>
-              <h3 style={styles.cardTitle}>تنبيهات المخزون</h3>
-              <p style={styles.cardText}>مراقبة المخزون المنخفض والمواد المنتهية</p>
+              <span style={styles.tabIcon}>⚠️</span>
+              <span style={styles.tabLabel}>التنبيهات</span>
             </div>
           </>
         )}
@@ -138,53 +115,37 @@ const Home = () => {
         {user.role !== 'warehouse_manager' && user.role !== 'patient' && (
           <>
             <div 
-              style={{...styles.card, ...styles.cardTeal}}
+              style={styles.tab}
               onClick={() => navigateTo('/dashboard/treatments')}
             >
-              <div style={styles.cardHeader}>
-                <div style={styles.cardIcon}>🦷</div>
-                <div style={styles.cardBadge}>طبي</div>
-              </div>
-              <h3 style={styles.cardTitle}>العلاجات</h3>
-              <p style={styles.cardText}>تسجيل وتتبع خطط العلاج والإجراءات الطبية</p>
+              <span style={styles.tabIcon}>🦷</span>
+              <span style={styles.tabLabel}>العلاجات</span>
             </div>
 
             <div 
-              style={{...styles.card, ...styles.cardPurple}}
+              style={styles.tab}
               onClick={() => navigateTo('/dashboard/medications')}
             >
-              <div style={styles.cardHeader}>
-                <div style={styles.cardIcon}>💊</div>
-                <div style={styles.cardBadge}>مخزون</div>
-              </div>
-              <h3 style={styles.cardTitle}>الأدوية والمستلزمات</h3>
-              <p style={styles.cardText}>إدارة المخزون والأدوية والمستلزمات الطبية</p>
+              <span style={styles.tabIcon}>💊</span>
+              <span style={styles.tabLabel}>الأدوية والمستلزمات</span>
             </div>
 
             {(user.role === 'reception' || user.role === 'admin') && (
               <>
                 <div 
-                  style={{...styles.card, ...styles.cardOrange}}
+                  style={styles.tab}
                   onClick={() => navigateTo('/dashboard/suppliers')}
                 >
-                  <div style={styles.cardHeader}>
-                    <div style={styles.cardIcon}>🚚</div>
-                    <div style={styles.cardBadge}>موردين</div>
-                  </div>
-                  <h3 style={styles.cardTitle}>الموردين</h3>
-                  <p style={styles.cardText}>متابعة الموردين والاشتراكات والطلبات</p>
+                  <span style={styles.tabIcon}>🚚</span>
+                  <span style={styles.tabLabel}>الموردين</span>
                 </div>
 
                 <div 
-                  style={{...styles.card, ...styles.cardIndigo}}
+                  style={styles.tab}
                   onClick={() => navigateTo('/dashboard/payments')}
                 >
-                  <div style={styles.cardHeader}>
-                    <div style={styles.cardIcon}>💰</div>
-                    <div style={styles.cardBadge}>مالية</div>
-                  </div>
-                  <h3 style={styles.cardTitle}>المدفوعات</h3>
-                  <p style={styles.cardText}>إدارة المدفوعات والفواتير المالية</p>
+                  <span style={styles.tabIcon}>💰</span>
+                  <span style={styles.tabLabel}>المدفوعات</span>
                 </div>
               </>
             )}
@@ -192,8 +153,8 @@ const Home = () => {
         )}
       </div>
 
-      {/* جدول المواعيد اليومية لمستخدمي الاستقبال */}
-      {(user.role === 'reception' || user.role === 'admin') && appointments.length > 0 && (
+      {/* جدول المواعيد اليومية */}
+      {(user.role === 'reception' || user.role === 'admin' || user.role === 'doctor') && (
         <div style={styles.appointmentsSection}>
           <div style={styles.sectionHeader}>
             <h2 style={styles.sectionTitle}>📅 مواعيد اليوم</h2>
@@ -205,34 +166,41 @@ const Home = () => {
             </button>
           </div>
           <div style={styles.appointmentsTable}>
-            <table style={styles.table}>
-              <thead>
-                <tr style={styles.tableHeaderRow}>
-                  <th style={styles.tableHeader}>الوقت</th>
-                  <th style={styles.tableHeader}>المريض</th>
-                  <th style={styles.tableHeader}>الطبيب</th>
-                  <th style={styles.tableHeader}>الحالة</th>
-                  <th style={styles.tableHeader}>الملاحظات</th>
-                </tr>
-              </thead>
-              <tbody>
-                {appointments.map((appointment, index) => (
-                  <tr key={appointment.id} style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
-                    <td style={styles.tableCell}>
-                      {new Date(appointment.appointment_date).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}
-                    </td>
-                    <td style={styles.tableCell}>{appointment.patient_name || '-'}</td>
-                    <td style={styles.tableCell}>{appointment.doctor_name || '-'}</td>
-                    <td style={styles.tableCell}>
-                      <span style={{...styles.statusBadge, ...getStatusStyle(appointment.status)}}>
-                        {getStatusLabel(appointment.status)}
-                      </span>
-                    </td>
-                    <td style={styles.tableCell}>{appointment.notes || '-'}</td>
+            {appointments.length > 0 ? (
+              <table style={styles.table}>
+                <thead>
+                  <tr style={styles.tableHeaderRow}>
+                    <th style={styles.tableHeader}>الوقت</th>
+                    <th style={styles.tableHeader}>المريض</th>
+                    <th style={styles.tableHeader}>الطبيب</th>
+                    <th style={styles.tableHeader}>الحالة</th>
+                    <th style={styles.tableHeader}>الملاحظات</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {appointments.map((appointment, index) => (
+                    <tr key={appointment.id} style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
+                      <td style={styles.tableCell}>
+                        {new Date(appointment.appointment_date).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}
+                      </td>
+                      <td style={styles.tableCell}>{appointment.patient_name || '-'}</td>
+                      <td style={styles.tableCell}>{appointment.doctor_name || '-'}</td>
+                      <td style={styles.tableCell}>
+                        <span style={{...styles.statusBadge, ...getStatusStyle(appointment.status)}}>
+                          {getStatusLabel(appointment.status)}
+                        </span>
+                      </td>
+                      <td style={styles.tableCell}>{appointment.notes || '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div style={styles.emptyState}>
+                <div style={styles.emptyIcon}>📅</div>
+                <p style={styles.emptyText}>لا توجد مواعيد لليوم</p>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -366,78 +334,35 @@ const styles = {
     alignItems: 'center',
     gap: '8px'
   },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '25px',
-    marginBottom: '40px'
-  },
-  card: {
-    borderRadius: '20px',
-    padding: '30px',
-    boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
-    transition: 'all 0.3s',
-    cursor: 'pointer',
-    border: '1px solid rgba(255,255,255,0.2)',
-    position: 'relative',
-    overflow: 'hidden'
-  },
-  cardBlue: {
-    background: 'linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)',
-    color: 'white'
-  },
-  cardGreen: {
-    background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-    color: 'white'
-  },
-  cardTeal: {
-    background: 'linear-gradient(135deg, #06B6D4 0%, #0891B2 100%)',
-    color: 'white'
-  },
-  cardPurple: {
-    background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
-    color: 'white'
-  },
-  cardOrange: {
-    background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-    color: 'white'
-  },
-  cardIndigo: {
-    background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
-    color: 'white'
-  },
-  cardRed: {
-    background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
-    color: 'white'
-  },
-  cardHeader: {
+  tabsContainer: {
     display: 'flex',
-    justifyContent: 'space-between',
+    gap: '12px',
+    marginBottom: '30px',
+    flexWrap: 'wrap',
+    overflowX: 'auto',
+    paddingBottom: '10px'
+  },
+  tab: {
+    display: 'flex',
     alignItems: 'center',
-    marginBottom: '20px'
+    gap: '10px',
+    padding: '12px 20px',
+    background: 'white',
+    borderRadius: '12px',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
+    cursor: 'pointer',
+    transition: 'all 0.3s',
+    border: '2px solid transparent',
+    whiteSpace: 'nowrap',
+    flexShrink: 0
   },
-  cardIcon: {
-    fontSize: '48px',
-    filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))'
+  tabIcon: {
+    fontSize: '22px'
   },
-  cardBadge: {
-    background: 'rgba(255,255,255,0.25)',
-    backdropFilter: 'blur(10px)',
-    padding: '6px 14px',
-    borderRadius: '20px',
-    fontSize: '12px',
-    fontWeight: '600',
-    border: '1px solid rgba(255,255,255,0.3)'
-  },
-  cardTitle: {
-    fontSize: '22px',
-    marginBottom: '12px',
-    fontWeight: '700'
-  },
-  cardText: {
+  tabLabel: {
     fontSize: '15px',
-    opacity: 0.95,
-    lineHeight: '1.6'
+    fontWeight: '600',
+    color: '#0F172A'
   },
   appointmentsSection: {
     background: 'white',
@@ -526,6 +451,20 @@ const styles = {
     fontSize: '13px',
     fontWeight: '600',
     display: 'inline-block'
+  },
+  emptyState: {
+    textAlign: 'center',
+    padding: '60px 20px',
+    color: '#94A3B8'
+  },
+  emptyIcon: {
+    fontSize: '64px',
+    marginBottom: '20px',
+    opacity: 0.5
+  },
+  emptyText: {
+    fontSize: '18px',
+    fontWeight: '500'
   },
   notificationsList: {
     display: 'flex',
