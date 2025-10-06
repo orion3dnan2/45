@@ -24,7 +24,11 @@ const getPatients = async (req, res) => {
     const { archived } = req.query;
     
     let query = `
-      SELECT p.*, u.full_name, u.email, u.phone, u.username
+      SELECT p.*, 
+             COALESCE(p.full_name, u.full_name) as full_name,
+             COALESCE(p.email, u.email) as email,
+             COALESCE(p.phone, u.phone) as phone,
+             u.username
       FROM patients p
       LEFT JOIN users u ON p.user_id = u.id
     `;
@@ -78,7 +82,11 @@ const getPatientById = async (req, res) => {
   const client = await pool.connect();
   try {
     const patientResult = await client.query(`
-      SELECT p.*, u.full_name, u.email, u.phone, u.username
+      SELECT p.*, 
+             COALESCE(p.full_name, u.full_name) as full_name,
+             COALESCE(p.email, u.email) as email,
+             COALESCE(p.phone, u.phone) as phone,
+             u.username
       FROM patients p
       LEFT JOIN users u ON p.user_id = u.id
       WHERE p.id = $1
@@ -243,23 +251,14 @@ const createPatient = async (req, res) => {
       return res.status(400).json({ error: 'الاسم ورقم الهاتف مطلوبان' });
     }
 
-    const username = 'patient_' + Date.now();
-    const defaultPassword = require('bcryptjs').hashSync('password', 10);
-    
-    const userResult = await client.query(
-      `INSERT INTO users (username, password, full_name, role, email, phone)
-       VALUES ($1, $2, $3, 'patient', $4, $5)
-       RETURNING id`,
-      [username, defaultPassword, full_name, email, phone]
-    );
-    const userId = userResult.rows[0].id;
-
     const patientResult = await client.query(
-      `INSERT INTO patients (user_id, national_id, date_of_birth, address, medical_history, allergies, insurance_info, diagnosis)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `INSERT INTO patients (full_name, phone, email, national_id, date_of_birth, address, medical_history, allergies, insurance_info, diagnosis)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        RETURNING id`,
       [
-        userId,
+        full_name,
+        phone,
+        email || null,
         national_id || null,
         date_of_birth || null,
         address || null,
@@ -271,6 +270,11 @@ const createPatient = async (req, res) => {
     );
 
     const patientId = patientResult.rows[0].id;
+
+    await client.query(
+      `UPDATE patients SET updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
+      [patientId]
+    );
 
     await client.query(
       `INSERT INTO payments (patient_id, amount, payment_method, payment_date, status, notes, created_by)
@@ -288,8 +292,7 @@ const createPatient = async (req, res) => {
 
     res.status(201).json({ 
       message: 'تم إضافة المريض بنجاح وإنشاء فاتورة أولية',
-      patientId: patientId,
-      userId: userId
+      patientId: patientId
     });
   } catch (error) {
     console.error(error);

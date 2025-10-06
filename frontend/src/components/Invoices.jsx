@@ -208,7 +208,12 @@ const Invoices = () => {
   };
 
   const printInvoice = (invoice) => {
-    const invoiceData = invoice.notes ? JSON.parse(invoice.notes) : {};
+    let invoiceData = {};
+    try {
+      invoiceData = invoice.notes ? JSON.parse(invoice.notes) : {};
+    } catch (e) {
+      invoiceData = {};
+    }
     const items = invoiceData.items || [];
     const patient = patients.find(p => p.id === invoice.patient_id);
     
@@ -539,7 +544,12 @@ const Invoices = () => {
 
       <div style={styles.invoicesList}>
         {filteredInvoices.map(invoice => {
-          const invoiceData = invoice.notes ? JSON.parse(invoice.notes) : {};
+          let invoiceData = {};
+          try {
+            invoiceData = invoice.notes ? JSON.parse(invoice.notes) : {};
+          } catch (e) {
+            invoiceData = {};
+          }
           const items = invoiceData.items || [];
           
           return (

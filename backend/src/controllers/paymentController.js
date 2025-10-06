@@ -46,7 +46,7 @@ const getPayments = async (req, res) => {
     let query = `
       SELECT py.*, 
              p.id as patient_id,
-             pu.full_name as patient_name,
+             COALESCE(p.full_name, pu.full_name) as patient_name,
              t.diagnosis,
              t.procedure_done
       FROM payments py
@@ -307,7 +307,7 @@ const getPendingTreatments = async (req, res) => {
         t.cost,
         t.tooth_number,
         p.id as patient_id,
-        pu.full_name as patient_name,
+        COALESCE(p.full_name, pu.full_name) as patient_name,
         d.full_name as doctor_name
       FROM treatments t
       JOIN patients p ON t.patient_id = p.id
