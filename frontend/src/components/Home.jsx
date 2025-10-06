@@ -1,11 +1,14 @@
 import React, { useEffect, useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { AuthContext } from '../contexts/AuthContext';
 
 const Home = () => {
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [notifications, setNotifications] = useState([]);
+  const [appointments, setAppointments] = useState([]);
 
   useEffect(() => {
     loadData();
@@ -13,9 +16,18 @@ const Home = () => {
 
   const loadData = async () => {
     try {
+      // تحميل الإشعارات
       const notifs = await api.getNotifications({ is_read: 'false' });
       setNotifications(notifs.slice(0, 5));
 
+      // تحميل المواعيد لمستخدمي الاستقبال
+      if (user.role === 'reception' || user.role === 'admin') {
+        const today = new Date().toISOString().split('T')[0];
+        const appointmentsData = await api.getAppointments({ date: today });
+        setAppointments(appointmentsData.slice(0, 5));
+      }
+
+      // تحميل الإحصائيات للإداريين
       if (user.role === 'admin' || user.role === 'accountant') {
         const paymentStats = await api.getPaymentStats();
         setStats(paymentStats);
@@ -23,6 +35,11 @@ const Home = () => {
     } catch (error) {
       console.error('خطأ في تحميل البيانات:', error);
     }
+  };
+
+  // دالة للانتقال إلى الصفحات المختلفة
+  const navigateTo = (path) => {
+    navigate(path);
   };
 
   return (
@@ -40,7 +57,10 @@ const Home = () => {
       <div style={styles.grid}>
         {user.role !== 'warehouse_manager' && user.role !== 'patient' && (
           <>
-            <div style={{...styles.card, ...styles.cardBlue}}>
+            <div 
+              style={{...styles.card, ...styles.cardBlue}}
+              onClick={() => navigateTo('/dashboard/patients')}
+            >
               <div style={styles.cardHeader}>
                 <div style={styles.cardIcon}>👥</div>
                 <div style={styles.cardBadge}>متابعة</div>
@@ -49,7 +69,10 @@ const Home = () => {
               <p style={styles.cardText}>عرض وإدارة سجلات المرضى والملفات الطبية</p>
             </div>
 
-            <div style={{...styles.card, ...styles.cardGreen}}>
+            <div 
+              style={{...styles.card, ...styles.cardGreen}}
+              onClick={() => navigateTo('/dashboard/appointments')}
+            >
               <div style={styles.cardHeader}>
                 <div style={styles.cardIcon}>📅</div>
                 <div style={styles.cardBadge}>جدولة</div>
@@ -62,7 +85,10 @@ const Home = () => {
 
         {user.role === 'warehouse_manager' && (
           <>
-            <div style={{...styles.card, ...styles.cardPurple}}>
+            <div 
+              style={{...styles.card, ...styles.cardPurple}}
+              onClick={() => navigateTo('/dashboard/medications')}
+            >
               <div style={styles.cardHeader}>
                 <div style={styles.cardIcon}>💊</div>
                 <div style={styles.cardBadge}>مخزون</div>
@@ -71,7 +97,10 @@ const Home = () => {
               <p style={styles.cardText}>إضافة وإدارة الأدوية والمستلزمات الطبية</p>
             </div>
 
-            <div style={{...styles.card, ...styles.cardOrange}}>
+            <div 
+              style={{...styles.card, ...styles.cardOrange}}
+              onClick={() => navigateTo('/dashboard/suppliers')}
+            >
               <div style={styles.cardHeader}>
                 <div style={styles.cardIcon}>🚚</div>
                 <div style={styles.cardBadge}>موردين</div>
@@ -80,7 +109,10 @@ const Home = () => {
               <p style={styles.cardText}>متابعة الموردين والاشتراكات والطلبات</p>
             </div>
 
-            <div style={{...styles.card, ...styles.cardTeal}}>
+            <div 
+              style={{...styles.card, ...styles.cardTeal}}
+              onClick={() => navigateTo('/dashboard/treatments')}
+            >
               <div style={styles.cardHeader}>
                 <div style={styles.cardIcon}>🦷</div>
                 <div style={styles.cardBadge}>علاجات</div>
@@ -89,7 +121,10 @@ const Home = () => {
               <p style={styles.cardText}>إدارة ومتابعة المواد المستخدمة في العلاجات</p>
             </div>
 
-            <div style={{...styles.card, ...styles.cardRed}}>
+            <div 
+              style={{...styles.card, ...styles.cardRed}}
+              onClick={() => navigateTo('/dashboard/notifications')}
+            >
               <div style={styles.cardHeader}>
                 <div style={styles.cardIcon}>⚠️</div>
                 <div style={styles.cardBadge}>تنبيهات</div>
@@ -102,7 +137,10 @@ const Home = () => {
 
         {user.role !== 'warehouse_manager' && user.role !== 'patient' && (
           <>
-            <div style={{...styles.card, ...styles.cardTeal}}>
+            <div 
+              style={{...styles.card, ...styles.cardTeal}}
+              onClick={() => navigateTo('/dashboard/treatments')}
+            >
               <div style={styles.cardHeader}>
                 <div style={styles.cardIcon}>🦷</div>
                 <div style={styles.cardBadge}>طبي</div>
@@ -111,7 +149,10 @@ const Home = () => {
               <p style={styles.cardText}>تسجيل وتتبع خطط العلاج والإجراءات الطبية</p>
             </div>
 
-            <div style={{...styles.card, ...styles.cardPurple}}>
+            <div 
+              style={{...styles.card, ...styles.cardPurple}}
+              onClick={() => navigateTo('/dashboard/medications')}
+            >
               <div style={styles.cardHeader}>
                 <div style={styles.cardIcon}>💊</div>
                 <div style={styles.cardBadge}>مخزون</div>
@@ -119,11 +160,85 @@ const Home = () => {
               <h3 style={styles.cardTitle}>الأدوية والمستلزمات</h3>
               <p style={styles.cardText}>إدارة المخزون والأدوية والمستلزمات الطبية</p>
             </div>
+
+            {(user.role === 'reception' || user.role === 'admin') && (
+              <>
+                <div 
+                  style={{...styles.card, ...styles.cardOrange}}
+                  onClick={() => navigateTo('/dashboard/suppliers')}
+                >
+                  <div style={styles.cardHeader}>
+                    <div style={styles.cardIcon}>🚚</div>
+                    <div style={styles.cardBadge}>موردين</div>
+                  </div>
+                  <h3 style={styles.cardTitle}>الموردين</h3>
+                  <p style={styles.cardText}>متابعة الموردين والاشتراكات والطلبات</p>
+                </div>
+
+                <div 
+                  style={{...styles.card, ...styles.cardIndigo}}
+                  onClick={() => navigateTo('/dashboard/payments')}
+                >
+                  <div style={styles.cardHeader}>
+                    <div style={styles.cardIcon}>💰</div>
+                    <div style={styles.cardBadge}>مالية</div>
+                  </div>
+                  <h3 style={styles.cardTitle}>المدفوعات</h3>
+                  <p style={styles.cardText}>إدارة المدفوعات والفواتير المالية</p>
+                </div>
+              </>
+            )}
           </>
         )}
       </div>
 
-      {notifications.length > 0 && (
+      {/* جدول المواعيد اليومية لمستخدمي الاستقبال */}
+      {(user.role === 'reception' || user.role === 'admin') && appointments.length > 0 && (
+        <div style={styles.appointmentsSection}>
+          <div style={styles.sectionHeader}>
+            <h2 style={styles.sectionTitle}>📅 مواعيد اليوم</h2>
+            <button 
+              onClick={() => navigateTo('/dashboard/appointments')}
+              style={styles.viewAllBtn}
+            >
+              عرض الكل
+            </button>
+          </div>
+          <div style={styles.appointmentsTable}>
+            <table style={styles.table}>
+              <thead>
+                <tr style={styles.tableHeaderRow}>
+                  <th style={styles.tableHeader}>الوقت</th>
+                  <th style={styles.tableHeader}>المريض</th>
+                  <th style={styles.tableHeader}>الطبيب</th>
+                  <th style={styles.tableHeader}>الحالة</th>
+                  <th style={styles.tableHeader}>الملاحظات</th>
+                </tr>
+              </thead>
+              <tbody>
+                {appointments.map((appointment, index) => (
+                  <tr key={appointment.id} style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
+                    <td style={styles.tableCell}>
+                      {new Date(appointment.appointment_date).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}
+                    </td>
+                    <td style={styles.tableCell}>{appointment.patient_name || '-'}</td>
+                    <td style={styles.tableCell}>{appointment.doctor_name || '-'}</td>
+                    <td style={styles.tableCell}>
+                      <span style={{...styles.statusBadge, ...getStatusStyle(appointment.status)}}>
+                        {getStatusLabel(appointment.status)}
+                      </span>
+                    </td>
+                    <td style={styles.tableCell}>{appointment.notes || '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* الإشعارات للأطباء والإداريين */}
+      {user.role !== 'reception' && notifications.length > 0 && (
         <div style={styles.notificationsSection}>
           <div style={styles.sectionHeader}>
             <h2 style={styles.sectionTitle}>🔔 الإشعارات الحديثة</h2>
@@ -145,6 +260,7 @@ const Home = () => {
         </div>
       )}
 
+      {/* إحصائيات الدفعات للإداريين */}
       {stats && (
         <div style={styles.statsSection}>
           <h2 style={styles.sectionTitle}>💰 إحصائيات الدفعات</h2>
@@ -192,6 +308,28 @@ const getNotificationIcon = (type) => {
     general: '📢'
   };
   return icons[type] || '📢';
+};
+
+const getStatusLabel = (status) => {
+  const labels = {
+    scheduled: 'مجدول',
+    confirmed: 'مؤكد',
+    in_progress: 'جاري',
+    completed: 'مكتمل',
+    cancelled: 'ملغي'
+  };
+  return labels[status] || status;
+};
+
+const getStatusStyle = (status) => {
+  const styles = {
+    scheduled: { background: '#E0F2FE', color: '#0284C7' },
+    confirmed: { background: '#D1FAE5', color: '#059669' },
+    in_progress: { background: '#FEF3C7', color: '#D97706' },
+    completed: { background: '#DCFCE7', color: '#16A34A' },
+    cancelled: { background: '#FEE2E2', color: '#DC2626' }
+  };
+  return styles[status] || { background: '#F1F5F9', color: '#64748B' };
 };
 
 const styles = {
@@ -264,6 +402,10 @@ const styles = {
     background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
     color: 'white'
   },
+  cardIndigo: {
+    background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+    color: 'white'
+  },
   cardRed: {
     background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
     color: 'white'
@@ -297,6 +439,14 @@ const styles = {
     opacity: 0.95,
     lineHeight: '1.6'
   },
+  appointmentsSection: {
+    background: 'white',
+    borderRadius: '20px',
+    padding: '30px',
+    marginBottom: '30px',
+    boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+    border: '1px solid #E2E8F0'
+  },
   notificationsSection: {
     background: 'white',
     borderRadius: '20px',
@@ -318,6 +468,18 @@ const styles = {
     color: '#0F172A',
     fontWeight: '700'
   },
+  viewAllBtn: {
+    background: 'linear-gradient(135deg, #0EA5E9 0%, #10B981 100%)',
+    color: 'white',
+    padding: '8px 20px',
+    borderRadius: '20px',
+    border: 'none',
+    fontSize: '14px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.3s',
+    fontFamily: 'inherit'
+  },
   notifBadge: {
     background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
     color: 'white',
@@ -325,6 +487,45 @@ const styles = {
     borderRadius: '20px',
     fontSize: '13px',
     fontWeight: '600'
+  },
+  appointmentsTable: {
+    overflowX: 'auto'
+  },
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse'
+  },
+  tableHeaderRow: {
+    background: 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)'
+  },
+  tableHeader: {
+    padding: '16px',
+    textAlign: 'right',
+    fontSize: '15px',
+    fontWeight: '700',
+    color: '#0F172A',
+    borderBottom: '2px solid #E2E8F0'
+  },
+  tableRow: {
+    background: 'white',
+    transition: 'all 0.2s'
+  },
+  tableRowAlt: {
+    background: '#F8FAFC',
+    transition: 'all 0.2s'
+  },
+  tableCell: {
+    padding: '14px 16px',
+    fontSize: '15px',
+    color: '#334155',
+    borderBottom: '1px solid #E2E8F0'
+  },
+  statusBadge: {
+    padding: '4px 12px',
+    borderRadius: '12px',
+    fontSize: '13px',
+    fontWeight: '600',
+    display: 'inline-block'
   },
   notificationsList: {
     display: 'flex',
