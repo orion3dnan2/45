@@ -176,11 +176,11 @@ const Payments = () => {
           ${payment.notes ? `<p><strong>ملاحظات:</strong> ${payment.notes}</p>` : ''}
         </div>
         <div class="amount">
-          المبلغ المدفوع: ${payment.amount} ريال
+          المبلغ المدفوع: ${parseFloat(payment.amount).toFixed(3)} د.ك
         </div>
         <div class="footer">
           <p>شكراً لزيارتكم - نتمنى لكم دوام الصحة والعافية</p>
-          <p>تم الطباعة: ${new Date().toLocaleString('ar-SA')}</p>
+          <p>تم الطباعة: ${new Date().toLocaleString('ar-KW')}</p>
         </div>
         <script>
           window.print();
@@ -220,12 +220,12 @@ const Payments = () => {
         <div style={styles.statsSection}>
           <div style={styles.statCard}>
             <div style={styles.statIcon}>✅</div>
-            <h3 style={styles.statValue}>{stats.summary.total_completed || 0} ريال</h3>
+            <h3 style={styles.statValue}>{(stats.summary.total_completed || 0).toFixed(3)} د.ك</h3>
             <p style={styles.statLabel}>إجمالي المدفوعات المكتملة</p>
           </div>
           <div style={{...styles.statCard, background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)'}}>
             <div style={styles.statIcon}>⏳</div>
-            <h3 style={styles.statValue}>{stats.summary.total_pending || 0} ريال</h3>
+            <h3 style={styles.statValue}>{(stats.summary.total_pending || 0).toFixed(3)} د.ك</h3>
             <p style={styles.statLabel}>المدفوعات المعلقة</p>
           </div>
           <div style={{...styles.statCard, background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)'}}>
@@ -253,7 +253,7 @@ const Payments = () => {
                 <div style={styles.pendingTreatmentAction}>
                   <div style={styles.pendingCostBadge}>
                     <span style={styles.costLabel}>التكلفة</span>
-                    <span style={styles.costValue}>{treatment.cost} ريال</span>
+                    <span style={styles.costValue}>{parseFloat(treatment.cost).toFixed(3)} د.ك</span>
                   </div>
                   <button 
                     onClick={() => handlePayFromTreatment(treatment)} 
@@ -305,7 +305,7 @@ const Payments = () => {
           <div key={payment.id} style={styles.paymentCard}>
             <div style={styles.paymentHeader}>
               <div>
-                <h3 style={styles.paymentTitle}>💰 {payment.amount} ريال</h3>
+                <h3 style={styles.paymentTitle}>💰 {parseFloat(payment.amount).toFixed(3)} د.ك</h3>
                 <p style={styles.paymentId}>إيصال #{payment.id}</p>
               </div>
               <span style={getStatusBadgeStyle(payment.status)}>
@@ -375,14 +375,14 @@ const Payments = () => {
 
               <div style={styles.formGrid}>
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>المبلغ (ريال) *</label>
+                  <label style={styles.label}>المبلغ (د.ك) *</label>
                   <input 
                     type="number"
                     value={formData.amount} 
                     onChange={(e) => setFormData({...formData, amount: e.target.value})}
                     style={styles.input}
                     min="0"
-                    step="0.01"
+                    step="0.001"
                     required
                   />
                 </div>

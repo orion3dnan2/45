@@ -177,7 +177,7 @@ const Treatments = () => {
               <p><strong>التاريخ:</strong> {treatment.treatment_date}</p>
               {treatment.diagnosis && <p><strong>التشخيص:</strong> {treatment.diagnosis}</p>}
               {treatment.tooth_number && <p><strong>رقم السن:</strong> {treatment.tooth_number}</p>}
-              {treatment.cost && <p><strong>التكلفة:</strong> {treatment.cost} ر.س</p>}
+              {treatment.cost && <p><strong>التكلفة:</strong> {parseFloat(treatment.cost).toFixed(3)} د.ك</p>}
               {treatment.notes && <p><strong>ملاحظات:</strong> {treatment.notes}</p>}
             </div>
 
@@ -285,14 +285,14 @@ const Treatments = () => {
               </div>
 
               <div style={styles.formRow}>
-                <label style={styles.label}>التكلفة (ر.س)</label>
+                <label style={styles.label}>التكلفة (د.ك)</label>
                 <input
                   type="number"
-                  step="0.01"
+                  step="0.001"
                   value={formData.cost}
                   onChange={(e) => setFormData({...formData, cost: e.target.value})}
                   style={styles.input}
-                  placeholder="0.00"
+                  placeholder="0.000"
                 />
               </div>
 
