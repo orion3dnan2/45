@@ -193,6 +193,71 @@ else {
         );
 
         ALTER TABLE patients ADD COLUMN IF NOT EXISTS diagnosis TEXT;
+
+        CREATE TABLE IF NOT EXISTS governorates (
+          id SERIAL PRIMARY KEY,
+          name_ar TEXT NOT NULL,
+          name_en TEXT NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS areas (
+          id SERIAL PRIMARY KEY,
+          governorate_id INTEGER NOT NULL,
+          name_ar TEXT NOT NULL,
+          name_en TEXT NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (governorate_id) REFERENCES governorates(id)
+        );
+
+        ALTER TABLE patients ADD COLUMN IF NOT EXISTS governorate_id INTEGER;
+        ALTER TABLE patients ADD COLUMN IF NOT EXISTS area_id INTEGER;
+        ALTER TABLE suppliers ADD COLUMN IF NOT EXISTS governorate_id INTEGER;
+        ALTER TABLE suppliers ADD COLUMN IF NOT EXISTS area_id INTEGER;
+
+        INSERT INTO governorates (id, name_ar, name_en) 
+        VALUES 
+          (1, 'العاصمة', 'Capital'),
+          (2, 'حولي', 'Hawalli'),
+          (3, 'الفروانية', 'Farwaniya'),
+          (4, 'الأحمدي', 'Ahmadi'),
+          (5, 'الجهراء', 'Jahra'),
+          (6, 'مبارك الكبير', 'Mubarak Al-Kabeer')
+        ON CONFLICT (id) DO NOTHING;
+
+        INSERT INTO areas (governorate_id, name_ar, name_en)
+        VALUES
+          (1, 'الشويخ', 'Shuwaikh'),
+          (1, 'الدسمة', 'Dasman'),
+          (1, 'المرقاب', 'Mirqab'),
+          (1, 'الصوابر', 'Sawabir'),
+          (1, 'دسمان', 'Dasman'),
+          (2, 'السالمية', 'Salmiya'),
+          (2, 'حولي', 'Hawalli'),
+          (2, 'الجابرية', 'Jabriya'),
+          (2, 'بيان', 'Bayan'),
+          (2, 'مشرف', 'Mishref'),
+          (2, 'سلوى', 'Salwa'),
+          (3, 'الفروانية', 'Farwaniya'),
+          (3, 'جليب الشيوخ', 'Jleeb Al-Shuyoukh'),
+          (3, 'الرقعي', 'Riggae'),
+          (3, 'العمرية', 'Omariya'),
+          (3, 'خيطان', 'Khaitan'),
+          (4, 'الأحمدي', 'Ahmadi'),
+          (4, 'الفحيحيل', 'Fahaheel'),
+          (4, 'المنقف', 'Mangaf'),
+          (4, 'أبو حليفة', 'Abu Halifa'),
+          (4, 'صباح السالم', 'Sabah Al-Salem'),
+          (5, 'الجهراء', 'Jahra'),
+          (5, 'القيروان', 'Qairowan'),
+          (5, 'النسيم', 'Naseem'),
+          (5, 'الصليبية', 'Sulaibiya'),
+          (6, 'مبارك الكبير', 'Mubarak Al-Kabeer'),
+          (6, 'صباح الناصر', 'Sabah Al-Nasser'),
+          (6, 'العدان', 'Al-Adan'),
+          (6, 'القصور', 'Al-Qusor'),
+          (6, 'المسيلة', 'Messila')
+        ON CONFLICT DO NOTHING;
       `);
       
       console.log('Database initialized successfully');
