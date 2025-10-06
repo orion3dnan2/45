@@ -218,7 +218,7 @@ const Payments = () => {
         )}
       </div>
       
-      {stats && (
+      {stats && user.role !== 'reception' && (
         <div style={styles.statsSection}>
           <div style={styles.statCard}>
             <div style={styles.statIcon}>✅</div>
