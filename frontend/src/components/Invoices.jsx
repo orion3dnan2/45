@@ -9,7 +9,6 @@ const Invoices = () => {
   const [treatments, setTreatments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -22,13 +21,6 @@ const Invoices = () => {
     items: [{ description: '', quantity: 1, unit_price: '' }],
     tax_rate: 0,
     discount_rate: 0,
-    notes: ''
-  });
-
-  const [paymentForm, setPaymentForm] = useState({
-    amount: '',
-    payment_method: 'cash',
-    payment_reference: '',
     notes: ''
   });
 
@@ -124,34 +116,6 @@ const Invoices = () => {
     }
   };
 
-  const handleRecordPayment = async (e) => {
-    e.preventDefault();
-    try {
-      await api.recordInvoicePayment(selectedInvoice.id, {
-        ...paymentForm,
-        amount: parseFloat(paymentForm.amount)
-      });
-      setShowPaymentModal(false);
-      resetPaymentForm();
-      loadData();
-      alert('تم تسجيل الدفعة بنجاح');
-    } catch (error) {
-      console.error('خطأ في تسجيل الدفعة:', error);
-      alert('فشل في تسجيل الدفعة');
-    }
-  };
-
-  const openPaymentModal = (invoice) => {
-    setSelectedInvoice(invoice);
-    setPaymentForm({
-      amount: invoice.balance_due,
-      payment_method: 'cash',
-      payment_reference: '',
-      notes: ''
-    });
-    setShowPaymentModal(true);
-  };
-
   const resetInvoiceForm = () => {
     setInvoiceForm({
       patient_id: '',
@@ -164,15 +128,6 @@ const Invoices = () => {
       notes: ''
     });
     setTreatments([]);
-  };
-
-  const resetPaymentForm = () => {
-    setPaymentForm({
-      amount: '',
-      payment_method: 'cash',
-      payment_reference: '',
-      notes: ''
-    });
   };
 
   const filteredInvoices = invoices.filter(invoice => {
@@ -290,14 +245,6 @@ const Invoices = () => {
                     </span>
                   </td>
                   <td style={styles.tableCell}>
-                    {invoice.balance_due > 0 && invoice.status !== 'cancelled' && (
-                      <button
-                        onClick={() => openPaymentModal(invoice)}
-                        style={styles.payButton}
-                      >
-                        💰 تسجيل دفعة
-                      </button>
-                    )}
                   </td>
                 </tr>
               ))}
@@ -477,96 +424,6 @@ const Invoices = () => {
                 <button
                   type="button"
                   onClick={() => { setShowInvoiceModal(false); resetInvoiceForm(); }}
-                  style={styles.cancelButton}
-                >
-                  إلغاء
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {showPaymentModal && selectedInvoice && (
-        <div style={styles.modal}>
-          <div style={{...styles.modalContent, maxWidth: '500px'}}>
-            <div style={styles.modalHeader}>
-              <h2 style={styles.modalTitle}>تسجيل دفعة - {selectedInvoice.invoice_number}</h2>
-              <button onClick={() => { setShowPaymentModal(false); resetPaymentForm(); }} style={styles.closeButton}>×</button>
-            </div>
-            <form onSubmit={handleRecordPayment}>
-              <div style={styles.paymentInfo}>
-                <div style={styles.infoRow}>
-                  <span>إجمالي الفاتورة:</span>
-                  <strong>{parseFloat(selectedInvoice.total_amount).toFixed(3)} د.ك</strong>
-                </div>
-                <div style={styles.infoRow}>
-                  <span>المدفوع:</span>
-                  <strong>{parseFloat(selectedInvoice.amount_paid).toFixed(3)} د.ك</strong>
-                </div>
-                <div style={{...styles.infoRow, ...styles.balanceRow}}>
-                  <span>الرصيد المتبقي:</span>
-                  <strong style={{ color: '#DC2626' }}>{parseFloat(selectedInvoice.balance_due).toFixed(3)} د.ك</strong>
-                </div>
-              </div>
-
-              <div style={styles.formGroup}>
-                <label style={styles.label}>المبلغ المدفوع *</label>
-                <input
-                  type="number"
-                  step="0.001"
-                  value={paymentForm.amount}
-                  onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })}
-                  style={styles.input}
-                  max={selectedInvoice.balance_due}
-                  required
-                />
-              </div>
-
-              <div style={styles.formGroup}>
-                <label style={styles.label}>طريقة الدفع *</label>
-                <select
-                  value={paymentForm.payment_method}
-                  onChange={(e) => setPaymentForm({ ...paymentForm, payment_method: e.target.value })}
-                  style={styles.input}
-                  required
-                >
-                  <option value="cash">نقدي</option>
-                  <option value="knet">كي نت</option>
-                  <option value="credit_card">بطاقة ائتمان</option>
-                  <option value="bank_transfer">تحويل بنكي</option>
-                  <option value="insurance">تأمين</option>
-                </select>
-              </div>
-
-              <div style={styles.formGroup}>
-                <label style={styles.label}>رقم المرجع / الإيصال</label>
-                <input
-                  type="text"
-                  value={paymentForm.payment_reference}
-                  onChange={(e) => setPaymentForm({ ...paymentForm, payment_reference: e.target.value })}
-                  style={styles.input}
-                  placeholder="رقم المعاملة أو الإيصال"
-                />
-              </div>
-
-              <div style={styles.formGroup}>
-                <label style={styles.label}>ملاحظات</label>
-                <textarea
-                  value={paymentForm.notes}
-                  onChange={(e) => setPaymentForm({ ...paymentForm, notes: e.target.value })}
-                  style={{...styles.input, minHeight: '60px', resize: 'vertical'}}
-                  rows="2"
-                />
-              </div>
-
-              <div style={styles.modalActions}>
-                <button type="submit" style={styles.submitButton}>
-                  تسجيل الدفعة
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setShowPaymentModal(false); resetPaymentForm(); }}
                   style={styles.cancelButton}
                 >
                   إلغاء

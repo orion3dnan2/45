@@ -283,15 +283,6 @@ export const api = {
     return response.json();
   },
 
-  async recordInvoicePayment(id, paymentData) {
-    const response = await fetch(`${API_URL}/invoices/${id}/payment`, {
-      method: 'POST',
-      headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
-      body: JSON.stringify(paymentData)
-    });
-    return response.json();
-  },
-
   async getDoctors() {
     const response = await fetch(`${API_URL}/auth/users?role=doctor`, {
       headers: getAuthHeader()

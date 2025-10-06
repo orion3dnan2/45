@@ -237,81 +237,10 @@ const deleteInvoice = async (req, res) => {
   }
 };
 
-const recordPayment = async (req, res) => {
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
-
-    const { id } = req.params;
-    const { amount, payment_method, payment_reference, notes } = req.body;
-
-    const invoiceResult = await client.query(
-      'SELECT total_amount, amount_paid FROM invoices WHERE id = $1',
-      [id]
-    );
-
-    if (invoiceResult.rows.length === 0) {
-      return res.status(404).json({ message: 'الفاتورة غير موجودة' });
-    }
-
-    const invoice = invoiceResult.rows[0];
-    const newAmountPaid = parseFloat(invoice.amount_paid) + parseFloat(amount);
-    const balance_due = parseFloat(invoice.total_amount) - newAmountPaid;
-
-    let status = 'pending';
-    if (balance_due <= 0) {
-      status = 'paid';
-    } else if (newAmountPaid > 0) {
-      status = 'partially_paid';
-    }
-
-    await client.query(`
-      UPDATE invoices 
-      SET amount_paid = $1, balance_due = $2, status = $3, updated_at = CURRENT_TIMESTAMP
-      WHERE id = $4
-    `, [newAmountPaid, balance_due, status, id]);
-
-    const invoiceData = await client.query(
-      'SELECT patient_id, treatment_id FROM invoices WHERE id = $1',
-      [id]
-    );
-
-    await client.query(`
-      INSERT INTO payments (
-        patient_id, treatment_id, invoice_id, amount, payment_method,
-        payment_reference, payment_date, status, notes, created_by, received_by
-      )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-    `, [
-      invoiceData.rows[0].patient_id,
-      invoiceData.rows[0].treatment_id,
-      id,
-      amount,
-      payment_method,
-      payment_reference || null,
-      new Date().toISOString().split('T')[0],
-      'completed',
-      notes || null,
-      req.user.id,
-      req.user.id
-    ]);
-
-    await client.query('COMMIT');
-    res.json({ message: 'تم تسجيل الدفعة بنجاح', balance_due, status });
-  } catch (error) {
-    await client.query('ROLLBACK');
-    console.error('Error recording payment:', error);
-    res.status(500).json({ message: 'خطأ في تسجيل الدفعة' });
-  } finally {
-    client.release();
-  }
-};
-
 module.exports = {
   getAllInvoices,
   getInvoiceById,
   createInvoice,
   updateInvoice,
-  deleteInvoice,
-  recordPayment
+  deleteInvoice
 };
