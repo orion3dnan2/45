@@ -37,11 +37,12 @@ const getPatients = async (req, res) => {
     
     if (userRole === 'doctor') {
       query += `
-      WHERE p.id IN (
-        SELECT DISTINCT patient_id FROM appointments WHERE doctor_id = ${userId}
-        UNION
-        SELECT DISTINCT patient_id FROM treatments WHERE doctor_id = ${userId}
-      )
+      WHERE (p.primary_doctor_id = ${userId} 
+        OR p.id IN (
+          SELECT DISTINCT patient_id FROM appointments WHERE doctor_id = ${userId}
+          UNION
+          SELECT DISTINCT patient_id FROM treatments WHERE doctor_id = ${userId}
+        ))
       `;
       
       if (archived !== undefined) {
@@ -96,7 +97,10 @@ const getPatientById = async (req, res) => {
   // وضع الإنتاج: الاستعلام من قاعدة البيانات
   const client = await pool.connect();
   try {
-    const patientResult = await client.query(`
+    const userRole = req.user.role;
+    const userId = req.user.id;
+    
+    let query = `
       SELECT p.*, 
              COALESCE(p.full_name, u.full_name) as full_name,
              COALESCE(p.email, u.email) as email,
@@ -105,12 +109,23 @@ const getPatientById = async (req, res) => {
       FROM patients p
       LEFT JOIN users u ON p.user_id = u.id
       WHERE p.id = $1
-    `, [id]);
+    `;
+    
+    if (userRole === 'doctor') {
+      query += ` AND (p.primary_doctor_id = ${userId} 
+        OR p.id IN (
+          SELECT DISTINCT patient_id FROM appointments WHERE doctor_id = ${userId}
+          UNION
+          SELECT DISTINCT patient_id FROM treatments WHERE doctor_id = ${userId}
+        ))`;
+    }
+    
+    const patientResult = await client.query(query, [id]);
     
     const patient = patientResult.rows[0];
     
     if (!patient) {
-      return res.status(404).json({ error: 'المريض غير موجود' });
+      return res.status(404).json({ error: 'المريض غير موجود أو ليس لديك صلاحية الوصول' });
     }
 
     const appointmentsResult = await client.query(`
