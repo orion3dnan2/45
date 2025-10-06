@@ -291,12 +291,14 @@ const Patients = () => {
               >
                 📋 المعلومات الشخصية
               </button>
-              <button 
-                onClick={() => setActiveTab('medical')} 
-                style={activeTab === 'medical' ? styles.activeTab : styles.tab}
-              >
-                🏥 التاريخ الطبي
-              </button>
+              {user.role !== 'reception' && (
+                <button 
+                  onClick={() => setActiveTab('medical')} 
+                  style={activeTab === 'medical' ? styles.activeTab : styles.tab}
+                >
+                  🏥 التاريخ الطبي
+                </button>
+              )}
               <button 
                 onClick={() => setActiveTab('appointments')} 
                 style={activeTab === 'appointments' ? styles.activeTab : styles.tab}
