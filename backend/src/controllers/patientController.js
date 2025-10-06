@@ -22,9 +22,11 @@ const getPatients = async (req, res) => {
   const client = await pool.connect();
   try {
     const { archived } = req.query;
+    const userRole = req.user.role;
+    const userId = req.user.id;
     
     let query = `
-      SELECT p.*, 
+      SELECT DISTINCT p.*, 
              COALESCE(p.full_name, u.full_name) as full_name,
              COALESCE(p.email, u.email) as email,
              COALESCE(p.phone, u.phone) as phone,
@@ -33,18 +35,31 @@ const getPatients = async (req, res) => {
       LEFT JOIN users u ON p.user_id = u.id
     `;
     
-    const params = [];
-    
-    if (archived !== undefined) {
-      query += ' WHERE p.archived = $1';
-      params.push(archived === 'true' ? 1 : 0);
+    if (userRole === 'doctor') {
+      query += `
+      WHERE p.id IN (
+        SELECT DISTINCT patient_id FROM appointments WHERE doctor_id = ${userId}
+        UNION
+        SELECT DISTINCT patient_id FROM treatments WHERE doctor_id = ${userId}
+      )
+      `;
+      
+      if (archived !== undefined) {
+        query += ` AND p.archived = ${archived === 'true' ? 1 : 0}`;
+      } else {
+        query += ` AND p.archived = 0`;
+      }
     } else {
-      query += ' WHERE p.archived = 0';
+      if (archived !== undefined) {
+        query += ` WHERE p.archived = ${archived === 'true' ? 1 : 0}`;
+      } else {
+        query += ` WHERE p.archived = 0`;
+      }
     }
     
     query += ' ORDER BY p.created_at DESC';
     
-    const result = await client.query(query, params);
+    const result = await client.query(query);
     const patients = result.rows;
     res.json(patients);
   } catch (error) {
