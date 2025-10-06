@@ -8,9 +8,9 @@ async function seed() {
     console.log('إنشاء بيانات تجريبية...');
     
     const users = [
-      { username: 'reception', password: 'password', full_name: 'موظف الاستقبال', role: 'reception', email: 'reception@clinic.com', phone: '0501234568' },
-      { username: 'doctor', password: 'password', full_name: 'د. أحمد محمد', role: 'doctor', email: 'doctor@clinic.com', phone: '+96551325559' },
-      { username: 'admin', password: 'password', full_name: 'المدير العام', role: 'admin', email: 'admin@clinic.com', phone: '0501234569' }
+      { username: 'reception', password: 'password', full_name: 'موظف الاستقبال', role: 'reception', email: 'reception@clinic.com.kw', phone: '96551234568' },
+      { username: 'doctor', password: 'password', full_name: 'د. أحمد محمد', role: 'doctor', email: 'doctor@clinic.com.kw', phone: '96551325559' },
+      { username: 'admin', password: 'password', full_name: 'المدير العام', role: 'admin', email: 'admin@clinic.com.kw', phone: '96551234569' }
     ];
     
     const userIds = {};
@@ -27,29 +27,29 @@ async function seed() {
     }
     
     const patient1Result = await client.query(
-      `INSERT INTO patients (national_id, date_of_birth, address, medical_history, allergies)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO patients (national_id, date_of_birth, address, medical_history, allergies, governorate_id, area_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        ON CONFLICT (national_id) DO UPDATE SET national_id = EXCLUDED.national_id
        RETURNING id`,
-      ['1234567890', '1990-05-15', 'الرياض، حي النخيل', 'لا يوجد', 'حساسية من البنسلين']
+      ['289123456789', '1990-05-15', 'الكويت، محافظة حولي - السالمية', 'لا يوجد', 'حساسية من البنسلين', 2, 6]
     );
     const patient1Id = patient1Result.rows[0].id;
     
     const patient2Result = await client.query(
-      `INSERT INTO patients (national_id, date_of_birth, address, medical_history, allergies)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO patients (national_id, date_of_birth, address, medical_history, allergies, governorate_id, area_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        ON CONFLICT (national_id) DO UPDATE SET national_id = EXCLUDED.national_id
        RETURNING id`,
-      ['0987654321', '1985-08-22', 'جدة، حي الزهراء', 'ضغط الدم', 'لا يوجد']
+      ['287654321098', '1985-08-22', 'الكويت، محافظة العاصمة - الشويخ', 'ضغط الدم', 'لا يوجد', 1, 1]
     );
     const patient2Id = patient2Result.rows[0].id;
     
     const medications = [
-      { name: 'أموكسيسيلين 500mg', description: 'مضاد حيوي', unit: 'كبسولة', quantity_in_stock: 45, minimum_quantity: 20, unit_price: 2.5, category: 'مضادات حيوية' },
-      { name: 'إيبوبروفين 400mg', description: 'مسكن ومضاد التهاب', unit: 'قرص', quantity_in_stock: 8, minimum_quantity: 15, unit_price: 1.5, category: 'مسكنات' },
-      { name: 'قطن طبي', description: 'قطن معقم', unit: 'علبة', quantity_in_stock: 30, minimum_quantity: 10, unit_price: 5.0, category: 'مستلزمات' },
-      { name: 'قفازات طبية', description: 'قفازات لاتكس معقمة', unit: 'علبة (100 قطعة)', quantity_in_stock: 3, minimum_quantity: 5, unit_price: 15.0, category: 'مستلزمات' },
-      { name: 'مخدر موضعي', description: 'ليدوكايين 2%', unit: 'أمبول', quantity_in_stock: 25, minimum_quantity: 10, unit_price: 8.0, category: 'مخدرات' }
+      { name: 'أموكسيسيلين 500mg', description: 'مضاد حيوي', unit: 'كبسولة', quantity_in_stock: 45, minimum_quantity: 20, unit_price: 0.750, category: 'مضادات حيوية' },
+      { name: 'إيبوبروفين 400mg', description: 'مسكن ومضاد التهاب', unit: 'قرص', quantity_in_stock: 8, minimum_quantity: 15, unit_price: 0.450, category: 'مسكنات' },
+      { name: 'قطن طبي', description: 'قطن معقم', unit: 'علبة', quantity_in_stock: 30, minimum_quantity: 10, unit_price: 1.500, category: 'مستلزمات' },
+      { name: 'قفازات طبية', description: 'قفازات لاتكس معقمة', unit: 'علبة (100 قطعة)', quantity_in_stock: 3, minimum_quantity: 5, unit_price: 4.500, category: 'مستلزمات' },
+      { name: 'مخدر موضعي', description: 'ليدوكايين 2%', unit: 'أمبول', quantity_in_stock: 25, minimum_quantity: 10, unit_price: 2.400, category: 'مخدرات' }
     ];
     
     await client.query('DELETE FROM medication_usage');
@@ -69,9 +69,11 @@ async function seed() {
       { 
         name: 'شركة الأدوية المتحدة', 
         contact_person: 'خالد السعيد', 
-        phone: '0112345678', 
-        email: 'info@united-pharma.com',
-        address: 'الرياض',
+        phone: '22445566', 
+        email: 'info@united-pharma.com.kw',
+        address: 'الكويت، محافظة الأحمدي - الفحيحيل',
+        governorate_id: 4,
+        area_id: 18,
         subscription_start_date: '2024-01-01',
         subscription_end_date: '2025-06-30',
         payment_terms: 'الدفع خلال 30 يوم'
@@ -79,9 +81,11 @@ async function seed() {
       { 
         name: 'مؤسسة المستلزمات الطبية', 
         contact_person: 'عبدالرحمن أحمد', 
-        phone: '0112345679', 
-        email: 'sales@medical-supplies.com',
-        address: 'جدة',
+        phone: '22334455', 
+        email: 'sales@medical-supplies.com.kw',
+        address: 'الكويت، محافظة الفروانية - جليب الشيوخ',
+        governorate_id: 3,
+        area_id: 13,
         subscription_start_date: '2024-06-01',
         subscription_end_date: '2024-12-31',
         payment_terms: 'الدفع عند الاستلام'
@@ -92,14 +96,16 @@ async function seed() {
     
     for (const supplier of suppliers) {
       await client.query(
-        `INSERT INTO suppliers (name, contact_person, phone, email, address, subscription_start_date, subscription_end_date, payment_terms)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        `INSERT INTO suppliers (name, contact_person, phone, email, address, governorate_id, area_id, subscription_start_date, subscription_end_date, payment_terms)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
         [
           supplier.name, 
           supplier.contact_person, 
           supplier.phone, 
           supplier.email,
           supplier.address,
+          supplier.governorate_id,
+          supplier.area_id,
           supplier.subscription_start_date,
           supplier.subscription_end_date,
           supplier.payment_terms
@@ -155,7 +161,7 @@ async function seed() {
         procedure_done: 'حشو مركب',
         tooth_number: '16',
         status: 'completed',
-        cost: 350.00,
+        cost: 105.000,
         notes: 'تم العلاج بنجاح'
       }
     ];
