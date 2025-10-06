@@ -20,6 +20,7 @@ const Invoices = () => {
     invoice_date: new Date().toISOString().split('T')[0],
     governorate_id: '',
     area_id: '',
+    payment_method: 'cash',
     items: [{ service: '', quantity: 1, unit_price: '', notes: '' }],
     discount: 0,
     extra_fees: 0,
@@ -110,7 +111,8 @@ const Invoices = () => {
       setInvoiceForm({
         ...invoiceForm,
         patient_id: '',
-        items: [{ service: '', quantity: 1, unit_price: '', notes: '' }]
+        items: [{ service: '', quantity: 1, unit_price: '', notes: '' }],
+        payment_method: 'cash'
       });
       setPatientTreatments([]);
     }
@@ -158,7 +160,7 @@ const Invoices = () => {
         patient_id: invoiceForm.patient_id,
         amount: calculateTotal(),
         payment_date: invoiceForm.invoice_date,
-        payment_method: 'cash',
+        payment_method: invoiceForm.payment_method,
         status: 'pending',
         notes: JSON.stringify({
           doctor_name: invoiceForm.doctor_name,
@@ -194,6 +196,7 @@ const Invoices = () => {
       invoice_date: new Date().toISOString().split('T')[0],
       governorate_id: '',
       area_id: '',
+      payment_method: 'cash',
       items: [{ service: '', quantity: 1, unit_price: '', notes: '' }],
       discount: 0,
       extra_fees: 0,
@@ -573,6 +576,12 @@ const Invoices = () => {
                     {parseFloat(invoice.amount).toFixed(3)} د.ك
                   </span>
                 </div>
+                <div style={styles.paymentMethodDisplay}>
+                  <span style={{fontSize: '14px', color: '#64748B'}}>طريقة الدفع:</span>
+                  <span style={styles.paymentMethodBadge}>
+                    {getPaymentMethodIcon(invoice.payment_method)} {getPaymentMethodLabel(invoice.payment_method)}
+                  </span>
+                </div>
                 <div style={styles.invoiceActions}>
                   <button onClick={() => printInvoice(invoice)} style={styles.printBtn}>
                     🖨️ طباعة
@@ -664,6 +673,24 @@ const Invoices = () => {
                   />
                 </div>
 
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>طريقة الدفع *</label>
+                  <select 
+                    value={invoiceForm.payment_method}
+                    onChange={(e) => setInvoiceForm({...invoiceForm, payment_method: e.target.value})}
+                    style={styles.input}
+                    required
+                  >
+                    <option value="cash">نقدي (Cash)</option>
+                    <option value="knet">كي نت (KNET)</option>
+                    <option value="card">بطاقة ائتمان (Credit Card)</option>
+                    <option value="transfer">تحويل بنكي</option>
+                    <option value="insurance">تأمين</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={styles.formGrid}>
                 <div style={styles.formGroup}>
                   <label style={styles.label}>المحافظة</label>
                   <select 
@@ -834,6 +861,28 @@ const getStatusBadgeStyle = (status) => {
   return { ...baseStyle, ...colors[status] };
 };
 
+const getPaymentMethodLabel = (method) => {
+  const labels = {
+    cash: 'نقدي',
+    knet: 'كي نت (KNET)',
+    card: 'بطاقة ائتمان',
+    transfer: 'تحويل بنكي',
+    insurance: 'تأمين'
+  };
+  return labels[method] || method;
+};
+
+const getPaymentMethodIcon = (method) => {
+  const icons = {
+    cash: '💵',
+    knet: '💳',
+    card: '💳',
+    transfer: '🏦',
+    insurance: '🏥'
+  };
+  return icons[method] || '💰';
+};
+
 const styles = {
   header: {
     display: 'flex',
@@ -992,6 +1041,23 @@ const styles = {
     fontWeight: '600',
     marginBottom: '12px',
     color: '#334155'
+  },
+  paymentMethodDisplay: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    marginBottom: '12px',
+    padding: '8px 12px',
+    background: '#F8FAFC',
+    borderRadius: '8px'
+  },
+  paymentMethodBadge: {
+    padding: '4px 12px',
+    background: '#E0F2FE',
+    color: '#0369A1',
+    borderRadius: '12px',
+    fontSize: '14px',
+    fontWeight: '600'
   },
   invoiceActions: {
     display: 'flex',
