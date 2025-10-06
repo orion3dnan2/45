@@ -60,7 +60,7 @@ const Signup = () => {
           <div style={styles.logoCircle}>
             <span style={styles.toothIcon}>🦷</span>
           </div>
-          <h1 style={styles.brandTitle}>عيادة الأسنان الحديثة</h1>
+          <h1 style={styles.brandTitle}>مركز العيادات التخصصية - عيادة الاسنان</h1>
           <p style={styles.brandSubtitle}>انضم إلى فريق العمل</p>
           <div style={styles.features}>
             <div style={styles.feature}>

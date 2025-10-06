@@ -47,7 +47,7 @@ const Home = () => {
       <div style={styles.header}>
         <div>
           <h1 style={styles.title}>مرحباً، {user.full_name} 👋</h1>
-          <p style={styles.subtitle}>نظام إدارة عيادة الأسنان الحديثة</p>
+          <p style={styles.subtitle}>نظام إدارة مركز العيادات التخصصية - عيادة الاسنان</p>
         </div>
         <div style={styles.headerBadge}>
           <span style={styles.badgeText}>{getRoleLabel(user.role)}</span>

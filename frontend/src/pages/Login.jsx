@@ -67,7 +67,7 @@ const Login = () => {
           <div style={styles.logoCircle}>
             <span style={styles.toothIcon}>🦷</span>
           </div>
-          <h1 style={styles.brandTitle}>عيادة الأسنان الحديثة</h1>
+          <h1 style={styles.brandTitle}>مركز العيادات التخصصية - عيادة الاسنان</h1>
           <p style={styles.brandSubtitle}>نظام إدارة متطور لعيادات الأسنان</p>
           <div style={styles.features}>
             <div style={styles.feature}>
