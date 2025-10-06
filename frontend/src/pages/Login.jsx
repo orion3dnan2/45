@@ -1,8 +1,10 @@
 import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { api } from '../services/api';
 
 const Login = () => {
+  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -51,11 +53,9 @@ const Login = () => {
   };
 
   const demoAccounts = [
-    { username: 'doctor', password: 'password', role: 'طبيب', icon: '👨‍⚕️', color: '#0EA5E9' },
     { username: 'reception', password: 'password', role: 'استقبال', icon: '👩‍💼', color: '#10B981' },
-    { username: 'admin', password: 'password', role: 'إداري', icon: '👨‍💻', color: '#8B5CF6' },
-    { username: 'accountant', password: 'password', role: 'محاسب', icon: '💰', color: '#F59E0B' },
-    { username: 'warehouse', password: 'password', role: 'مسؤول مخزن', icon: '📦', color: '#EF4444' }
+    { username: 'doctor', password: 'password', role: 'طبيب', icon: '👨‍⚕️', color: '#0EA5E9' },
+    { username: 'admin', password: 'password', role: 'إداري', icon: '👨‍💻', color: '#8B5CF6' }
   ];
 
   return (
@@ -128,6 +128,18 @@ const Login = () => {
               {loading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
             </button>
           </form>
+
+          <div style={styles.signupLink}>
+            <p style={styles.signupText}>
+              ليس لديك حساب؟{' '}
+              <button 
+                onClick={() => navigate('/signup')} 
+                style={styles.linkButton}
+              >
+                إنشاء حساب جديد
+              </button>
+            </p>
+          </div>
           
           <div style={styles.demoInfo}>
             <p style={styles.demoTitle}>🔑 حسابات تجريبية - اضغط للدخول السريع:</p>
@@ -404,6 +416,26 @@ const styles = {
     fontSize: '20px',
     color: '#94A3B8',
     transition: 'all 0.3s'
+  },
+  signupLink: {
+    marginTop: '25px',
+    textAlign: 'center',
+    paddingTop: '20px',
+    borderTop: '1px solid #E2E8F0'
+  },
+  signupText: {
+    color: '#64748B',
+    fontSize: '15px'
+  },
+  linkButton: {
+    background: 'none',
+    border: 'none',
+    color: '#0EA5E9',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    textDecoration: 'underline',
+    fontSize: '15px',
+    fontFamily: 'inherit'
   }
 };
 

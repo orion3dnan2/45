@@ -3,10 +3,10 @@ const router = express.Router();
 const { createTreatment, getTreatments, updateTreatment } = require('../controllers/treatmentController');
 const { authMiddleware, checkRole } = require('../middleware/auth');
 
-router.post('/', authMiddleware, checkRole('doctor', 'warehouse_manager'), createTreatment);
+router.post('/', authMiddleware, checkRole('doctor', 'admin'), createTreatment);
 router.get('/', authMiddleware, getTreatments);
-router.put('/:id', authMiddleware, checkRole('doctor', 'warehouse_manager'), updateTreatment);
-router.delete('/:id', authMiddleware, checkRole('doctor', 'warehouse_manager', 'admin'), async (req, res) => {
+router.put('/:id', authMiddleware, checkRole('doctor', 'admin'), updateTreatment);
+router.delete('/:id', authMiddleware, checkRole('doctor', 'admin'), async (req, res) => {
   const pool = require('../models/database');
   const client = await pool.connect();
   try {

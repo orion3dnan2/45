@@ -23,13 +23,6 @@ const register = async (req, res) => {
 
     const userId = result.rows[0].id;
 
-    if (role === 'patient') {
-      await client.query(
-        `INSERT INTO patients (user_id) VALUES ($1)`,
-        [userId]
-      );
-    }
-
     res.status(201).json({ message: 'تم إنشاء الحساب بنجاح', userId });
   } catch (error) {
     if (error.message.includes('duplicate key') || error.code === '23505') {
