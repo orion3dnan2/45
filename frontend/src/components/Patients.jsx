@@ -77,6 +77,8 @@ const Patients = () => {
     e.preventDefault();
     try {
       await api.updatePatient(selectedPatient.id, {
+        full_name: formData.full_name,
+        phone: formData.phone,
         national_id: formData.national_id,
         date_of_birth: formData.date_of_birth,
         address: formData.address,
@@ -86,6 +88,7 @@ const Patients = () => {
         diagnosis: formData.diagnosis
       });
       setShowEditModal(false);
+      loadPatients();
       viewPatientDetails(selectedPatient.id);
       alert('تم تحديث بيانات المريض بنجاح');
     } catch (error) {
@@ -215,13 +218,39 @@ const Patients = () => {
                   ...styles.patientCard,
                   ...(selectedPatient?.id === patient.id ? styles.selectedCard : {})
                 }} 
-                onClick={() => viewPatientDetails(patient.id)}
               >
-                <div style={styles.patientInfo}>
+                <div style={styles.patientInfo} onClick={() => viewPatientDetails(patient.id)}>
                   <h3 style={styles.patientName}>👤 {patient.full_name || 'غير محدد'}</h3>
                   <p style={styles.patientDetail}>📞 {patient.phone || 'لا يوجد'}</p>
                   <p style={styles.patientDetail}>🆔 الرقم المدني: {patient.national_id || 'لا يوجد'}</p>
                 </div>
+                {canDelete && (
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (window.confirm(`هل تريد حذف ${patient.full_name || 'هذا المريض'}؟`)) {
+                        if (window.confirm('⚠️ تأكيد نهائي: هذا الإجراء لا يمكن التراجع عنه!')) {
+                          api.deletePatient(patient.id)
+                            .then(() => {
+                              loadPatients();
+                              if (selectedPatient?.id === patient.id) {
+                                setSelectedPatient(null);
+                              }
+                              alert('تم حذف المريض بنجاح');
+                            })
+                            .catch(err => {
+                              console.error('خطأ في حذف المريض:', err);
+                              alert('فشل في حذف المريض');
+                            });
+                        }
+                      }
+                    }}
+                    style={styles.deleteIconBtn}
+                    title="حذف المريض"
+                  >
+                    🗑️
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -560,22 +589,24 @@ const Patients = () => {
             <form onSubmit={handleEditPatient}>
               <div style={styles.formGrid}>
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>الاسم الكامل</label>
+                  <label style={styles.label}>الاسم الكامل *</label>
                   <input 
                     type="text"
                     value={formData.full_name} 
-                    style={{...styles.input, backgroundColor: '#f5f5f5'}}
-                    disabled
+                    onChange={(e) => setFormData({...formData, full_name: e.target.value})}
+                    style={styles.input}
+                    required
                   />
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>رقم الهاتف</label>
+                  <label style={styles.label}>رقم الهاتف *</label>
                   <input 
                     type="tel"
                     value={formData.phone} 
-                    style={{...styles.input, backgroundColor: '#f5f5f5'}}
-                    disabled
+                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    style={styles.input}
+                    required
                   />
                 </div>
 
@@ -800,8 +831,11 @@ const styles = {
     background: '#F8FAFC',
     borderRadius: '12px',
     border: '2px solid #E2E8F0',
-    cursor: 'pointer',
-    transition: 'all 0.3s'
+    transition: 'all 0.3s',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: '10px'
   },
   selectedCard: {
     background: 'linear-gradient(135deg, #667eea15 0%, #764ba215 100%)',
@@ -811,7 +845,21 @@ const styles = {
   patientInfo: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '6px'
+    gap: '6px',
+    flex: 1,
+    cursor: 'pointer'
+  },
+  deleteIconBtn: {
+    background: 'linear-gradient(135deg, #DC2626 0%, #991B1B 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '8px',
+    padding: '8px 12px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    transition: 'all 0.3s',
+    boxShadow: '0 2px 8px rgba(220, 38, 38, 0.3)',
+    minWidth: '40px'
   },
   patientName: {
     fontSize: '16px',

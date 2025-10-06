@@ -136,7 +136,39 @@ const updatePatient = async (req, res) => {
   const client = await pool.connect();
   try {
     const { id } = req.params;
-    const { national_id, date_of_birth, address, medical_history, allergies, insurance_info, diagnosis } = req.body;
+    const { full_name, phone, national_id, date_of_birth, address, medical_history, allergies, insurance_info, diagnosis } = req.body;
+
+    const patientResult = await client.query('SELECT user_id FROM patients WHERE id = $1', [id]);
+    if (patientResult.rows.length === 0) {
+      return res.status(404).json({ error: 'المريض غير موجود' });
+    }
+    
+    const userId = patientResult.rows[0].user_id;
+
+    if (userId && (full_name || phone)) {
+      const userUpdates = [];
+      const userParams = [];
+      let userParamCount = 1;
+
+      if (full_name) {
+        userUpdates.push(`full_name = $${userParamCount}`);
+        userParams.push(full_name);
+        userParamCount++;
+      }
+      if (phone) {
+        userUpdates.push(`phone = $${userParamCount}`);
+        userParams.push(phone);
+        userParamCount++;
+      }
+
+      userUpdates.push('updated_at = CURRENT_TIMESTAMP');
+      userParams.push(userId);
+
+      await client.query(
+        `UPDATE users SET ${userUpdates.join(', ')} WHERE id = $${userParamCount}`,
+        userParams
+      );
+    }
 
     const updates = [];
     const params = [];
@@ -178,13 +210,15 @@ const updatePatient = async (req, res) => {
       paramCount++;
     }
 
-    updates.push('updated_at = CURRENT_TIMESTAMP');
-    params.push(id);
+    if (updates.length > 0) {
+      updates.push('updated_at = CURRENT_TIMESTAMP');
+      params.push(id);
 
-    await client.query(
-      `UPDATE patients SET ${updates.join(', ')} WHERE id = $${paramCount}`,
-      params
-    );
+      await client.query(
+        `UPDATE patients SET ${updates.join(', ')} WHERE id = $${paramCount}`,
+        params
+      );
+    }
 
     res.json({ message: 'تم تحديث بيانات المريض بنجاح' });
   } catch (error) {
