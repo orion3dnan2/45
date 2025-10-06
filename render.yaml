@@ -1,11 +1,10 @@
 services:
   - type: web
     name: clinic-system
-    env: node
-    region: oregon
+    runtime: node
     plan: free
-    buildCommand: npm install && cd backend && npm install && cd ../frontend && npm install && npm run build
-    startCommand: NODE_ENV=production node backend/server.js
+    buildCommand: cd backend && npm install && cd ../frontend && npm install && npm run build
+    startCommand: cd backend && NODE_ENV=production node server.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -18,6 +17,4 @@ services:
 
 databases:
   - name: clinic-postgres
-    databaseName: clinic_db
-    user: clinic_user
     plan: free
