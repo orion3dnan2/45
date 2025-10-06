@@ -3,9 +3,8 @@ services:
     name: clinic-system
     env: node
     plan: free
-    rootDir: backend
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    buildCommand: cd backend && npm install && cd ../frontend && npm install && npm run build && rm -rf ../backend/public && cp -r dist ../backend/public
+    startCommand: cd backend && npm start
     envVars:
       - key: NODE_ENV
         value: production
