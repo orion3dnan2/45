@@ -270,9 +270,25 @@ const createPatient = async (req, res) => {
       ]
     );
 
+    const patientId = patientResult.rows[0].id;
+
+    await client.query(
+      `INSERT INTO payments (patient_id, amount, payment_method, payment_date, status, notes, created_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [
+        patientId,
+        10.000,
+        'نقدي',
+        new Date().toISOString().split('T')[0],
+        'pending',
+        'رسوم فتح ملف - فاتورة أولية',
+        req.user.id
+      ]
+    );
+
     res.status(201).json({ 
-      message: 'تم إضافة المريض بنجاح',
-      patientId: patientResult.rows[0].id,
+      message: 'تم إضافة المريض بنجاح وإنشاء فاتورة أولية',
+      patientId: patientId,
       userId: userId
     });
   } catch (error) {
