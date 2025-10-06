@@ -6,6 +6,7 @@ const Invoices = () => {
   const { user } = useContext(AuthContext);
   const [invoices, setInvoices] = useState([]);
   const [patients, setPatients] = useState([]);
+  const [patientTreatments, setPatientTreatments] = useState([]);
   const [governorates, setGovernorates] = useState([]);
   const [areas, setAreas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -66,6 +67,52 @@ const Invoices = () => {
       loadAreas(governorateId);
     } else {
       setAreas([]);
+    }
+  };
+
+  const loadPatientTreatments = async (patientId) => {
+    try {
+      const treatments = await api.getTreatments({ patient_id: patientId });
+      const completedTreatments = treatments.filter(t => t.status === 'completed');
+      setPatientTreatments(completedTreatments);
+      
+      if (completedTreatments.length > 0) {
+        const treatmentItems = completedTreatments.map(treatment => ({
+          service: treatment.procedure_done || treatment.diagnosis,
+          quantity: 1,
+          unit_price: parseFloat(treatment.cost || 0),
+          notes: treatment.tooth_number ? `رقم السن: ${treatment.tooth_number}` : '',
+          treatment_id: treatment.id
+        }));
+        
+        setInvoiceForm({
+          ...invoiceForm,
+          patient_id: patientId,
+          items: treatmentItems
+        });
+      } else {
+        setInvoiceForm({
+          ...invoiceForm,
+          patient_id: patientId,
+          items: [{ service: '', quantity: 1, unit_price: '', notes: '' }]
+        });
+      }
+    } catch (error) {
+      console.error('خطأ في تحميل علاجات المريض:', error);
+      setPatientTreatments([]);
+    }
+  };
+
+  const handlePatientChange = (patientId) => {
+    if (patientId) {
+      loadPatientTreatments(patientId);
+    } else {
+      setInvoiceForm({
+        ...invoiceForm,
+        patient_id: '',
+        items: [{ service: '', quantity: 1, unit_price: '', notes: '' }]
+      });
+      setPatientTreatments([]);
     }
   };
 
@@ -154,6 +201,7 @@ const Invoices = () => {
     });
     setCurrentInvoice(null);
     setAreas([]);
+    setPatientTreatments([]);
   };
 
   const printInvoice = (invoice) => {
@@ -563,7 +611,7 @@ const Invoices = () => {
                   <label style={styles.label}>المريض *</label>
                   <select 
                     value={invoiceForm.patient_id}
-                    onChange={(e) => setInvoiceForm({...invoiceForm, patient_id: e.target.value})}
+                    onChange={(e) => handlePatientChange(e.target.value)}
                     style={styles.input}
                     required
                   >
@@ -575,7 +623,23 @@ const Invoices = () => {
                     ))}
                   </select>
                 </div>
+              </div>
 
+              {patientTreatments.length > 0 && (
+                <div style={{
+                  background: '#D1FAE5',
+                  padding: '12px 16px',
+                  borderRadius: '10px',
+                  marginBottom: '20px',
+                  border: '1px solid #10B981'
+                }}>
+                  <p style={{color: '#065F46', margin: 0, fontSize: '14px'}}>
+                    ✅ تم تحميل {patientTreatments.length} علاج مكتمل للمريض تلقائياً
+                  </p>
+                </div>
+              )}
+
+              <div style={styles.formGrid}>
                 <div style={styles.formGroup}>
                   <label style={styles.label}>الطبيب المعالج *</label>
                   <input 
