@@ -1,6 +1,15 @@
 const pool = require('../models/database');
+const { DEMO_APPOINTMENTS, DEMO_USERS } = require('../../demoData');
+const { DEMO_USERS: USERS_LIST } = require('../../demoUsers');
+
+const isDemoMode = process.env.DEMO_MODE === 'true';
 
 const createAppointment = async (req, res) => {
+  // في وضع الديمو، لا يمكن الإضافة
+  if (isDemoMode) {
+    return res.status(403).json({ error: 'إضافة المواعيد غير متاحة في وضع الديمو' });
+  }
+
   const client = await pool.connect();
   try {
     const { patient_id, doctor_id, appointment_date, duration, notes } = req.body;
@@ -45,6 +54,39 @@ const createAppointment = async (req, res) => {
 };
 
 const getAppointments = async (req, res) => {
+  // وضع الديمو: إرجاع البيانات التجريبية
+  if (isDemoMode) {
+    const { status, doctor_id, patient_id, date } = req.query;
+    let appointments = [...DEMO_APPOINTMENTS];
+    
+    // تطبيق الفلاتر
+    if (status) {
+      appointments = appointments.filter(a => a.status === status);
+    }
+    if (doctor_id) {
+      appointments = appointments.filter(a => a.doctor_id === parseInt(doctor_id));
+    }
+    if (patient_id) {
+      appointments = appointments.filter(a => a.patient_id === parseInt(patient_id));
+    }
+    if (date) {
+      appointments = appointments.filter(a => a.appointment_date.startsWith(date));
+    }
+    
+    // إضافة أسماء الطبيب والمريض
+    appointments = appointments.map(appt => {
+      const doctor = USERS_LIST.find(u => u.id === appt.doctor_id);
+      return {
+        ...appt,
+        doctor_name: doctor ? doctor.full_name : 'د. أحمد محمد',
+        doctor_phone: doctor ? doctor.phone : '+96551325559'
+      };
+    });
+    
+    return res.json(appointments);
+  }
+
+  // وضع الإنتاج: الاستعلام من قاعدة البيانات
   const client = await pool.connect();
   try {
     const { status, doctor_id, patient_id, date } = req.query;
@@ -105,6 +147,11 @@ const getAppointments = async (req, res) => {
 };
 
 const updateAppointment = async (req, res) => {
+  // في وضع الديمو، لا يمكن التعديل
+  if (isDemoMode) {
+    return res.status(403).json({ error: 'التعديل غير متاح في وضع الديمو' });
+  }
+
   const client = await pool.connect();
   try {
     const { id } = req.params;

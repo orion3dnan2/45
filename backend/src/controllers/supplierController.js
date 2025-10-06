@@ -1,6 +1,31 @@
 const pool = require('../models/database');
+const { DEMO_SUPPLIERS } = require('../../demoData');
+
+const isDemoMode = process.env.DEMO_MODE === 'true';
 
 const getSuppliers = async (req, res) => {
+  // وضع الديمو: إرجاع البيانات التجريبية
+  if (isDemoMode) {
+    const suppliers = [...DEMO_SUPPLIERS];
+    
+    const today = new Date().toISOString().split('T')[0];
+    const suppliersWithStatus = suppliers.map(supplier => {
+      let status = 'active';
+      if (supplier.subscription_end_date) {
+        const daysUntilExpiry = Math.ceil((new Date(supplier.subscription_end_date) - new Date(today)) / (1000 * 60 * 60 * 24));
+        if (daysUntilExpiry < 0) {
+          status = 'expired';
+        } else if (daysUntilExpiry <= 30) {
+          status = 'expiring_soon';
+        }
+      }
+      return { ...supplier, status };
+    });
+    
+    return res.json(suppliersWithStatus);
+  }
+
+  // وضع الإنتاج: الاستعلام من قاعدة البيانات
   const client = await pool.connect();
   try {
     const result = await client.query('SELECT * FROM suppliers ORDER BY name ASC');
@@ -30,6 +55,11 @@ const getSuppliers = async (req, res) => {
 };
 
 const createSupplier = async (req, res) => {
+  // في وضع الديمو، لا يمكن الإضافة
+  if (isDemoMode) {
+    return res.status(403).json({ error: 'إضافة الموردين غير متاحة في وضع الديمو' });
+  }
+
   const client = await pool.connect();
   try {
     const { name, contact_person, phone, email, address, subscription_start_date, subscription_end_date, payment_terms } = req.body;
@@ -66,6 +96,11 @@ const createSupplier = async (req, res) => {
 };
 
 const updateSupplier = async (req, res) => {
+  // في وضع الديمو، لا يمكن التعديل
+  if (isDemoMode) {
+    return res.status(403).json({ error: 'التعديل غير متاح في وضع الديمو' });
+  }
+
   const client = await pool.connect();
   try {
     const { id } = req.params;
@@ -134,6 +169,11 @@ const updateSupplier = async (req, res) => {
 };
 
 const deleteSupplier = async (req, res) => {
+  // في وضع الديمو، لا يمكن الحذف
+  if (isDemoMode) {
+    return res.status(403).json({ error: 'الحذف غير متاح في وضع الديمو' });
+  }
+
   const client = await pool.connect();
   try {
     const { id } = req.params;

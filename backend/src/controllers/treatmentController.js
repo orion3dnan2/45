@@ -1,6 +1,15 @@
 const pool = require('../models/database');
+const { DEMO_TREATMENTS } = require('../../demoData');
+const { DEMO_USERS } = require('../../demoUsers');
+
+const isDemoMode = process.env.DEMO_MODE === 'true';
 
 const createTreatment = async (req, res) => {
+  // في وضع الديمو، لا يمكن الإضافة
+  if (isDemoMode) {
+    return res.status(403).json({ error: 'إضافة العلاجات غير متاحة في وضع الديمو' });
+  }
+
   const client = await pool.connect();
   try {
     const { patient_id, doctor_id, appointment_id, treatment_date, diagnosis, procedure_done, tooth_number, cost, notes, medications } = req.body;
@@ -54,6 +63,35 @@ const createTreatment = async (req, res) => {
 };
 
 const getTreatments = async (req, res) => {
+  // وضع الديمو: إرجاع البيانات التجريبية
+  if (isDemoMode) {
+    const { patient_id, doctor_id, status } = req.query;
+    let treatments = [...DEMO_TREATMENTS];
+    
+    // تطبيق الفلاتر
+    if (patient_id) {
+      treatments = treatments.filter(t => t.patient_id === parseInt(patient_id));
+    }
+    if (doctor_id) {
+      treatments = treatments.filter(t => t.doctor_id === parseInt(doctor_id));
+    }
+    if (status) {
+      treatments = treatments.filter(t => t.status === status);
+    }
+    
+    // إضافة اسم الطبيب
+    treatments = treatments.map(treatment => {
+      const doctor = DEMO_USERS.find(u => u.id === treatment.doctor_id);
+      return {
+        ...treatment,
+        doctor_name: doctor ? doctor.full_name : 'د. أحمد محمد'
+      };
+    });
+    
+    return res.json(treatments);
+  }
+
+  // وضع الإنتاج: الاستعلام من قاعدة البيانات
   const client = await pool.connect();
   try {
     const { patient_id, doctor_id, status } = req.query;
@@ -106,6 +144,11 @@ const getTreatments = async (req, res) => {
 };
 
 const updateTreatment = async (req, res) => {
+  // في وضع الديمو، لا يمكن التعديل
+  if (isDemoMode) {
+    return res.status(403).json({ error: 'التعديل غير متاح في وضع الديمو' });
+  }
+
   const client = await pool.connect();
   try {
     const { id } = req.params;

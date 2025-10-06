@@ -1,6 +1,24 @@
 const pool = require('../models/database');
+const { DEMO_PATIENTS, DEMO_APPOINTMENTS, DEMO_TREATMENTS, DEMO_PAYMENTS } = require('../../demoData');
+
+const isDemoMode = process.env.DEMO_MODE === 'true';
 
 const getPatients = async (req, res) => {
+  // وضع الديمو: إرجاع البيانات التجريبية
+  if (isDemoMode) {
+    const { archived } = req.query;
+    let patients = [...DEMO_PATIENTS];
+    
+    if (archived !== undefined) {
+      patients = patients.filter(p => p.archived === (archived === 'true' ? 1 : 0));
+    } else {
+      patients = patients.filter(p => p.archived === 0);
+    }
+    
+    return res.json(patients);
+  }
+
+  // وضع الإنتاج: الاستعلام من قاعدة البيانات
   const client = await pool.connect();
   try {
     const { archived } = req.query;
@@ -34,10 +52,31 @@ const getPatients = async (req, res) => {
 };
 
 const getPatientById = async (req, res) => {
+  const { id } = req.params;
+  
+  // وضع الديمو: إرجاع البيانات التجريبية
+  if (isDemoMode) {
+    const patient = DEMO_PATIENTS.find(p => p.id === parseInt(id));
+    
+    if (!patient) {
+      return res.status(404).json({ error: 'المريض غير موجود' });
+    }
+
+    const appointments = DEMO_APPOINTMENTS.filter(a => a.patient_id === parseInt(id));
+    const treatments = DEMO_TREATMENTS.filter(t => t.patient_id === parseInt(id));
+    const payments = DEMO_PAYMENTS.filter(p => p.patient_id === parseInt(id));
+
+    return res.json({
+      ...patient,
+      appointments,
+      treatments,
+      payments
+    });
+  }
+
+  // وضع الإنتاج: الاستعلام من قاعدة البيانات
   const client = await pool.connect();
   try {
-    const { id } = req.params;
-    
     const patientResult = await client.query(`
       SELECT p.*, u.full_name, u.email, u.phone, u.username
       FROM patients p
@@ -89,6 +128,11 @@ const getPatientById = async (req, res) => {
 };
 
 const updatePatient = async (req, res) => {
+  // في وضع الديمو، لا يمكن التعديل
+  if (isDemoMode) {
+    return res.status(403).json({ error: 'التعديل غير متاح في وضع الديمو' });
+  }
+
   const client = await pool.connect();
   try {
     const { id } = req.params;
@@ -152,6 +196,11 @@ const updatePatient = async (req, res) => {
 };
 
 const createPatient = async (req, res) => {
+  // في وضع الديمو، لا يمكن الإضافة
+  if (isDemoMode) {
+    return res.status(403).json({ error: 'إضافة المرضى غير متاحة في وضع الديمو' });
+  }
+
   const client = await pool.connect();
   try {
     const { full_name, phone, email, national_id, date_of_birth, address, medical_history, allergies, insurance_info, diagnosis } = req.body;
@@ -204,6 +253,11 @@ const createPatient = async (req, res) => {
 };
 
 const deletePatient = async (req, res) => {
+  // في وضع الديمو، لا يمكن الحذف
+  if (isDemoMode) {
+    return res.status(403).json({ error: 'الحذف غير متاح في وضع الديمو' });
+  }
+
   const client = await pool.connect();
   try {
     const { id } = req.params;
@@ -220,6 +274,11 @@ const deletePatient = async (req, res) => {
 };
 
 const archivePatient = async (req, res) => {
+  // في وضع الديمو، لا يمكن الأرشفة
+  if (isDemoMode) {
+    return res.status(403).json({ error: 'الأرشفة غير متاحة في وضع الديمو' });
+  }
+
   const client = await pool.connect();
   try {
     const { id } = req.params;

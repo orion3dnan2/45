@@ -1,6 +1,41 @@
 const pool = require('../models/database');
+const { DEMO_NOTIFICATIONS } = require('../../demoData');
+
+const isDemoMode = process.env.DEMO_MODE === 'true';
 
 const getNotifications = async (req, res) => {
+  // وضع الديمو: إرجاع البيانات التجريبية
+  if (isDemoMode) {
+    const { user_id, is_read, type } = req.query;
+    let notifications = [...DEMO_NOTIFICATIONS];
+    
+    // تطبيق الفلاتر
+    if (user_id) {
+      notifications = notifications.filter(n => 
+        n.user_id === parseInt(user_id) || n.user_id === null
+      );
+    } else {
+      notifications = notifications.filter(n => n.user_id === null);
+    }
+    
+    if (is_read !== undefined) {
+      notifications = notifications.filter(n => 
+        n.is_read === (is_read === 'true' ? 1 : 0)
+      );
+    }
+    
+    if (type) {
+      notifications = notifications.filter(n => n.type === type);
+    }
+    
+    // ترتيب حسب التاريخ وتحديد العدد
+    notifications.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    notifications = notifications.slice(0, 100);
+    
+    return res.json(notifications);
+  }
+
+  // وضع الإنتاج: الاستعلام من قاعدة البيانات
   const client = await pool.connect();
   try {
     const { user_id, is_read, type } = req.query;
@@ -44,6 +79,11 @@ const getNotifications = async (req, res) => {
 };
 
 const markAsRead = async (req, res) => {
+  // في وضع الديمو، لا يمكن التعديل
+  if (isDemoMode) {
+    return res.status(403).json({ error: 'التعديل غير متاح في وضع الديمو' });
+  }
+
   const client = await pool.connect();
   try {
     const { id } = req.params;
@@ -60,6 +100,11 @@ const markAsRead = async (req, res) => {
 };
 
 const markAllAsRead = async (req, res) => {
+  // في وضع الديمو، لا يمكن التعديل
+  if (isDemoMode) {
+    return res.status(403).json({ error: 'التعديل غير متاح في وضع الديمو' });
+  }
+
   const client = await pool.connect();
   try {
     const { user_id } = req.body;

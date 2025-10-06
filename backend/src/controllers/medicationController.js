@@ -1,6 +1,22 @@
 const pool = require('../models/database');
+const { DEMO_MEDICATIONS } = require('../../demoData');
+
+const isDemoMode = process.env.DEMO_MODE === 'true';
 
 const getMedications = async (req, res) => {
+  // وضع الديمو: إرجاع البيانات التجريبية
+  if (isDemoMode) {
+    const { low_stock } = req.query;
+    let medications = [...DEMO_MEDICATIONS];
+    
+    if (low_stock === 'true') {
+      medications = medications.filter(m => m.quantity_in_stock <= m.minimum_quantity);
+    }
+    
+    return res.json(medications);
+  }
+
+  // وضع الإنتاج: الاستعلام من قاعدة البيانات
   const client = await pool.connect();
   try {
     const { low_stock } = req.query;
@@ -27,6 +43,11 @@ const getMedications = async (req, res) => {
 };
 
 const createMedication = async (req, res) => {
+  // في وضع الديمو، لا يمكن الإضافة
+  if (isDemoMode) {
+    return res.status(403).json({ error: 'إضافة الأدوية غير متاحة في وضع الديمو' });
+  }
+
   const client = await pool.connect();
   try {
     const { name, description, unit, quantity_in_stock, minimum_quantity, unit_price, expiry_date, category } = req.body;
@@ -76,6 +97,11 @@ const createMedication = async (req, res) => {
 };
 
 const updateMedication = async (req, res) => {
+  // في وضع الديمو، لا يمكن التعديل
+  if (isDemoMode) {
+    return res.status(403).json({ error: 'التعديل غير متاح في وضع الديمو' });
+  }
+
   const client = await pool.connect();
   try {
     const { id } = req.params;
@@ -178,6 +204,11 @@ const updateMedication = async (req, res) => {
 };
 
 const deleteMedication = async (req, res) => {
+  // في وضع الديمو، لا يمكن الحذف
+  if (isDemoMode) {
+    return res.status(403).json({ error: 'الحذف غير متاح في وضع الديمو' });
+  }
+
   const client = await pool.connect();
   try {
     const { id } = req.params;
