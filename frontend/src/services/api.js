@@ -256,5 +256,12 @@ export const api = {
       headers: getAuthHeader()
     });
     return response.json();
+  },
+
+  async getPendingTreatments() {
+    const response = await fetch(`${API_URL}/payments/pending-treatments`, {
+      headers: getAuthHeader()
+    });
+    return response.json();
   }
 };

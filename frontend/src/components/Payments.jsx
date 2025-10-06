@@ -5,6 +5,7 @@ import { AuthContext } from '../contexts/AuthContext';
 const Payments = () => {
   const { user } = useContext(AuthContext);
   const [payments, setPayments] = useState([]);
+  const [pendingTreatments, setPendingTreatments] = useState([]);
   const [patients, setPatients] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -34,12 +35,14 @@ const Payments = () => {
         params.status = filterStatus;
       }
       
-      const [paymentsData, statsData] = await Promise.all([
+      const [paymentsData, statsData, pendingData] = await Promise.all([
         api.getPayments(params),
-        api.getPaymentStats()
+        api.getPaymentStats(),
+        api.getPendingTreatments()
       ]);
       setPayments(paymentsData);
       setStats(statsData);
+      setPendingTreatments(pendingData);
     } catch (error) {
       console.error('خطأ في تحميل البيانات:', error);
     } finally {
@@ -91,6 +94,18 @@ const Payments = () => {
       payment_date: new Date().toISOString().split('T')[0],
       notes: ''
     });
+  };
+
+  const handlePayFromTreatment = (treatment) => {
+    setFormData({
+      patient_id: treatment.patient_id,
+      treatment_id: treatment.treatment_id,
+      amount: treatment.cost,
+      payment_method: 'cash',
+      payment_date: new Date().toISOString().split('T')[0],
+      notes: `دفعة لعلاج: ${treatment.procedure_done || treatment.diagnosis}`
+    });
+    setShowAddModal(true);
   };
 
   const printReceipt = (payment) => {
@@ -217,6 +232,38 @@ const Payments = () => {
             <div style={styles.statIcon}>📊</div>
             <h3 style={styles.statValue}>{stats.summary.total_payments || 0}</h3>
             <p style={styles.statLabel}>عدد المعاملات</p>
+          </div>
+        </div>
+      )}
+
+      {pendingTreatments.length > 0 && canManagePayments && (
+        <div style={styles.pendingSection}>
+          <h2 style={styles.sectionTitle}>🔔 علاجات مكتملة بانتظار الدفع ({pendingTreatments.length})</h2>
+          <div style={styles.pendingTreatmentsList}>
+            {pendingTreatments.map(treatment => (
+              <div key={treatment.treatment_id} style={styles.pendingTreatmentCard}>
+                <div style={styles.pendingTreatmentInfo}>
+                  <h3 style={styles.pendingTreatmentTitle}>👤 {treatment.patient_name}</h3>
+                  <p><strong>التشخيص:</strong> {treatment.diagnosis}</p>
+                  <p><strong>الإجراء:</strong> {treatment.procedure_done}</p>
+                  <p><strong>التاريخ:</strong> {treatment.treatment_date}</p>
+                  <p><strong>الطبيب:</strong> {treatment.doctor_name}</p>
+                  {treatment.tooth_number && <p><strong>رقم السن:</strong> {treatment.tooth_number}</p>}
+                </div>
+                <div style={styles.pendingTreatmentAction}>
+                  <div style={styles.pendingCostBadge}>
+                    <span style={styles.costLabel}>التكلفة</span>
+                    <span style={styles.costValue}>{treatment.cost} ريال</span>
+                  </div>
+                  <button 
+                    onClick={() => handlePayFromTreatment(treatment)} 
+                    style={styles.payNowBtn}
+                  >
+                    💰 تسجيل الدفعة
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -714,6 +761,88 @@ const styles = {
     fontSize: '16px',
     fontWeight: '700',
     transition: 'all 0.3s'
+  },
+  pendingSection: {
+    marginBottom: '30px',
+    background: 'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',
+    padding: '25px',
+    borderRadius: '16px',
+    border: '2px solid #F59E0B'
+  },
+  sectionTitle: {
+    fontSize: '20px',
+    fontWeight: '700',
+    color: '#92400E',
+    marginBottom: '20px',
+    margin: '0 0 20px 0'
+  },
+  pendingTreatmentsList: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
+    gap: '15px'
+  },
+  pendingTreatmentCard: {
+    background: 'white',
+    borderRadius: '12px',
+    padding: '20px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: '20px',
+    border: '1px solid #FDE68A',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+    transition: 'all 0.3s'
+  },
+  pendingTreatmentInfo: {
+    flex: 1,
+    fontSize: '14px',
+    color: '#475569',
+    lineHeight: '1.8'
+  },
+  pendingTreatmentTitle: {
+    fontSize: '18px',
+    color: '#333',
+    fontWeight: '700',
+    margin: '0 0 12px 0'
+  },
+  pendingTreatmentAction: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '12px'
+  },
+  pendingCostBadge: {
+    background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+    color: 'white',
+    padding: '12px 20px',
+    borderRadius: '10px',
+    textAlign: 'center',
+    minWidth: '120px',
+    boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
+  },
+  costLabel: {
+    display: 'block',
+    fontSize: '12px',
+    opacity: 0.9,
+    marginBottom: '4px'
+  },
+  costValue: {
+    display: 'block',
+    fontSize: '20px',
+    fontWeight: '700'
+  },
+  payNowBtn: {
+    padding: '12px 20px',
+    background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '10px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '700',
+    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+    transition: 'all 0.3s',
+    whiteSpace: 'nowrap'
   }
 };
 
