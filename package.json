@@ -6,7 +6,9 @@
     "backend": "node backend/server.js",
     "frontend": "npx vite",
     "seed": "node backend/seed.js",
-    "dev": "node backend/server.js & npx vite"
+    "dev": "node backend/server.js & npx vite",
+    "build": "npx vite build --outDir ../backend/public",
+    "start": "node backend/server.js"
   },
   "keywords": [],
   "author": "",

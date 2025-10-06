@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const db = require('./src/models/database');
 const { startScheduler } = require('./src/utils/notificationScheduler');
 
@@ -31,6 +32,14 @@ app.use('/api/payments', paymentRoutes);
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'نظام عيادة الأسنان يعمل بشكل صحيح' });
 });
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'public')));
+  
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  });
+}
 
 app.listen(PORT, () => {
   console.log(`Backend server is running on port ${PORT}`);
