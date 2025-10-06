@@ -408,6 +408,7 @@ const Payments = () => {
                   required
                 >
                   <option value="cash">نقدي</option>
+                  <option value="knet">كي نت (KNET)</option>
                   <option value="card">بطاقة ائتمان</option>
                   <option value="transfer">تحويل بنكي</option>
                   <option value="insurance">تأمين</option>
@@ -449,6 +450,7 @@ const getStatusLabel = (status) => {
 const getPaymentMethodLabel = (method) => {
   const labels = {
     cash: 'نقدي',
+    knet: 'كي نت (KNET)',
     card: 'بطاقة ائتمان',
     transfer: 'تحويل بنكي',
     insurance: 'تأمين'

@@ -263,5 +263,22 @@ export const api = {
       headers: getAuthHeader()
     });
     return response.json();
+  },
+
+  async getGovernorates() {
+    const response = await fetch(`${API_URL}/locations/governorates`, {
+      headers: getAuthHeader()
+    });
+    return response.json();
+  },
+
+  async getAreas(governorateId = null) {
+    const url = governorateId 
+      ? `${API_URL}/locations/areas/${governorateId}`
+      : `${API_URL}/locations/areas`;
+    const response = await fetch(url, {
+      headers: getAuthHeader()
+    });
+    return response.json();
   }
 };
