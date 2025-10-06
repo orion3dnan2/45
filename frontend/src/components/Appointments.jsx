@@ -328,24 +328,24 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
                 </td>
                 <td style={styles.td}>
                   <div style={styles.actionButtons}>
-                    {canAddOrEdit && appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
-                      <button onClick={() => openEditModal(appointment)} style={styles.editBtn} title="تعديل">
-                        ✏️
-                      </button>
-                    )}
                     {appointment.status === 'scheduled' && (
-                      <button onClick={() => updateStatus(appointment.id, 'confirmed')} style={styles.confirmBtn} title="تأكيد">
-                        ✓
+                      <button onClick={() => updateStatus(appointment.id, 'confirmed')} style={styles.confirmBtn} title="تأكيد الموعد">
+                        ✓ تأكيد
                       </button>
                     )}
                     {appointment.status === 'confirmed' && (
-                      <button onClick={() => updateStatus(appointment.id, 'in_progress')} style={styles.startBtn} title="بدء">
-                        ▶
+                      <button onClick={() => updateStatus(appointment.id, 'in_progress')} style={styles.startBtn} title="بدء الموعد - تسجيل الدخول">
+                        ▶ بدء
                       </button>
                     )}
                     {appointment.status === 'in_progress' && (
-                      <button onClick={() => updateStatus(appointment.id, 'completed')} style={styles.completeBtn} title="إنهاء">
-                        ✓
+                      <button onClick={() => updateStatus(appointment.id, 'completed')} style={styles.completeBtn} title="إنهاء الموعد">
+                        ✓ إنهاء
+                      </button>
+                    )}
+                    {canAddOrEdit && appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
+                      <button onClick={() => openEditModal(appointment)} style={styles.editBtn} title="تعديل">
+                        ✏️
                       </button>
                     )}
                     {appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
