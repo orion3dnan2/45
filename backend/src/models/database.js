@@ -41,7 +41,7 @@ else {
           username TEXT UNIQUE NOT NULL,
           password TEXT NOT NULL,
           full_name TEXT NOT NULL,
-          role TEXT NOT NULL CHECK(role IN ('doctor', 'reception', 'admin')),
+          role TEXT NOT NULL CHECK(role IN ('doctor', 'reception', 'admin', 'accountant')),
           email TEXT,
           phone TEXT,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -193,6 +193,51 @@ else {
         );
 
         ALTER TABLE patients ADD COLUMN IF NOT EXISTS diagnosis TEXT;
+        ALTER TABLE patients ADD COLUMN IF NOT EXISTS case_status TEXT DEFAULT 'new' CHECK(case_status IN ('new', 'active', 'completed', 'postponed', 'cancelled'));
+        ALTER TABLE patients ADD COLUMN IF NOT EXISTS primary_doctor_id INTEGER REFERENCES users(id);
+        ALTER TABLE patients ADD COLUMN IF NOT EXISTS last_visit_date DATE;
+        ALTER TABLE patients ADD COLUMN IF NOT EXISTS next_appointment_date DATE;
+
+        CREATE TABLE IF NOT EXISTS invoices (
+          id SERIAL PRIMARY KEY,
+          invoice_number TEXT UNIQUE NOT NULL,
+          patient_id INTEGER NOT NULL,
+          treatment_id INTEGER,
+          appointment_id INTEGER,
+          issue_date DATE NOT NULL DEFAULT CURRENT_DATE,
+          due_date DATE,
+          subtotal DECIMAL(10, 2) NOT NULL DEFAULT 0,
+          tax_rate DECIMAL(5, 2) DEFAULT 0,
+          tax_amount DECIMAL(10, 2) DEFAULT 0,
+          discount_rate DECIMAL(5, 2) DEFAULT 0,
+          discount_amount DECIMAL(10, 2) DEFAULT 0,
+          total_amount DECIMAL(10, 2) NOT NULL,
+          amount_paid DECIMAL(10, 2) DEFAULT 0,
+          balance_due DECIMAL(10, 2) NOT NULL,
+          status TEXT DEFAULT 'pending' CHECK(status IN ('draft', 'pending', 'paid', 'partially_paid', 'overdue', 'cancelled')),
+          notes TEXT,
+          created_by INTEGER,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (patient_id) REFERENCES patients(id),
+          FOREIGN KEY (treatment_id) REFERENCES treatments(id),
+          FOREIGN KEY (appointment_id) REFERENCES appointments(id),
+          FOREIGN KEY (created_by) REFERENCES users(id)
+        );
+
+        CREATE TABLE IF NOT EXISTS invoice_items (
+          id SERIAL PRIMARY KEY,
+          invoice_id INTEGER NOT NULL,
+          description TEXT NOT NULL,
+          quantity INTEGER DEFAULT 1,
+          unit_price DECIMAL(10, 2) NOT NULL,
+          total_price DECIMAL(10, 2) NOT NULL,
+          FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE
+        );
+
+        ALTER TABLE payments ADD COLUMN IF NOT EXISTS invoice_id INTEGER REFERENCES invoices(id);
+        ALTER TABLE payments ADD COLUMN IF NOT EXISTS payment_reference TEXT;
+        ALTER TABLE payments ADD COLUMN IF NOT EXISTS received_by INTEGER REFERENCES users(id);
 
         CREATE TABLE IF NOT EXISTS governorates (
           id SERIAL PRIMARY KEY,
