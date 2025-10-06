@@ -81,6 +81,10 @@ externalPort = 8000
 localPort = 40849
 externalPort = 5000
 
+[[ports]]
+localPort = 42919
+externalPort = 8081
+
 [deployment]
 deploymentTarget = "autoscale"
 run = ["bash", "-c", "node backend/server.js & vite --port 5000 --host 0.0.0.0"]
