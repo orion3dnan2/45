@@ -165,7 +165,7 @@ const Patients = () => {
   };
 
   const canAddOrEdit = user.role === 'doctor' || user.role === 'reception' || user.role === 'admin';
-  const canDelete = user.role === 'admin';
+  const canDelete = user.role === 'admin' || user.role === 'reception';
 
   const filteredPatients = patients.filter(patient => {
     if (!searchTerm) return true;
