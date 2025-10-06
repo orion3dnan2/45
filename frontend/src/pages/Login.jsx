@@ -23,6 +23,7 @@ const Login = () => {
         setError(data.error);
       } else {
         login(data.token, data.user);
+        navigate('/dashboard');
       }
     } catch (err) {
       setError('حدث خطأ أثناء تسجيل الدخول');
@@ -44,6 +45,7 @@ const Login = () => {
         setError(data.error);
       } else {
         login(data.token, data.user);
+        navigate('/dashboard');
       }
     } catch (err) {
       setError('حدث خطأ أثناء تسجيل الدخول');

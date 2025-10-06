@@ -36,23 +36,15 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${api.API_URL}/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
+      const data = await api.register(formData);
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (data.error) {
+        setError(data.error || data.message || 'حدث خطأ أثناء إنشاء الحساب');
+      } else {
         setSuccess('تم إنشاء الحساب بنجاح! سيتم تحويلك لصفحة تسجيل الدخول...');
         setTimeout(() => {
           navigate('/login');
         }, 2000);
-      } else {
-        setError(data.error || 'حدث خطأ أثناء إنشاء الحساب');
       }
     } catch (err) {
       setError('حدث خطأ أثناء الاتصال بالخادم');
