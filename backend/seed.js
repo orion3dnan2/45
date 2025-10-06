@@ -8,13 +8,9 @@ async function seed() {
     console.log('إنشاء بيانات تجريبية...');
     
     const users = [
+      { username: 'reception', password: 'password', full_name: 'موظف الاستقبال', role: 'reception', email: 'reception@clinic.com', phone: '0501234568' },
       { username: 'doctor', password: 'password', full_name: 'د. أحمد محمد', role: 'doctor', email: 'doctor@clinic.com', phone: '+96551325559' },
-      { username: 'reception', password: 'password', full_name: 'فاطمة علي', role: 'reception', email: 'reception@clinic.com', phone: '0501234568' },
-      { username: 'admin', password: 'password', full_name: 'محمد حسن', role: 'admin', email: 'admin@clinic.com', phone: '0501234569' },
-      { username: 'accountant', password: 'password', full_name: 'سارة خالد', role: 'accountant', email: 'accountant@clinic.com', phone: '0501234570' },
-      { username: 'warehouse', password: 'password', full_name: 'يوسف المخزني', role: 'warehouse_manager', email: 'warehouse@clinic.com', phone: '0501234573' },
-      { username: 'patient1', password: 'password', full_name: 'عمر عبدالله', role: 'patient', email: 'patient1@test.com', phone: '0501234571' },
-      { username: 'patient2', password: 'password', full_name: 'نورة إبراهيم', role: 'patient', email: 'patient2@test.com', phone: '0501234572' }
+      { username: 'admin', password: 'password', full_name: 'المدير العام', role: 'admin', email: 'admin@clinic.com', phone: '0501234569' }
     ];
     
     const userIds = {};
@@ -31,20 +27,20 @@ async function seed() {
     }
     
     const patient1Result = await client.query(
-      `INSERT INTO patients (user_id, national_id, date_of_birth, address, medical_history, allergies)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       ON CONFLICT (national_id) DO UPDATE SET user_id = EXCLUDED.user_id
+      `INSERT INTO patients (national_id, date_of_birth, address, medical_history, allergies)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (national_id) DO UPDATE SET national_id = EXCLUDED.national_id
        RETURNING id`,
-      [userIds['patient1'], '1234567890', '1990-05-15', 'الرياض، حي النخيل', 'لا يوجد', 'حساسية من البنسلين']
+      ['1234567890', '1990-05-15', 'الرياض، حي النخيل', 'لا يوجد', 'حساسية من البنسلين']
     );
     const patient1Id = patient1Result.rows[0].id;
     
     const patient2Result = await client.query(
-      `INSERT INTO patients (user_id, national_id, date_of_birth, address, medical_history, allergies)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       ON CONFLICT (national_id) DO UPDATE SET user_id = EXCLUDED.user_id
+      `INSERT INTO patients (national_id, date_of_birth, address, medical_history, allergies)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (national_id) DO UPDATE SET national_id = EXCLUDED.national_id
        RETURNING id`,
-      [userIds['patient2'], '0987654321', '1985-08-22', 'جدة، حي الزهراء', 'ضغط الدم', 'لا يوجد']
+      ['0987654321', '1985-08-22', 'جدة، حي الزهراء', 'ضغط الدم', 'لا يوجد']
     );
     const patient2Id = patient2Result.rows[0].id;
     
@@ -200,12 +196,12 @@ async function seed() {
     
     console.log('✓ تم إنشاء البيانات التجريبية بنجاح!');
     console.log('\nالحسابات المتاحة:');
-    console.log('- طبيب: doctor / password');
     console.log('- استقبال: reception / password');
-    console.log('- إداري: admin / password');
-    console.log('- محاسب: accountant / password');
-    console.log('- مسؤول مخزن: warehouse / password');
-    console.log('- مريض: patient1 / password');
+    console.log('  الصلاحيات: فتح ملف مريض - تحديد مواعيد - متابعة مواعيد المرضى والأطباء - مراجعة المخزن والعلاجات والأدوية - الموردون');
+    console.log('\n- طبيب: doctor / password');
+    console.log('  الصلاحيات: إرفاق التشخيص - المواعيد - التحكم في التسعيرة - معرفة محتويات المخزن - متابعة حالة المريض');
+    console.log('\n- إداري: admin / password');
+    console.log('  الصلاحيات: كل صلاحيات العيادة والتعديل والحذف والإضافة في جميع الأقسام');
     
   } catch (err) {
     console.error('Error seeding database:', err);

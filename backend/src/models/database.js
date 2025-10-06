@@ -15,7 +15,7 @@ const createTables = async () => {
         username TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
         full_name TEXT NOT NULL,
-        role TEXT NOT NULL CHECK(role IN ('doctor', 'reception', 'admin', 'accountant', 'patient', 'warehouse_manager')),
+        role TEXT NOT NULL CHECK(role IN ('doctor', 'reception', 'admin')),
         email TEXT,
         phone TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
