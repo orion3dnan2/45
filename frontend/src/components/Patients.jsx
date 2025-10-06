@@ -2,6 +2,28 @@ import React, { useEffect, useState, useContext } from 'react';
 import { api } from '../services/api';
 import { AuthContext } from '../contexts/AuthContext';
 
+const getCaseStatusLabel = (status) => {
+  const labels = {
+    new: 'جديد',
+    active: 'نشط',
+    completed: 'مكتمل',
+    postponed: 'مؤجل',
+    cancelled: 'ملغي'
+  };
+  return labels[status] || 'جديد';
+};
+
+const getCaseStatusStyle = (status) => {
+  const styles = {
+    new: { background: '#E0F2FE', color: '#0284C7', padding: '4px 12px', borderRadius: '8px', fontWeight: '600' },
+    active: { background: '#DCFCE7', color: '#16A34A', padding: '4px 12px', borderRadius: '8px', fontWeight: '600' },
+    completed: { background: '#D1FAE5', color: '#059669', padding: '4px 12px', borderRadius: '8px', fontWeight: '600' },
+    postponed: { background: '#FEF3C7', color: '#D97706', padding: '4px 12px', borderRadius: '8px', fontWeight: '600' },
+    cancelled: { background: '#FEE2E2', color: '#DC2626', padding: '4px 12px', borderRadius: '8px', fontWeight: '600' }
+  };
+  return styles[status] || styles.new;
+};
+
 const Patients = () => {
   const { user } = useContext(AuthContext);
   const [patients, setPatients] = useState([]);
@@ -22,12 +44,25 @@ const Patients = () => {
     medical_history: '',
     allergies: '',
     insurance_info: '',
-    diagnosis: ''
+    diagnosis: '',
+    case_status: 'new',
+    primary_doctor_id: ''
   });
+  const [doctors, setDoctors] = useState([]);
 
   useEffect(() => {
     loadPatients();
+    loadDoctors();
   }, [showArchived]);
+
+  const loadDoctors = async () => {
+    try {
+      const doctorsData = await api.getDoctors();
+      setDoctors(doctorsData);
+    } catch (error) {
+      console.error('خطأ في تحميل الأطباء:', error);
+    }
+  };
 
   const loadPatients = async () => {
     try {
@@ -85,7 +120,9 @@ const Patients = () => {
         medical_history: formData.medical_history,
         allergies: formData.allergies,
         insurance_info: formData.insurance_info,
-        diagnosis: formData.diagnosis
+        diagnosis: formData.diagnosis,
+        case_status: formData.case_status,
+        primary_doctor_id: formData.primary_doctor_id || null
       });
       setShowEditModal(false);
       loadPatients();
@@ -108,7 +145,9 @@ const Patients = () => {
       medical_history: selectedPatient.medical_history || '',
       allergies: selectedPatient.allergies || '',
       insurance_info: selectedPatient.insurance_info || '',
-      diagnosis: selectedPatient.diagnosis || ''
+      diagnosis: selectedPatient.diagnosis || '',
+      case_status: selectedPatient.case_status || 'new',
+      primary_doctor_id: selectedPatient.primary_doctor_id || ''
     });
     setShowEditModal(true);
   };
@@ -124,7 +163,9 @@ const Patients = () => {
       medical_history: '',
       allergies: '',
       insurance_info: '',
-      diagnosis: ''
+      diagnosis: '',
+      case_status: 'new',
+      primary_doctor_id: ''
     });
   };
 
@@ -354,6 +395,16 @@ const Patients = () => {
                     <span style={styles.infoLabel}>معلومات التأمين:</span>
                     <span style={styles.infoValue}>{selectedPatient.insurance_info || 'لا يوجد'}</span>
                   </div>
+                  <div style={styles.infoItem}>
+                    <span style={styles.infoLabel}>حالة القضية:</span>
+                    <span style={{...styles.infoValue, ...getCaseStatusStyle(selectedPatient.case_status)}}>
+                      {getCaseStatusLabel(selectedPatient.case_status)}
+                    </span>
+                  </div>
+                  <div style={styles.infoItem}>
+                    <span style={styles.infoLabel}>الطبيب الرئيسي:</span>
+                    <span style={styles.infoValue}>{selectedPatient.primary_doctor_name || 'غير محدد'}</span>
+                  </div>
                 </div>
               )}
 
@@ -575,6 +626,40 @@ const Patients = () => {
                 />
               </div>
 
+              <div style={styles.formRow}>
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>حالة القضية *</label>
+                  <select
+                    value={formData.case_status}
+                    onChange={(e) => setFormData({...formData, case_status: e.target.value})}
+                    style={styles.input}
+                    required
+                  >
+                    <option value="new">جديد</option>
+                    <option value="active">نشط</option>
+                    <option value="completed">مكتمل</option>
+                    <option value="postponed">مؤجل</option>
+                    <option value="cancelled">ملغي</option>
+                  </select>
+                </div>
+
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>الطبيب الرئيسي</label>
+                  <select
+                    value={formData.primary_doctor_id}
+                    onChange={(e) => setFormData({...formData, primary_doctor_id: e.target.value})}
+                    style={styles.input}
+                  >
+                    <option value="">اختياري</option>
+                    {doctors.map(doctor => (
+                      <option key={doctor.id} value={doctor.id}>
+                        {doctor.full_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
               <div style={styles.modalActions}>
                 <button type="submit" style={styles.submitBtn}>حفظ</button>
                 <button type="button" onClick={() => setShowAddModal(false)} style={styles.cancelModalBtn}>إلغاء</button>
@@ -683,6 +768,40 @@ const Patients = () => {
                   rows="2"
                   placeholder="مثال: تسوس الأسنان، التهاب اللثة..."
                 />
+              </div>
+
+              <div style={styles.formRow}>
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>حالة القضية *</label>
+                  <select
+                    value={formData.case_status}
+                    onChange={(e) => setFormData({...formData, case_status: e.target.value})}
+                    style={styles.input}
+                    required
+                  >
+                    <option value="new">جديد</option>
+                    <option value="active">نشط</option>
+                    <option value="completed">مكتمل</option>
+                    <option value="postponed">مؤجل</option>
+                    <option value="cancelled">ملغي</option>
+                  </select>
+                </div>
+
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>الطبيب الرئيسي</label>
+                  <select
+                    value={formData.primary_doctor_id}
+                    onChange={(e) => setFormData({...formData, primary_doctor_id: e.target.value})}
+                    style={styles.input}
+                  >
+                    <option value="">اختياري</option>
+                    {doctors.map(doctor => (
+                      <option key={doctor.id} value={doctor.id}>
+                        {doctor.full_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div style={styles.modalActions}>
@@ -1118,6 +1237,12 @@ const styles = {
   },
   formGroup: {
     marginBottom: '20px'
+  },
+  formRow: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gap: '15px',
+    marginBottom: '15px'
   },
   label: {
     display: 'block',
