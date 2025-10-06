@@ -57,14 +57,20 @@
 - **قاعدة البيانات**: PostgreSQL
 - **المصادقة**: JWT (JSON Web Tokens)
 - **تشفير كلمات المرور**: bcryptjs
-- **Port**: 3000 (localhost)
+- **Port**: 5000 (Replit) / 10000 (Render Production)
 
 ### Frontend
 - **Framework**: React
 - **Build Tool**: Vite
 - **Routing**: React Router
 - **Styling**: Inline CSS (Component-based)
-- **Port**: 5000 (0.0.0.0)
+- **مدمج مع Backend**: يتم خدمة الواجهة من backend/public
+
+### النشر على Render
+- **Full Stack**: Backend يخدم الواجهة الأمامية من نفس السيرفر
+- **Build Pipeline**: بناء تلقائي للواجهة عند النشر
+- **Database**: PostgreSQL من Render
+- **البيئة**: production مع متغيرات البيئة الآمنة
 
 ## الإعدادات الكويتية 🇰🇼
 

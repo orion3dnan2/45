@@ -16,7 +16,7 @@ const paymentRoutes = require('./src/routes/payments');
 const locationRoutes = require('./src/routes/locations');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
@@ -42,16 +42,15 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'نظام عيادة الأسنان يعمل بشكل صحيح' });
 });
 
-// في وضع الإنتاج، نخدم ملفات الواجهة الثابتة من backend/public
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, 'public')));
-  
-  // استخدام app.use بدلاً من app.get('*') لتجنب PathError في Express 5
-  // هذا catch-all route يجب أن يكون في النهاية لخدمة SPA
-  app.use((req, res) => {
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use((req, res, next) => {
+  if (!req.path.startsWith('/api')) {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
-  });
-}
+  } else {
+    next();
+  }
+});
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Backend server is running on port ${PORT}`);
