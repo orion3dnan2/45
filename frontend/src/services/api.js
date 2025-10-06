@@ -280,5 +280,62 @@ export const api = {
       headers: getAuthHeader()
     });
     return response.json();
+  },
+
+  async getInvoices(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    const response = await fetch(`${API_URL}/invoices?${queryString}`, {
+      headers: getAuthHeader()
+    });
+    return response.json();
+  },
+
+  async getInvoiceById(id) {
+    const response = await fetch(`${API_URL}/invoices/${id}`, {
+      headers: getAuthHeader()
+    });
+    return response.json();
+  },
+
+  async createInvoice(data) {
+    const response = await fetch(`${API_URL}/invoices`, {
+      method: 'POST',
+      headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    return response.json();
+  },
+
+  async updateInvoice(id, data) {
+    const response = await fetch(`${API_URL}/invoices/${id}`, {
+      method: 'PUT',
+      headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    return response.json();
+  },
+
+  async deleteInvoice(id) {
+    const response = await fetch(`${API_URL}/invoices/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeader()
+    });
+    return response.json();
+  },
+
+  async recordInvoicePayment(id, paymentData) {
+    const response = await fetch(`${API_URL}/invoices/${id}/payment`, {
+      method: 'POST',
+      headers: { ...getAuthHeader(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(paymentData)
+    });
+    return response.json();
+  },
+
+  async getDoctors() {
+    const response = await fetch(`${API_URL}/auth/users?role=doctor`, {
+      headers: getAuthHeader()
+    });
+    return response.json();
   }
 };

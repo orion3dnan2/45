@@ -27,8 +27,8 @@ const Home = () => {
         setAppointments(appointmentsData.slice(0, 5));
       }
 
-      // تحميل الإحصائيات للإداريين
-      if (user.role === 'admin') {
+      // تحميل الإحصائيات للإداريين والمحاسبين
+      if (user.role === 'admin' || user.role === 'accountant') {
         const paymentStats = await api.getPaymentStats();
         setStats(paymentStats);
       }
@@ -89,15 +89,17 @@ const Home = () => {
         </div>
 
         {(user.role === 'reception' || user.role === 'admin') && (
-          <>
-            <div 
-              style={styles.tab}
-              onClick={() => navigateTo('/dashboard/suppliers')}
-            >
-              <span style={styles.tabIcon}>🚚</span>
-              <span style={styles.tabLabel}>الموردين</span>
-            </div>
+          <div 
+            style={styles.tab}
+            onClick={() => navigateTo('/dashboard/suppliers')}
+          >
+            <span style={styles.tabIcon}>🚚</span>
+            <span style={styles.tabLabel}>الموردين</span>
+          </div>
+        )}
 
+        {(user.role === 'reception' || user.role === 'admin' || user.role === 'accountant') && (
+          <>
             <div 
               style={styles.tab}
               onClick={() => navigateTo('/dashboard/invoices')}
@@ -105,12 +107,20 @@ const Home = () => {
               <span style={styles.tabIcon}>📋</span>
               <span style={styles.tabLabel}>الفواتير</span>
             </div>
+
+            <div 
+              style={styles.tab}
+              onClick={() => navigateTo('/dashboard/payments')}
+            >
+              <span style={styles.tabIcon}>💰</span>
+              <span style={styles.tabLabel}>المدفوعات</span>
+            </div>
           </>
         )}
       </div>
 
       {/* جدول المواعيد اليومية */}
-      {(user.role === 'reception' || user.role === 'admin' || user.role === 'doctor') && (
+      {(user.role === 'reception' || user.role === 'admin' || user.role === 'doctor' || user.role === 'accountant') && (
         <div style={styles.appointmentsSection}>
           <div style={styles.sectionHeader}>
             <h2 style={styles.sectionTitle}>📅 مواعيد اليوم</h2>
@@ -161,8 +171,8 @@ const Home = () => {
         </div>
       )}
 
-      {/* الإشعارات للأطباء والإداريين */}
-      {user.role !== 'reception' && notifications.length > 0 && (
+      {/* الإشعارات */}
+      {notifications.length > 0 && (
         <div style={styles.notificationsSection}>
           <div style={styles.sectionHeader}>
             <h2 style={styles.sectionTitle}>🔔 الإشعارات الحديثة</h2>
@@ -215,7 +225,8 @@ const getRoleLabel = (role) => {
   const labels = {
     doctor: 'طبيب',
     reception: 'استقبال',
-    admin: 'إداري'
+    admin: 'إداري',
+    accountant: 'محاسب'
   };
   return labels[role] || role;
 };
