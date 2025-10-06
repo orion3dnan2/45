@@ -176,4 +176,41 @@ const getPaymentStats = async (req, res) => {
   }
 };
 
-module.exports = { getPayments, createPayment, updatePayment, getPaymentStats };
+const getPendingTreatments = async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(`
+      SELECT 
+        t.id as treatment_id,
+        t.patient_id,
+        t.treatment_date,
+        t.diagnosis,
+        t.procedure_done,
+        t.cost,
+        t.tooth_number,
+        p.id as patient_id,
+        pu.full_name as patient_name,
+        d.full_name as doctor_name
+      FROM treatments t
+      JOIN patients p ON t.patient_id = p.id
+      LEFT JOIN users pu ON p.user_id = pu.id
+      JOIN users d ON t.doctor_id = d.id
+      WHERE t.status = 'completed' 
+        AND t.cost > 0
+        AND NOT EXISTS (
+          SELECT 1 FROM payments py 
+          WHERE py.treatment_id = t.id
+        )
+      ORDER BY t.treatment_date DESC
+    `);
+    
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'خطأ في الخادم' });
+  } finally {
+    client.release();
+  }
+};
+
+module.exports = { getPayments, createPayment, updatePayment, getPaymentStats, getPendingTreatments };
