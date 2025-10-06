@@ -26,49 +26,30 @@ async function seed() {
       userIds[user.username] = result.rows[0].id;
     }
     
-    const patientUsers = [
-      { username: 'patient_1', password: 'password', full_name: 'خالد العنزي', role: 'patient', email: 'khalid@example.com', phone: '96550123456' },
-      { username: 'patient_2', password: 'password', full_name: 'فاطمة الرشيدي', role: 'patient', email: 'fatima@example.com', phone: '96550234567' },
-      { username: 'patient_3', password: 'password', full_name: 'محمد السعيد', role: 'patient', email: 'mohammed@example.com', phone: '96550345678' }
-    ];
-    
-    const patientUserIds = {};
-    for (const patient of patientUsers) {
-      const hashedPassword = bcrypt.hashSync(patient.password, 10);
-      const result = await client.query(
-        `INSERT INTO users (username, password, full_name, role, email, phone)
-         VALUES ($1, $2, $3, $4, $5, $6)
-         ON CONFLICT (username) DO UPDATE SET full_name = EXCLUDED.full_name, email = EXCLUDED.email, phone = EXCLUDED.phone
-         RETURNING id`,
-        [patient.username, hashedPassword, patient.full_name, patient.role, patient.email, patient.phone]
-      );
-      patientUserIds[patient.username] = result.rows[0].id;
-    }
-    
     const patient1Result = await client.query(
-      `INSERT INTO patients (user_id, national_id, date_of_birth, address, medical_history, allergies, governorate_id, area_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       ON CONFLICT (national_id) DO UPDATE SET user_id = EXCLUDED.user_id
+      `INSERT INTO patients (national_id, date_of_birth, address, medical_history, allergies, governorate_id, area_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       ON CONFLICT (national_id) DO UPDATE SET date_of_birth = EXCLUDED.date_of_birth
        RETURNING id`,
-      [patientUserIds['patient_1'], '289123456789', '1990-05-15', 'الكويت، محافظة حولي - السالمية', 'لا يوجد', 'حساسية من البنسلين', 2, 6]
+      ['289123456789', '1990-05-15', 'الكويت، محافظة حولي - السالمية', 'لا يوجد', 'حساسية من البنسلين', 2, 6]
     );
     const patient1Id = patient1Result.rows[0].id;
     
     const patient2Result = await client.query(
-      `INSERT INTO patients (user_id, national_id, date_of_birth, address, medical_history, allergies, governorate_id, area_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       ON CONFLICT (national_id) DO UPDATE SET user_id = EXCLUDED.user_id
+      `INSERT INTO patients (national_id, date_of_birth, address, medical_history, allergies, governorate_id, area_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       ON CONFLICT (national_id) DO UPDATE SET date_of_birth = EXCLUDED.date_of_birth
        RETURNING id`,
-      [patientUserIds['patient_2'], '287654321098', '1985-08-22', 'الكويت، محافظة العاصمة - الشويخ', 'ضغط الدم', 'لا يوجد', 1, 1]
+      ['287654321098', '1985-08-22', 'الكويت، محافظة العاصمة - الشويخ', 'ضغط الدم', 'لا يوجد', 1, 1]
     );
     const patient2Id = patient2Result.rows[0].id;
     
     const patient3Result = await client.query(
-      `INSERT INTO patients (user_id, national_id, date_of_birth, address, medical_history, allergies, governorate_id, area_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       ON CONFLICT (national_id) DO UPDATE SET user_id = EXCLUDED.user_id
+      `INSERT INTO patients (national_id, date_of_birth, address, medical_history, allergies, governorate_id, area_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       ON CONFLICT (national_id) DO UPDATE SET date_of_birth = EXCLUDED.date_of_birth
        RETURNING id`,
-      [patientUserIds['patient_3'], '291234567890', '1988-03-10', 'الكويت، محافظة الفروانية - الفردوس', 'لا يوجد', 'لا يوجد', 3, 13]
+      ['291234567890', '1988-03-10', 'الكويت، محافظة الفروانية - الفردوس', 'لا يوجد', 'لا يوجد', 3, 13]
     );
     const patient3Id = patient3Result.rows[0].id;
     
