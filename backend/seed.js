@@ -10,6 +10,7 @@ async function seed() {
     const users = [
       { username: 'reception', password: 'password', full_name: 'موظف الاستقبال', role: 'reception', email: 'reception@clinic.com.kw', phone: '96551234568' },
       { username: 'doctor', password: 'password', full_name: 'د. أحمد محمد', role: 'doctor', email: 'doctor@clinic.com.kw', phone: '96551325559' },
+      { username: 'accountant', password: 'password', full_name: 'محاسب العيادة', role: 'accountant', email: 'accountant@clinic.com.kw', phone: '96551234570' },
       { username: 'admin', password: 'password', full_name: 'المدير العام', role: 'admin', email: 'admin@clinic.com.kw', phone: '96551234569' }
     ];
     
@@ -27,29 +28,29 @@ async function seed() {
     }
     
     const patient1Result = await client.query(
-      `INSERT INTO patients (national_id, date_of_birth, address, medical_history, allergies, governorate_id, area_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       ON CONFLICT (national_id) DO UPDATE SET date_of_birth = EXCLUDED.date_of_birth
+      `INSERT INTO patients (national_id, date_of_birth, address, medical_history, allergies, governorate_id, area_id, case_status, primary_doctor_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       ON CONFLICT (national_id) DO UPDATE SET date_of_birth = EXCLUDED.date_of_birth, case_status = EXCLUDED.case_status, primary_doctor_id = EXCLUDED.primary_doctor_id
        RETURNING id`,
-      ['289123456789', '1990-05-15', 'الكويت، محافظة حولي - السالمية', 'لا يوجد', 'حساسية من البنسلين', 2, 6]
+      ['289123456789', '1990-05-15', 'الكويت، محافظة حولي - السالمية', 'لا يوجد', 'حساسية من البنسلين', 2, 6, 'active', userIds['doctor']]
     );
     const patient1Id = patient1Result.rows[0].id;
     
     const patient2Result = await client.query(
-      `INSERT INTO patients (national_id, date_of_birth, address, medical_history, allergies, governorate_id, area_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       ON CONFLICT (national_id) DO UPDATE SET date_of_birth = EXCLUDED.date_of_birth
+      `INSERT INTO patients (national_id, date_of_birth, address, medical_history, allergies, governorate_id, area_id, case_status, primary_doctor_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       ON CONFLICT (national_id) DO UPDATE SET date_of_birth = EXCLUDED.date_of_birth, case_status = EXCLUDED.case_status, primary_doctor_id = EXCLUDED.primary_doctor_id
        RETURNING id`,
-      ['287654321098', '1985-08-22', 'الكويت، محافظة العاصمة - الشويخ', 'ضغط الدم', 'لا يوجد', 1, 1]
+      ['287654321098', '1985-08-22', 'الكويت، محافظة العاصمة - الشويخ', 'ضغط الدم', 'لا يوجد', 1, 1, 'completed', userIds['doctor']]
     );
     const patient2Id = patient2Result.rows[0].id;
     
     const patient3Result = await client.query(
-      `INSERT INTO patients (national_id, date_of_birth, address, medical_history, allergies, governorate_id, area_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       ON CONFLICT (national_id) DO UPDATE SET date_of_birth = EXCLUDED.date_of_birth
+      `INSERT INTO patients (national_id, date_of_birth, address, medical_history, allergies, governorate_id, area_id, case_status, primary_doctor_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       ON CONFLICT (national_id) DO UPDATE SET date_of_birth = EXCLUDED.date_of_birth, case_status = EXCLUDED.case_status, primary_doctor_id = EXCLUDED.primary_doctor_id
        RETURNING id`,
-      ['291234567890', '1988-03-10', 'الكويت، محافظة الفروانية - الفردوس', 'لا يوجد', 'لا يوجد', 3, 13]
+      ['291234567890', '1988-03-10', 'الكويت، محافظة الفروانية - الفردوس', 'لا يوجد', 'لا يوجد', 3, 13, 'new', userIds['doctor']]
     );
     const patient3Id = patient3Result.rows[0].id;
     
@@ -177,10 +178,12 @@ async function seed() {
     
     await client.query('DELETE FROM treatments');
     
+    const treatmentIds = {};
     for (const treatment of treatments) {
-      await client.query(
+      const result = await client.query(
         `INSERT INTO treatments (patient_id, doctor_id, treatment_date, diagnosis, procedure_done, tooth_number, status, cost, notes)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+         RETURNING id`,
         [
           treatment.patient_id,
           treatment.doctor_id,
@@ -193,7 +196,43 @@ async function seed() {
           treatment.notes
         ]
       );
+      treatmentIds[treatment.patient_id] = result.rows[0].id;
     }
+    
+    await client.query('DELETE FROM invoice_items');
+    await client.query('DELETE FROM invoices');
+    
+    const invoice1Result = await client.query(
+      `INSERT INTO invoices (invoice_number, patient_id, treatment_id, issue_date, due_date, subtotal, tax_rate, tax_amount, discount_rate, discount_amount, total_amount, amount_paid, balance_due, status, created_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+       RETURNING id`,
+      ['INV-2024-001', patient1Id, treatmentIds[patient1Id], new Date().toISOString().split('T')[0], new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], 105.000, 0, 0, 0, 0, 105.000, 105.000, 0, 'paid', userIds['accountant']]
+    );
+    
+    await client.query(
+      `INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, total_price)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [invoice1Result.rows[0].id, 'حشو مركب - ضرس 16', 1, 105.000, 105.000]
+    );
+    
+    const invoice2Result = await client.query(
+      `INSERT INTO invoices (invoice_number, patient_id, issue_date, due_date, subtotal, tax_rate, tax_amount, discount_rate, discount_amount, total_amount, amount_paid, balance_due, status, created_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+       RETURNING id`,
+      ['INV-2024-002', patient2Id, new Date().toISOString().split('T')[0], new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], 150.000, 0, 0, 10, 15.000, 135.000, 0, 135.000, 'pending', userIds['accountant']]
+    );
+    
+    await client.query(
+      `INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, total_price)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [invoice2Result.rows[0].id, 'فحص شامل', 1, 50.000, 50.000]
+    );
+    
+    await client.query(
+      `INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, total_price)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [invoice2Result.rows[0].id, 'تنظيف الأسنان', 1, 100.000, 100.000]
+    );
     
     await client.query('DELETE FROM notifications');
     
@@ -215,6 +254,8 @@ async function seed() {
     console.log('  الصلاحيات: فتح ملف مريض - تحديد مواعيد - متابعة مواعيد المرضى والأطباء - مراجعة المخزن والعلاجات والأدوية - الموردون');
     console.log('\n- طبيب: doctor / password');
     console.log('  الصلاحيات: إرفاق التشخيص - المواعيد - التحكم في التسعيرة - معرفة محتويات المخزن - متابعة حالة المريض');
+    console.log('\n- محاسب: accountant / password');
+    console.log('  الصلاحيات: إصدار الفواتير - تحصيل الرسوم - متابعة المدفوعات - التقارير المالية');
     console.log('\n- إداري: admin / password');
     console.log('  الصلاحيات: كل صلاحيات العيادة والتعديل والحذف والإضافة في جميع الأقسام');
     
