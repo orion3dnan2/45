@@ -1,6 +1,10 @@
 const pool = require('../models/database');
 
+const isDemoMode = process.env.DEMO_MODE === 'true';
+
 async function checkLowStock() {
+  if (isDemoMode) return; // تعطيل الفحوصات في وضع الديمو
+  
   const client = await pool.connect();
   try {
     const result = await client.query(`
@@ -35,6 +39,8 @@ async function checkLowStock() {
 }
 
 async function checkSupplierSubscriptions() {
+  if (isDemoMode) return; // تعطيل الفحوصات في وضع الديمو
+  
   const client = await pool.connect();
   try {
     const result = await client.query(`
@@ -93,6 +99,8 @@ async function checkSupplierSubscriptions() {
 }
 
 async function checkPaymentsDue() {
+  if (isDemoMode) return; // تعطيل الفحوصات في وضع الديمو
+  
   const client = await pool.connect();
   try {
     const result = await client.query(`
@@ -142,6 +150,8 @@ async function checkPaymentsDue() {
 }
 
 async function checkAppointmentReminders() {
+  if (isDemoMode) return; // تعطيل الفحوصات في وضع الديمو
+  
   const client = await pool.connect();
   try {
     const result = await client.query(`
@@ -194,6 +204,11 @@ async function runAllChecks() {
 }
 
 function startScheduler() {
+  if (isDemoMode) {
+    console.log('[Notification Scheduler] Demo mode - Notification scheduler disabled');
+    return;
+  }
+  
   console.log('[Notification Scheduler] Starting automated notification system...');
   
   runAllChecks();
