@@ -6,3 +6,7 @@ dist/
 *.log
 .cache/
 backend/public/
+frontend/dist/
+frontend/node_modules/
+backend/node_modules/
+.local/
