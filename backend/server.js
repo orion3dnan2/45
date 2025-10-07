@@ -14,6 +14,7 @@ const supplierRoutes = require('./src/routes/suppliers');
 const notificationRoutes = require('./src/routes/notifications');
 const locationRoutes = require('./src/routes/locations');
 const invoiceRoutes = require('./src/routes/invoices');
+const documentRoutes = require('./src/routes/documents');
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -37,6 +38,7 @@ app.use('/api/suppliers', supplierRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/locations', locationRoutes);
 app.use('/api/invoices', invoiceRoutes);
+app.use('/api', documentRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'نظام عيادة الأسنان يعمل بشكل صحيح' });

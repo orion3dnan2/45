@@ -49,6 +49,9 @@ const Patients = () => {
     primary_doctor_id: ''
   });
   const [doctors, setDoctors] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadNotes, setUploadNotes] = useState('');
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     loadPatients();
@@ -202,6 +205,59 @@ const Patients = () => {
     } catch (error) {
       console.error('خطأ في حذف المريض:', error);
       alert('فشل في حذف المريض');
+    }
+  };
+
+  const handleUploadDocument = async () => {
+    if (!selectedFile) {
+      alert('الرجاء اختيار ملف للرفع');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      await api.uploadDocument(selectedPatient.id, selectedFile, uploadNotes);
+      setSelectedFile(null);
+      setUploadNotes('');
+      viewPatientDetails(selectedPatient.id);
+      alert('تم رفع المستند بنجاح');
+    } catch (error) {
+      console.error('خطأ في رفع المستند:', error);
+      alert('فشل في رفع المستند');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDeleteDocument = async (documentId) => {
+    if (!window.confirm('هل تريد حذف هذا المستند؟')) {
+      return;
+    }
+
+    try {
+      await api.deleteDocument(documentId);
+      viewPatientDetails(selectedPatient.id);
+      alert('تم حذف المستند بنجاح');
+    } catch (error) {
+      console.error('خطأ في حذف المستند:', error);
+      alert('فشل في حذف المستند');
+    }
+  };
+
+  const handleDownloadDocument = async (documentId, originalName) => {
+    try {
+      const blob = await api.downloadDocument(documentId);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = originalName;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('خطأ في تحميل المستند:', error);
+      alert('فشل في تحميل المستند');
     }
   };
 
@@ -426,6 +482,97 @@ const Patients = () => {
                     <h3 style={styles.blockTitle}>📝 التاريخ الطبي</h3>
                     <div style={styles.medicalContent}>
                       {selectedPatient.medical_history || 'لا يوجد تاريخ طبي مسجل'}
+                    </div>
+                  </div>
+                  
+                  <div style={styles.medicalBlock}>
+                    <h3 style={styles.blockTitle}>📎 المستندات والملفات</h3>
+                    {user.role === 'doctor' && (
+                      <div style={styles.uploadSection}>
+                        <div style={styles.fileInputGroup}>
+                          <input 
+                            type="file" 
+                            onChange={(e) => setSelectedFile(e.target.files[0])}
+                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
+                            style={styles.fileInput}
+                          />
+                          {selectedFile && (
+                            <div style={styles.selectedFileInfo}>
+                              <span>📄 {selectedFile.name}</span>
+                              <button 
+                                onClick={() => setSelectedFile(null)} 
+                                style={styles.clearFileBtn}
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                        <input 
+                          type="text"
+                          placeholder="ملاحظات عن المستند (اختياري)"
+                          value={uploadNotes}
+                          onChange={(e) => setUploadNotes(e.target.value)}
+                          style={styles.notesInput}
+                        />
+                        <button 
+                          onClick={handleUploadDocument}
+                          disabled={!selectedFile || uploading}
+                          style={{
+                            ...styles.uploadBtn,
+                            ...((!selectedFile || uploading) ? styles.uploadBtnDisabled : {})
+                          }}
+                        >
+                          {uploading ? '⏳ جاري الرفع...' : '📤 رفع المستند'}
+                        </button>
+                      </div>
+                    )}
+                    
+                    <div style={styles.documentsList}>
+                      {selectedPatient.documents?.length > 0 ? (
+                        selectedPatient.documents.map(doc => (
+                          <div key={doc.id} style={styles.documentCard}>
+                            <div style={styles.documentInfo}>
+                              <div style={styles.documentIcon}>
+                                {doc.file_type?.includes('pdf') ? '📄' : 
+                                 doc.file_type?.includes('image') ? '🖼️' : 
+                                 doc.file_type?.includes('word') ? '📝' : '📁'}
+                              </div>
+                              <div style={styles.documentDetails}>
+                                <div style={styles.documentName}>{doc.original_name}</div>
+                                <div style={styles.documentMeta}>
+                                  <span>👤 {doc.uploaded_by_name || 'غير معروف'}</span>
+                                  <span>📅 {new Date(doc.created_at).toLocaleDateString('ar-EG')}</span>
+                                  <span>📦 {(doc.file_size / 1024).toFixed(1)} KB</span>
+                                </div>
+                                {doc.notes && (
+                                  <div style={styles.documentNotes}>📝 {doc.notes}</div>
+                                )}
+                              </div>
+                            </div>
+                            <div style={styles.documentActions}>
+                              <button 
+                                onClick={() => handleDownloadDocument(doc.id, doc.original_name)}
+                                style={styles.downloadBtn}
+                                title="تحميل"
+                              >
+                                ⬇️
+                              </button>
+                              {user.role === 'doctor' && (
+                                <button 
+                                  onClick={() => handleDeleteDocument(doc.id)}
+                                  style={styles.deleteDocBtn}
+                                  title="حذف"
+                                >
+                                  🗑️
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div style={styles.emptyDocuments}>لا توجد مستندات مرفقة</div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1300,6 +1447,160 @@ const styles = {
     fontSize: '16px',
     fontWeight: '700',
     transition: 'all 0.3s'
+  },
+  uploadSection: {
+    marginTop: '15px',
+    padding: '16px',
+    background: '#FFFFFF',
+    borderRadius: '10px',
+    border: '2px dashed #CBD5E1',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px'
+  },
+  fileInputGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px'
+  },
+  fileInput: {
+    padding: '10px',
+    border: '1px solid #CBD5E1',
+    borderRadius: '8px',
+    fontSize: '14px',
+    cursor: 'pointer'
+  },
+  selectedFileInfo: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '10px 12px',
+    background: '#F1F5F9',
+    borderRadius: '8px',
+    fontSize: '14px',
+    color: '#475569'
+  },
+  clearFileBtn: {
+    background: '#DC2626',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    padding: '4px 10px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '600'
+  },
+  notesInput: {
+    padding: '10px 12px',
+    border: '1px solid #CBD5E1',
+    borderRadius: '8px',
+    fontSize: '14px',
+    resize: 'vertical'
+  },
+  uploadBtn: {
+    padding: '12px 20px',
+    background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '600',
+    boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)',
+    transition: 'all 0.3s'
+  },
+  uploadBtnDisabled: {
+    background: '#94A3B8',
+    cursor: 'not-allowed',
+    boxShadow: 'none'
+  },
+  documentsList: {
+    marginTop: '15px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px'
+  },
+  documentCard: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '14px',
+    background: '#FFFFFF',
+    borderRadius: '10px',
+    border: '1px solid #E2E8F0',
+    transition: 'all 0.3s',
+    gap: '12px'
+  },
+  documentInfo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    flex: 1
+  },
+  documentIcon: {
+    fontSize: '32px',
+    minWidth: '40px',
+    textAlign: 'center'
+  },
+  documentDetails: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px'
+  },
+  documentName: {
+    fontSize: '15px',
+    fontWeight: '600',
+    color: '#1E293B',
+    wordBreak: 'break-word'
+  },
+  documentMeta: {
+    display: 'flex',
+    gap: '12px',
+    fontSize: '12px',
+    color: '#64748B',
+    flexWrap: 'wrap'
+  },
+  documentNotes: {
+    fontSize: '13px',
+    color: '#475569',
+    fontStyle: 'italic',
+    marginTop: '4px'
+  },
+  documentActions: {
+    display: 'flex',
+    gap: '8px'
+  },
+  downloadBtn: {
+    background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '8px',
+    padding: '8px 12px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    transition: 'all 0.3s',
+    boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)'
+  },
+  deleteDocBtn: {
+    background: 'linear-gradient(135deg, #DC2626 0%, #991B1B 100%)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '8px',
+    padding: '8px 12px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    transition: 'all 0.3s',
+    boxShadow: '0 2px 8px rgba(220, 38, 38, 0.3)'
+  },
+  emptyDocuments: {
+    textAlign: 'center',
+    padding: '30px',
+    fontSize: '15px',
+    color: '#94A3B8',
+    background: '#FFFFFF',
+    borderRadius: '10px',
+    border: '2px dashed #CBD5E1'
   }
 };
 

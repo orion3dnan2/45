@@ -151,11 +151,21 @@ const getPatientById = async (req, res) => {
     `, [id]);
     const payments = paymentsResult.rows;
 
+    const documentsResult = await client.query(`
+      SELECT pd.*, u.full_name as uploaded_by_name
+      FROM patient_documents pd
+      LEFT JOIN users u ON pd.uploaded_by = u.id
+      WHERE pd.patient_id = $1
+      ORDER BY pd.created_at DESC
+    `, [id]);
+    const documents = documentsResult.rows;
+
     res.json({
       ...patient,
       appointments,
       treatments,
-      payments
+      payments,
+      documents
     });
   } catch (error) {
     console.error(error);

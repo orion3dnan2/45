@@ -288,5 +288,42 @@ export const api = {
       headers: getAuthHeader()
     });
     return response.json();
+  },
+
+  async uploadDocument(patientId, file, notes) {
+    const formData = new FormData();
+    formData.append('document', file);
+    if (notes) {
+      formData.append('notes', notes);
+    }
+
+    const response = await fetch(`${API_URL}/patients/${patientId}/documents`, {
+      method: 'POST',
+      headers: getAuthHeader(),
+      body: formData
+    });
+    return response.json();
+  },
+
+  async getPatientDocuments(patientId) {
+    const response = await fetch(`${API_URL}/patients/${patientId}/documents`, {
+      headers: getAuthHeader()
+    });
+    return response.json();
+  },
+
+  async downloadDocument(documentId) {
+    const response = await fetch(`${API_URL}/documents/${documentId}/download`, {
+      headers: getAuthHeader()
+    });
+    return response.blob();
+  },
+
+  async deleteDocument(documentId) {
+    const response = await fetch(`${API_URL}/documents/${documentId}`, {
+      method: 'DELETE',
+      headers: getAuthHeader()
+    });
+    return response.json();
   }
 };
