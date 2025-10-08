@@ -19,9 +19,62 @@
   "addSuccess": "Medication added successfully",
   "updateSuccess": "Medication updated successfully",
   "deleteSuccess": "Medication deleted successfully",
-  "deleteConfirm": "Are you sure you want to delete this medication?",
+  "deleteConfirm": "Are you sure you want to delete {name}?",
+  "addButton": "➕ Add New Medication",
+  "editTitle": "Edit Medication",
+  "addTitle": "Add New Medication",
+  "nameLabel": "Medication Name *",
+  "saveButton": "💾 Save Changes",
+  "addButtonShort": "➕ Add",
+  "errors": {
+    "loadFailed": "Error loading medications",
+    "operationFailed": "Operation failed",
+    "deleteFailed": "Failed to delete medication"
+  },
   "placeholders": {
     "category": "Example: Antibiotics, Painkillers, Supplies",
     "unit": "Example: Tablet, Capsule, Box"
-  }
+  },
+  "csvHeaders": {
+    "name": "Name",
+    "description": "Description",
+    "category": "Category",
+    "unit": "Unit",
+    "quantity": "Quantity",
+    "minQuantity": "Minimum Quantity",
+    "price": "Price",
+    "expiryDate": "Expiry Date"
+  },
+  "descriptionLabel": "Description:",
+  "categoryLabel": "Category:",
+  "filters": {
+    "allCategories": "All Categories",
+    "all": "All",
+    "lowStock": "⚠️ Low Stock"
+  },
+  "exportCSV": "📥 Export CSV",
+  "stockStatus": {
+    "outOfStock": "Out of Stock",
+    "lowStock": "Low Stock",
+    "inStock": "In Stock"
+  },
+  "unitLabel": "Unit:",
+  "quantityLabel": "Quantity Available:",
+  "minQuantityLabel": "Minimum Quantity:",
+  "priceLabel": "Price:",
+  "expiryDateLabel": "Expiry Date:",
+  "warnings": {
+    "outOfStock": "Out of stock!",
+    "lowStock": "Stock running low!"
+  },
+  "editButton": "✏️ Edit",
+  "deleteButton": "🗑️ Delete",
+  "noSearchResults": "No search results",
+  "noLowStockMedications": "No low stock medications",
+  "noMedications": "No medications registered",
+  "unitFormLabel": "Unit *",
+  "quantityFormLabel": "Quantity Available",
+  "minQuantityFormLabel": "Minimum Quantity",
+  "priceFormLabel": "Price (SAR)",
+  "expiryDateFormLabel": "Expiry Date"
 }

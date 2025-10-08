@@ -15,6 +15,25 @@
   "updateSuccess": "تم تحديث الفاتورة بنجاح",
   "deleteSuccess": "تم حذف الفاتورة بنجاح",
   "deleteConfirm": "هل أنت متأكد من حذف هذه الفاتورة؟",
+  "subtitle": "إدارة الفواتير والمدفوعات",
+  "addButton": "+ إنشاء فاتورة جديدة",
+  "addTitle": "إنشاء فاتورة جديدة",
+  "itemsTitle": "بنود الفاتورة",
+  "addItem": "+ إضافة بند",
+  "createButton": "إنشاء الفاتورة",
+  "status": {
+    "draft": "مسودة",
+    "pending": "معلقة",
+    "paid": "مدفوعة",
+    "partially_paid": "مدفوعة جزئياً",
+    "overdue": "متأخرة",
+    "cancelled": "ملغاة"
+  },
+  "errors": {
+    "loadDataFailed": "خطأ في تحميل البيانات",
+    "loadTreatmentsFailed": "خطأ في تحميل العلاجات",
+    "createFailed": "فشل في إنشاء الفاتورة"
+  },
   "placeholders": {
     "search": "بحث برقم الفاتورة أو اسم المريض أو الرقم المدني...",
     "description": "الوصف",

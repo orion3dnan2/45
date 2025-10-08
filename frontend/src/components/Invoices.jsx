@@ -39,7 +39,7 @@ const Invoices = () => {
       setInvoices(invoicesData);
       setPatients(patientsData);
     } catch (error) {
-      console.error('خطأ في تحميل البيانات:', error);
+      console.error('Error loading data:', error);
     } finally {
       setLoading(false);
     }
@@ -50,7 +50,7 @@ const Invoices = () => {
       const treatmentsData = await api.getTreatments({ patient_id: patientId, status: 'completed' });
       setTreatments(treatmentsData);
     } catch (error) {
-      console.error('خطأ في تحميل العلاجات:', error);
+      console.error('Error loading treatments:', error);
     }
   };
 
@@ -113,8 +113,8 @@ const Invoices = () => {
       loadData();
       alert(t('invoices:addSuccess'));
     } catch (error) {
-      console.error('خطأ في إنشاء الفاتورة:', error);
-      alert('فشل في إنشاء الفاتورة');
+      console.error('Error creating invoice:', error);
+      alert(t('invoices:errors.createFailed'));
     }
   };
 
@@ -143,12 +143,12 @@ const Invoices = () => {
 
   const getStatusLabel = (status) => {
     const labels = {
-      draft: 'مسودة',
-      pending: 'معلقة',
-      paid: 'مدفوعة',
-      partially_paid: 'مدفوعة جزئياً',
-      overdue: 'متأخرة',
-      cancelled: 'ملغاة'
+      draft: t('invoices:status.draft'),
+      pending: t('invoices:status.pending'),
+      paid: t('invoices:status.paid'),
+      partially_paid: t('invoices:status.partially_paid'),
+      overdue: t('invoices:status.overdue'),
+      cancelled: t('invoices:status.cancelled')
     };
     return labels[status] || status;
   };
@@ -174,11 +174,11 @@ const Invoices = () => {
       <div style={styles.header}>
         <div>
           <h1 style={styles.title}>📋 {t('invoices:title')}</h1>
-          <p style={styles.subtitle}>إدارة الفواتير والمدفوعات</p>
+          <p style={styles.subtitle}>{t('invoices:subtitle')}</p>
         </div>
         {(user.role === 'admin' || user.role === 'accountant') && (
           <button onClick={() => setShowInvoiceModal(true)} style={styles.addButton}>
-            + إنشاء فاتورة جديدة
+            {t('invoices:addButton')}
           </button>
         )}
       </div>
@@ -212,7 +212,7 @@ const Invoices = () => {
           <table style={styles.table}>
             <thead>
               <tr style={styles.tableHeaderRow}>
-                <th style={styles.tableHeader}>رقم الفاتورة</th>
+                <th style={styles.tableHeader}>{t('invoices:invoiceNumber')}</th>
                 <th style={styles.tableHeader}>المريض</th>
                 <th style={styles.tableHeader}>التاريخ</th>
                 <th style={styles.tableHeader}>تاريخ الاستحقاق</th>
@@ -264,7 +264,7 @@ const Invoices = () => {
         <div style={styles.modal}>
           <div style={styles.modalContent}>
             <div style={styles.modalHeader}>
-              <h2 style={styles.modalTitle}>إنشاء فاتورة جديدة</h2>
+              <h2 style={styles.modalTitle}>{t('invoices:addTitle')}</h2>
               <button onClick={() => { setShowInvoiceModal(false); resetInvoiceForm(); }} style={styles.closeButton}>×</button>
             </div>
             <form onSubmit={handleCreateInvoice}>
@@ -337,9 +337,9 @@ const Invoices = () => {
 
               <div style={styles.itemsSection}>
                 <div style={styles.itemsHeader}>
-                  <h3 style={styles.itemsTitle}>بنود الفاتورة</h3>
+                  <h3 style={styles.itemsTitle}>{t('invoices:itemsTitle')}</h3>
                   <button type="button" onClick={addInvoiceItem} style={styles.addItemButton}>
-                    + إضافة بند
+                    {t('invoices:addItem')}
                   </button>
                 </div>
                 
@@ -421,7 +421,7 @@ const Invoices = () => {
 
               <div style={styles.modalActions}>
                 <button type="submit" style={styles.submitButton}>
-                  إنشاء الفاتورة
+                  {t('invoices:createButton')}
                 </button>
                 <button
                   type="button"

@@ -3,15 +3,15 @@ import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import { AuthContext } from '../contexts/AuthContext';
 
-const getCaseStatusLabel = (status) => {
+const getCaseStatusLabel = (status, t) => {
   const labels = {
-    new: 'جديد',
-    active: 'نشط',
-    completed: 'مكتمل',
-    postponed: 'مؤجل',
-    cancelled: 'ملغي'
+    new: t('patients:status.new'),
+    active: t('patients:status.active'),
+    completed: t('patients:status.completed'),
+    postponed: t('patients:status.postponed'),
+    cancelled: t('patients:status.cancelled')
   };
-  return labels[status] || 'جديد';
+  return labels[status] || t('patients:status.new');
 };
 
 const getCaseStatusStyle = (status) => {
@@ -65,7 +65,7 @@ const Patients = () => {
       const doctorsData = await api.getDoctors();
       setDoctors(doctorsData);
     } catch (error) {
-      console.error('خطأ في تحميل الأطباء:', error);
+      console.error('Error loading doctors:', error);
     }
   };
 
@@ -83,7 +83,7 @@ const Patients = () => {
       const data = await response.json();
       setPatients(data);
     } catch (error) {
-      console.error('خطأ في تحميل المرضى:', error);
+      console.error('Error loading patients:', error);
     } finally {
       setLoading(false);
     }
@@ -95,7 +95,7 @@ const Patients = () => {
       setSelectedPatient(data);
       setActiveTab('info');
     } catch (error) {
-      console.error('خطأ في تحميل تفاصيل المريض:', error);
+      console.error('Error loading patient details:', error);
     }
   };
 
@@ -108,8 +108,8 @@ const Patients = () => {
       loadPatients();
       alert(t('patients:addSuccess'));
     } catch (error) {
-      console.error('خطأ في إضافة المريض:', error);
-      alert('فشل في إضافة المريض');
+      console.error('Error adding patient:', error);
+      alert(t('patients:errors.addFailed'));
     }
   };
 
@@ -134,8 +134,8 @@ const Patients = () => {
       viewPatientDetails(selectedPatient.id);
       alert(t('patients:updateSuccess'));
     } catch (error) {
-      console.error('خطأ في تحديث المريض:', error);
-      alert('فشل في تحديث المريض');
+      console.error('Error updating patient:', error);
+      alert(t('patients:errors.updateFailed'));
     }
   };
 
@@ -175,7 +175,7 @@ const Patients = () => {
   };
 
   const handleArchivePatient = async () => {
-    if (!window.confirm(selectedPatient.archived ? 'هل تريد إلغاء أرشفة هذا المريض؟' : 'هل تريد أرشفة هذا المريض؟')) {
+    if (!window.confirm(selectedPatient.archived ? t('patients:confirmUnarchive') : t('patients:confirmArchive'))) {
       return;
     }
     
@@ -183,19 +183,19 @@ const Patients = () => {
       await api.archivePatient(selectedPatient.id, !selectedPatient.archived);
       setSelectedPatient(null);
       loadPatients();
-      alert(selectedPatient.archived ? 'تم إلغاء أرشفة المريض بنجاح' : 'تم أرشفة المريض بنجاح');
+      alert(selectedPatient.archived ? t('patients:success.unarchived') : t('patients:success.archived'));
     } catch (error) {
-      console.error('خطأ في أرشفة المريض:', error);
-      alert('فشل في تنفيذ العملية');
+      console.error('Error archiving patient:', error);
+      alert(t('patients:errors.operationFailed'));
     }
   };
 
   const handleDeletePatient = async () => {
-    if (!window.confirm('⚠️ تحذير: هل أنت متأكد من حذف هذا المريض؟\n\nسيتم حذف جميع بيانات المريض بما في ذلك المواعيد والعلاجات والمدفوعات بشكل نهائي ولا يمكن استرجاعها.')) {
+    if (!window.confirm(t('patients:confirmDeleteWarning'))) {
       return;
     }
 
-    if (!window.confirm('تأكيد نهائي: هذا الإجراء لا يمكن التراجع عنه!')) {
+    if (!window.confirm(t('patients:confirmDelete'))) {
       return;
     }
     
@@ -203,16 +203,16 @@ const Patients = () => {
       await api.deletePatient(selectedPatient.id);
       setSelectedPatient(null);
       loadPatients();
-      alert('تم حذف المريض بنجاح');
+      alert(t('patients:success.deleted'));
     } catch (error) {
-      console.error('خطأ في حذف المريض:', error);
-      alert('فشل في حذف المريض');
+      console.error('Error deleting patient:', error);
+      alert(t('patients:errors.deleteFailed'));
     }
   };
 
   const handleUploadDocument = async () => {
     if (!selectedFile) {
-      alert('الرجاء اختيار ملف للرفع');
+      alert(t('patients:errors.selectFile'));
       return;
     }
 
@@ -222,27 +222,27 @@ const Patients = () => {
       setSelectedFile(null);
       setUploadNotes('');
       viewPatientDetails(selectedPatient.id);
-      alert('تم رفع المستند بنجاح');
+      alert(t('patients:success.documentUploaded'));
     } catch (error) {
-      console.error('خطأ في رفع المستند:', error);
-      alert('فشل في رفع المستند');
+      console.error('Error uploading document:', error);
+      alert(t('patients:errors.uploadFailed'));
     } finally {
       setUploading(false);
     }
   };
 
   const handleDeleteDocument = async (documentId) => {
-    if (!window.confirm('هل تريد حذف هذا المستند؟')) {
+    if (!window.confirm(t('patients:confirmDeleteDocument'))) {
       return;
     }
 
     try {
       await api.deleteDocument(documentId);
       viewPatientDetails(selectedPatient.id);
-      alert('تم حذف المستند بنجاح');
+      alert(t('patients:success.documentDeleted'));
     } catch (error) {
-      console.error('خطأ في حذف المستند:', error);
-      alert('فشل في حذف المستند');
+      console.error('Error deleting document:', error);
+      alert(t('patients:errors.deleteDocumentFailed'));
     }
   };
 
@@ -258,8 +258,8 @@ const Patients = () => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      console.error('خطأ في تحميل المستند:', error);
-      alert('فشل في تحميل المستند');
+      console.error('Error downloading document:', error);
+      alert(t('patients:errors.downloadFailed'));
     }
   };
 
@@ -327,8 +327,8 @@ const Patients = () => {
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (window.confirm(`هل تريد حذف ${patient.full_name || 'هذا المريض'}؟`)) {
-                        if (window.confirm('⚠️ تأكيد نهائي: هذا الإجراء لا يمكن التراجع عنه!')) {
+                      if (window.confirm(t('patients:deleteConfirm'))) {
+                        if (window.confirm(t('patients:confirmDelete'))) {
                           api.deletePatient(patient.id)
                             .then(() => {
                               loadPatients();
@@ -338,8 +338,8 @@ const Patients = () => {
                               alert(t('patients:deleteSuccess'));
                             })
                             .catch(err => {
-                              console.error('خطأ في حذف المريض:', err);
-                              alert('فشل في حذف المريض');
+                              console.error('Error deleting patient:', err);
+                              alert(t('patients:errors.deleteFailed'));
                             });
                         }
                       }
@@ -456,7 +456,7 @@ const Patients = () => {
                   <div style={styles.infoItem}>
                     <span style={styles.infoLabel}>حالة القضية:</span>
                     <span style={{...styles.infoValue, ...getCaseStatusStyle(selectedPatient.case_status)}}>
-                      {getCaseStatusLabel(selectedPatient.case_status)}
+                      {getCaseStatusLabel(selectedPatient.case_status, t)}
                     </span>
                   </div>
                   <div style={styles.infoItem}>

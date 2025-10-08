@@ -43,5 +43,6 @@
   "available": "متوفر",
   "unavailable": "غير متوفر",
   "active": "نشط",
-  "inactive": "غير نشط"
+  "inactive": "غير نشط",
+  "currency": "ر.س"
 }

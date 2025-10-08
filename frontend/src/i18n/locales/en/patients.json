@@ -16,6 +16,39 @@
   "updateSuccess": "Patient updated successfully",
   "deleteSuccess": "Patient deleted successfully",
   "deleteConfirm": "Are you sure you want to delete this patient?",
+  "confirmDelete": "Final confirmation: This action cannot be undone!",
+  "confirmArchive": "Are you sure you want to archive this patient?",
+  "confirmUnarchive": "Are you sure you want to unarchive this patient?",
+  "status": {
+    "new": "New",
+    "active": "Active",
+    "completed": "Completed",
+    "postponed": "Postponed",
+    "cancelled": "Cancelled"
+  },
+  "success": {
+    "archived": "Patient archived successfully",
+    "unarchived": "Patient unarchived successfully",
+    "deleted": "Patient deleted successfully",
+    "documentUploaded": "Document uploaded successfully",
+    "documentDeleted": "Document deleted successfully"
+  },
+  "errors": {
+    "addFailed": "Failed to add patient",
+    "updateFailed": "Failed to update patient",
+    "deleteFailed": "Failed to delete patient",
+    "operationFailed": "Operation failed",
+    "loadDoctorsFailed": "Error loading doctors",
+    "loadPatientsFailed": "Error loading patients",
+    "loadPatientDetailsFailed": "Error loading patient details",
+    "archiveFailed": "Error archiving patient",
+    "uploadFailed": "Failed to upload document",
+    "deleteDocumentFailed": "Failed to delete document",
+    "downloadFailed": "Failed to download document",
+    "selectFile": "Please select a file to upload"
+  },
+  "confirmDeleteDocument": "Are you sure you want to delete this document?",
+  "confirmDeleteWarning": "⚠️ Warning: Are you sure you want to delete this patient?\n\nAll patient data including appointments, treatments, and payments will be permanently deleted and cannot be recovered.",
   "placeholders": {
     "nationalId": "Example: 12345678901",
     "allergies": "Example: Penicillin allergy, latex allergy...",

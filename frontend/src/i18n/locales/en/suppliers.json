@@ -10,11 +10,46 @@
   "updateSuccess": "Supplier updated successfully",
   "deleteSuccess": "Supplier deleted successfully",
   "deleteConfirm": "Are you sure you want to delete this supplier?",
+  "addButton": "+ Add New Supplier",
+  "contactLabel": "Contact:",
+  "subscriptionStart": "Subscription Start:",
+  "subscriptionEnd": "Subscription End:",
+  "subscriptionExpiringSoon": "⚠️ Subscription expiring soon!",
+  "subscriptionExpired": "❌ Subscription expired!",
+  "editTitle": "✏️ Edit Supplier",
+  "addTitle": "➕ Add New Supplier",
+  "nameLabel": "Supplier Name *",
+  "contactPersonLabel": "Contact Person",
+  "subscriptionStartLabel": "Subscription Start",
+  "subscriptionEndLabel": "Subscription End",
+  "saveButton": "💾 Save Changes",
+  "addButtonFull": "➕ Add Supplier",
+  "status": {
+    "active": "Active",
+    "expiring_soon": "Expiring Soon",
+    "expired": "Expired"
+  },
+  "errors": {
+    "loadFailed": "Error loading suppliers",
+    "operationFailed": "Operation failed",
+    "deleteFailed": "Failed to delete supplier"
+  },
   "placeholders": {
     "name": "Enter supplier name",
     "contactPerson": "Contact person name",
     "phone": "05xxxxxxxx",
     "email": "example@domain.com",
-    "address": "Supplier address"
-  }
+    "address": "Supplier address",
+    "paymentTerms": "Example: Payment within 30 days of invoice date"
+  },
+  "phoneLabel": "📞 Phone:",
+  "emailLabel": "📧 Email:",
+  "phoneFormLabel": "Phone Number",
+  "emailFormLabel": "Email Address",
+  "addressLabel": "📍 Address:",
+  "paymentTermsLabel": "Payment Terms:",
+  "editButton": "✏️ Edit",
+  "deleteButton": "🗑️ Delete",
+  "addressFormLabel": "Address",
+  "paymentTermsFormLabel": "Payment Terms"
 }

@@ -16,6 +16,39 @@
   "updateSuccess": "تم تحديث المريض بنجاح",
   "deleteSuccess": "تم حذف المريض بنجاح",
   "deleteConfirm": "هل أنت متأكد من حذف هذا المريض؟",
+  "confirmDelete": "تأكيد نهائي: هذا الإجراء لا يمكن التراجع عنه!",
+  "confirmArchive": "هل تريد أرشفة هذا المريض؟",
+  "confirmUnarchive": "هل تريد إلغاء أرشفة هذا المريض؟",
+  "status": {
+    "new": "جديد",
+    "active": "نشط",
+    "completed": "مكتمل",
+    "postponed": "مؤجل",
+    "cancelled": "ملغي"
+  },
+  "success": {
+    "archived": "تم أرشفة المريض بنجاح",
+    "unarchived": "تم إلغاء أرشفة المريض بنجاح",
+    "deleted": "تم حذف المريض بنجاح",
+    "documentUploaded": "تم رفع المستند بنجاح",
+    "documentDeleted": "تم حذف المستند بنجاح"
+  },
+  "errors": {
+    "addFailed": "فشل في إضافة المريض",
+    "updateFailed": "فشل في تحديث المريض",
+    "deleteFailed": "فشل في حذف المريض",
+    "operationFailed": "فشل في تنفيذ العملية",
+    "loadDoctorsFailed": "خطأ في تحميل الأطباء",
+    "loadPatientsFailed": "خطأ في تحميل المرضى",
+    "loadPatientDetailsFailed": "خطأ في تحميل تفاصيل المريض",
+    "archiveFailed": "خطأ في أرشفة المريض",
+    "uploadFailed": "فشل في رفع المستند",
+    "deleteDocumentFailed": "فشل في حذف المستند",
+    "downloadFailed": "فشل في تحميل المستند",
+    "selectFile": "الرجاء اختيار ملف للرفع"
+  },
+  "confirmDeleteDocument": "هل تريد حذف هذا المستند؟",
+  "confirmDeleteWarning": "⚠️ تحذير: هل أنت متأكد من حذف هذا المريض؟\n\nسيتم حذف جميع بيانات المريض بما في ذلك المواعيد والعلاجات والمدفوعات بشكل نهائي ولا يمكن استرجاعها.",
   "placeholders": {
     "nationalId": "مثال: 12345678901",
     "allergies": "مثال: حساسية من البنسلين، حساسية من اللاتكس...",

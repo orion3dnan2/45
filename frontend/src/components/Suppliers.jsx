@@ -33,7 +33,7 @@ const Suppliers = () => {
       const data = await api.getSuppliers();
       setSuppliers(data);
     } catch (error) {
-      console.error('خطأ في تحميل الموردين:', error);
+      console.error('Error loading suppliers:', error);
     } finally {
       setLoading(false);
     }
@@ -54,8 +54,8 @@ const Suppliers = () => {
       resetForm();
       loadSuppliers();
     } catch (error) {
-      console.error('خطأ:', error);
-      alert('فشلت العملية');
+      console.error('Error:', error);
+      alert(t('suppliers:errors.operationFailed'));
     }
   };
 
@@ -75,15 +75,15 @@ const Suppliers = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('هل أنت متأكد من حذف هذا المورد؟')) return;
+    if (!window.confirm(t('suppliers:deleteConfirm'))) return;
     
     try {
       await api.deleteSupplier(id);
       alert(t('suppliers:deleteSuccess'));
       loadSuppliers();
     } catch (error) {
-      console.error('خطأ:', error);
-      alert('فشل حذف المورد');
+      console.error('Error:', error);
+      alert(t('suppliers:errors.deleteFailed'));
     }
   };
 
@@ -116,7 +116,7 @@ const Suppliers = () => {
         <h1 style={styles.title}>{t('suppliers:title')}</h1>
         {canManage && (
           <button onClick={() => setShowAddModal(true)} style={styles.addButton}>
-            + إضافة مورد جديد
+            {t('suppliers:addButton')}
           </button>
         )}
       </div>
@@ -127,46 +127,46 @@ const Suppliers = () => {
             <div style={styles.supplierHeader}>
               <h3 style={styles.supplierName}>🚚 {supplier.name}</h3>
               <span style={getStatusBadgeStyle(supplier.status)}>
-                {getStatusLabel(supplier.status)}
+                {getStatusLabel(supplier.status, t)}
               </span>
             </div>
             
             <div style={styles.supplierBody}>
-              {supplier.contact_person && <p><strong>جهة الاتصال:</strong> {supplier.contact_person}</p>}
-              {supplier.phone && <p><strong>📞 الهاتف:</strong> {supplier.phone}</p>}
-              {supplier.email && <p><strong>📧 البريد:</strong> {supplier.email}</p>}
-              {supplier.address && <p><strong>📍 العنوان:</strong> {supplier.address}</p>}
+              {supplier.contact_person && <p><strong>{t('suppliers:contactLabel')}</strong> {supplier.contact_person}</p>}
+              {supplier.phone && <p><strong>{t('suppliers:phoneLabel')}</strong> {supplier.phone}</p>}
+              {supplier.email && <p><strong>{t('suppliers:emailLabel')}</strong> {supplier.email}</p>}
+              {supplier.address && <p><strong>{t('suppliers:addressLabel')}</strong> {supplier.address}</p>}
               
               {supplier.subscription_start_date && (
-                <p><strong>بداية الاشتراك:</strong> {supplier.subscription_start_date}</p>
+                <p><strong>{t('suppliers:subscriptionStart')}</strong> {supplier.subscription_start_date}</p>
               )}
               {supplier.subscription_end_date && (
-                <p><strong>نهاية الاشتراك:</strong> {supplier.subscription_end_date}</p>
+                <p><strong>{t('suppliers:subscriptionEnd')}</strong> {supplier.subscription_end_date}</p>
               )}
               {supplier.payment_terms && (
-                <p><strong>شروط الدفع:</strong> {supplier.payment_terms}</p>
+                <p><strong>{t('suppliers:paymentTermsLabel')}</strong> {supplier.payment_terms}</p>
               )}
             </div>
             
             {supplier.status === 'expiring_soon' && (
               <div style={styles.warningAlert}>
-                ⚠️ الاشتراك سينتهي قريباً!
+                {t('suppliers:subscriptionExpiringSoon')}
               </div>
             )}
             {supplier.status === 'expired' && (
               <div style={styles.dangerAlert}>
-                ❌ الاشتراك منتهي!
+                {t('suppliers:subscriptionExpired')}
               </div>
             )}
 
             {canManage && (
               <div style={styles.cardActions}>
                 <button onClick={() => handleEdit(supplier)} style={styles.editBtn}>
-                  ✏️ تعديل
+                  {t('suppliers:editButton')}
                 </button>
                 {user.role === 'admin' && (
                   <button onClick={() => handleDelete(supplier.id)} style={styles.deleteBtn}>
-                    🗑️ حذف
+                    {t('suppliers:deleteButton')}
                   </button>
                 )}
               </div>
@@ -176,7 +176,7 @@ const Suppliers = () => {
       </div>
 
       {suppliers.length === 0 && (
-        <div style={styles.empty}>لا يوجد موردين مسجلين</div>
+        <div style={styles.empty}>{t('suppliers:noSuppliers')}</div>
       )}
 
       {(showAddModal || showEditModal) && (
@@ -184,7 +184,7 @@ const Suppliers = () => {
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div style={styles.modalHeader}>
               <h2 style={styles.modalTitle}>
-                {editingSupplier ? '✏️ تعديل المورد' : '➕ إضافة مورد جديد'}
+                {editingSupplier ? t('suppliers:editTitle') : t('suppliers:addTitle')}
               </h2>
               <button onClick={() => { setShowAddModal(false); setShowEditModal(false); resetForm(); }} style={styles.closeBtn}>
                 ✕
@@ -193,7 +193,7 @@ const Suppliers = () => {
             
             <form onSubmit={handleSubmit} style={styles.form}>
               <div style={styles.formGroup}>
-                <label style={styles.label}>اسم المورد *</label>
+                <label style={styles.label}>{t('suppliers:nameLabel')}</label>
                 <input
                   type="text"
                   name="name"
@@ -206,7 +206,7 @@ const Suppliers = () => {
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>جهة الاتصال</label>
+                <label style={styles.label}>{t('suppliers:contactPersonLabel')}</label>
                 <input
                   type="text"
                   name="contact_person"
@@ -219,7 +219,7 @@ const Suppliers = () => {
 
               <div style={styles.formRow}>
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>رقم الهاتف</label>
+                  <label style={styles.label}>{t('suppliers:phoneFormLabel')}</label>
                   <input
                     type="tel"
                     name="phone"
@@ -231,7 +231,7 @@ const Suppliers = () => {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>البريد الإلكتروني</label>
+                  <label style={styles.label}>{t('suppliers:emailFormLabel')}</label>
                   <input
                     type="email"
                     name="email"
@@ -244,7 +244,7 @@ const Suppliers = () => {
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>العنوان</label>
+                <label style={styles.label}>{t('suppliers:addressFormLabel')}</label>
                 <input
                   type="text"
                   name="address"
@@ -257,7 +257,7 @@ const Suppliers = () => {
 
               <div style={styles.formRow}>
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>بداية الاشتراك</label>
+                  <label style={styles.label}>{t('suppliers:subscriptionStartLabel')}</label>
                   <input
                     type="date"
                     name="subscription_start_date"
@@ -268,7 +268,7 @@ const Suppliers = () => {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>نهاية الاشتراك</label>
+                  <label style={styles.label}>{t('suppliers:subscriptionEndLabel')}</label>
                   <input
                     type="date"
                     name="subscription_end_date"
@@ -280,23 +280,23 @@ const Suppliers = () => {
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>شروط الدفع</label>
+                <label style={styles.label}>{t('suppliers:paymentTermsFormLabel')}</label>
                 <textarea
                   name="payment_terms"
                   value={formData.payment_terms}
                   onChange={handleChange}
                   style={styles.textarea}
-                  placeholder="مثال: الدفع خلال 30 يوم من تاريخ الفاتورة"
+                  placeholder={t('suppliers:placeholders.paymentTerms')}
                   rows="3"
                 />
               </div>
 
               <div style={styles.modalActions}>
                 <button type="submit" style={styles.submitBtn}>
-                  {editingSupplier ? '💾 حفظ التعديلات' : '➕ إضافة المورد'}
+                  {editingSupplier ? t('suppliers:saveButton') : t('suppliers:addButtonFull')}
                 </button>
                 <button type="button" onClick={() => { setShowAddModal(false); setShowEditModal(false); resetForm(); }} style={styles.cancelBtn}>
-                  إلغاء
+                  {t('common:cancel')}
                 </button>
               </div>
             </form>
@@ -307,11 +307,11 @@ const Suppliers = () => {
   );
 };
 
-const getStatusLabel = (status) => {
+const getStatusLabel = (status, t) => {
   const labels = {
-    active: 'نشط',
-    expiring_soon: 'قرب الانتهاء',
-    expired: 'منتهي'
+    active: t('suppliers:status.active'),
+    expiring_soon: t('suppliers:status.expiring_soon'),
+    expired: t('suppliers:status.expired')
   };
   return labels[status] || status;
 };

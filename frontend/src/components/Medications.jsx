@@ -46,8 +46,8 @@ const Medications = () => {
       const uniqueCategories = [...new Set(data.map(m => m.category).filter(Boolean))];
       setCategories(uniqueCategories);
     } catch (error) {
-      console.error('خطأ في تحميل الأدوية:', error);
-      alert('فشل تحميل الأدوية');
+      console.error('Error loading medications:', error);
+      alert(t('medications:errors.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -85,8 +85,8 @@ const Medications = () => {
       resetForm();
       loadMedications();
     } catch (error) {
-      console.error('خطأ:', error);
-      alert('فشلت العملية');
+      console.error('Error:', error);
+      alert(t('medications:errors.operationFailed'));
     }
   };
 
@@ -106,15 +106,15 @@ const Medications = () => {
   };
 
   const handleDelete = async (id, name) => {
-    if (!window.confirm(`هل أنت متأكد من حذف ${name}؟`)) return;
+    if (!window.confirm(t('medications:deleteConfirm', { name }))) return;
     
     try {
       await api.deleteMedication(id);
       alert(t('medications:deleteSuccess'));
       loadMedications();
     } catch (error) {
-      console.error('خطأ:', error);
-      alert('فشل حذف الدواء');
+      console.error('Error:', error);
+      alert(t('medications:errors.deleteFailed'));
     }
   };
 
@@ -140,7 +140,16 @@ const Medications = () => {
 
   const exportData = () => {
     const csvContent = [
-      ['الاسم', 'الوصف', 'الفئة', 'الوحدة', 'الكمية', 'الحد الأدنى', 'السعر', 'تاريخ الانتهاء'].join(','),
+      [
+        t('medications:csvHeaders.name'),
+        t('medications:csvHeaders.description'),
+        t('medications:csvHeaders.category'),
+        t('medications:csvHeaders.unit'),
+        t('medications:csvHeaders.quantity'),
+        t('medications:csvHeaders.minQuantity'),
+        t('medications:csvHeaders.price'),
+        t('medications:csvHeaders.expiryDate')
+      ].join(','),
       ...filteredMedications.map(m => [
         m.name,
         m.description || '',
@@ -168,7 +177,7 @@ const Medications = () => {
         <h1 style={styles.title}>💊 {t('medications:title')}</h1>
         {canManage && (
           <button onClick={() => setShowAddModal(true)} style={styles.addBtn}>
-            ➕ إضافة دواء جديد
+            {t('medications:addButton')}
           </button>
         )}
       </div>
@@ -190,21 +199,21 @@ const Medications = () => {
             onChange={(e) => setCategoryFilter(e.target.value)}
             style={styles.select}
           >
-            <option value="all">جميع الفئات</option>
+            <option value="all">{t('medications:filters.allCategories')}</option>
             {categories.map(cat => (
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>
 
           <button onClick={() => setShowLowStock(false)} style={!showLowStock ? styles.activeFilter : styles.filterBtn}>
-            الكل ({medications.length})
+            {t('medications:filters.all')} ({medications.length})
           </button>
           <button onClick={() => setShowLowStock(true)} style={showLowStock ? styles.activeFilter : styles.filterBtn}>
-            ⚠️ قرب النفاذ
+            {t('medications:filters.lowStock')}
           </button>
 
           <button onClick={exportData} style={styles.exportBtn}>
-            📥 تصدير CSV
+            {t('medications:exportCSV')}
           </button>
         </div>
       </div>
@@ -217,36 +226,36 @@ const Medications = () => {
               <div style={styles.medicationHeader}>
                 <h3 style={styles.medicationName}>💊 {medication.name}</h3>
                 <span style={getStockBadgeStyle(stockStatus)}>
-                  {stockStatus === 'out' ? 'نفذت' : stockStatus === 'low' ? 'قرب النفاذ' : 'متوفر'}
+                  {stockStatus === 'out' ? t('medications:stockStatus.outOfStock') : stockStatus === 'low' ? t('medications:stockStatus.lowStock') : t('medications:stockStatus.inStock')}
                 </span>
               </div>
               
               <div style={styles.medicationBody}>
-                {medication.description && <p><strong>الوصف:</strong> {medication.description}</p>}
-                <p><strong>الفئة:</strong> {medication.category || 'غير محدد'}</p>
-                <p><strong>الوحدة:</strong> {medication.unit}</p>
-                <p><strong>الكمية المتوفرة:</strong> {medication.quantity_in_stock}</p>
-                <p><strong>الحد الأدنى:</strong> {medication.minimum_quantity}</p>
-                {medication.unit_price && <p><strong>السعر:</strong> {medication.unit_price} ر.س</p>}
+                {medication.description && <p><strong>{t('medications:descriptionLabel')}</strong> {medication.description}</p>}
+                <p><strong>{t('medications:categoryLabel')}</strong> {medication.category || t('common:notSpecified')}</p>
+                <p><strong>{t('medications:unitLabel')}</strong> {medication.unit}</p>
+                <p><strong>{t('medications:quantityLabel')}</strong> {medication.quantity_in_stock}</p>
+                <p><strong>{t('medications:minQuantityLabel')}</strong> {medication.minimum_quantity}</p>
+                {medication.unit_price && <p><strong>{t('medications:priceLabel')}</strong> {medication.unit_price} {t('common:currency')}</p>}
                 {medication.expiry_date && (
-                  <p><strong>تاريخ الانتهاء:</strong> {medication.expiry_date}</p>
+                  <p><strong>{t('medications:expiryDateLabel')}</strong> {medication.expiry_date}</p>
                 )}
               </div>
               
               {stockStatus !== 'good' && (
                 <div style={styles.alert}>
-                  ⚠️ {stockStatus === 'out' ? 'نفذت الكمية!' : 'الكمية أوشكت على النفاذ!'}
+                  ⚠️ {stockStatus === 'out' ? t('medications:warnings.outOfStock') : t('medications:warnings.lowStock')}
                 </div>
               )}
 
               {canManage && (
                 <div style={styles.actions}>
                   <button onClick={() => handleEdit(medication)} style={styles.editBtn}>
-                    ✏️ تعديل
+                    {t('medications:editButton')}
                   </button>
                   {['admin', 'warehouse_manager', 'accountant'].includes(user.role) && (
                     <button onClick={() => handleDelete(medication.id, medication.name)} style={styles.deleteBtn}>
-                      🗑️ حذف
+                      {t('medications:deleteButton')}
                     </button>
                   )}
                 </div>
@@ -258,17 +267,17 @@ const Medications = () => {
 
       {filteredMedications.length === 0 && (
         <div style={styles.empty}>
-          {searchTerm ? 'لا توجد نتائج للبحث' : showLowStock ? 'لا توجد أدوية قريبة من النفاذ' : 'لا توجد أدوية مسجلة'}
+          {searchTerm ? t('medications:noSearchResults') : showLowStock ? t('medications:noLowStockMedications') : t('medications:noMedications')}
         </div>
       )}
 
       {(showAddModal || showEditModal) && (
         <div style={styles.modalOverlay} onClick={() => { setShowAddModal(false); setShowEditModal(false); resetForm(); }}>
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h2 style={styles.modalTitle}>{editingMed ? 'تعديل الدواء' : 'إضافة دواء جديد'}</h2>
+            <h2 style={styles.modalTitle}>{editingMed ? t('medications:editTitle') : t('medications:addTitle')}</h2>
             <form onSubmit={handleSubmit} style={styles.form}>
               <div style={styles.formRow}>
-                <label style={styles.label}>اسم الدواء *</label>
+                <label style={styles.label}>{t('medications:nameLabel')}</label>
                 <input
                   type="text"
                   required
@@ -279,7 +288,7 @@ const Medications = () => {
               </div>
 
               <div style={styles.formRow}>
-                <label style={styles.label}>الوصف</label>
+                <label style={styles.label}>{t('medications:descriptionLabel')}</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
@@ -288,7 +297,7 @@ const Medications = () => {
               </div>
 
               <div style={styles.formRow}>
-                <label style={styles.label}>الفئة</label>
+                <label style={styles.label}>{t('medications:categoryLabel')}</label>
                 <input
                   type="text"
                   value={formData.category}
@@ -299,7 +308,7 @@ const Medications = () => {
               </div>
 
               <div style={styles.formRow}>
-                <label style={styles.label}>الوحدة *</label>
+                <label style={styles.label}>{t('medications:unitFormLabel')}</label>
                 <input
                   type="text"
                   required
@@ -312,7 +321,7 @@ const Medications = () => {
 
               <div style={styles.formGrid}>
                 <div style={styles.formRow}>
-                  <label style={styles.label}>الكمية المتوفرة</label>
+                  <label style={styles.label}>{t('medications:quantityFormLabel')}</label>
                   <input
                     type="number"
                     value={formData.quantity_in_stock}
@@ -322,7 +331,7 @@ const Medications = () => {
                 </div>
 
                 <div style={styles.formRow}>
-                  <label style={styles.label}>الحد الأدنى</label>
+                  <label style={styles.label}>{t('medications:minQuantityFormLabel')}</label>
                   <input
                     type="number"
                     value={formData.minimum_quantity}
@@ -334,7 +343,7 @@ const Medications = () => {
 
               <div style={styles.formGrid}>
                 <div style={styles.formRow}>
-                  <label style={styles.label}>السعر (ر.س)</label>
+                  <label style={styles.label}>{t('medications:priceFormLabel')}</label>
                   <input
                     type="number"
                     step="0.01"
@@ -345,7 +354,7 @@ const Medications = () => {
                 </div>
 
                 <div style={styles.formRow}>
-                  <label style={styles.label}>تاريخ الانتهاء</label>
+                  <label style={styles.label}>{t('medications:expiryDateFormLabel')}</label>
                   <input
                     type="date"
                     value={formData.expiry_date}
@@ -357,7 +366,7 @@ const Medications = () => {
 
               <div style={styles.formActions}>
                 <button type="submit" style={styles.submitBtn}>
-                  {editingMed ? '💾 حفظ التعديلات' : '➕ إضافة'}
+                  {editingMed ? t('medications:saveButton') : t('medications:addButtonShort')}
                 </button>
                 <button 
                   type="button" 
@@ -368,7 +377,7 @@ const Medications = () => {
                   }} 
                   style={styles.cancelBtn}
                 >
-                  ❌ إلغاء
+                  {t('common:cancel')}
                 </button>
               </div>
             </form>

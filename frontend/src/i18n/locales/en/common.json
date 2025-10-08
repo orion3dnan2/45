@@ -43,5 +43,6 @@
   "available": "Available",
   "unavailable": "Unavailable",
   "active": "Active",
-  "inactive": "Inactive"
+  "inactive": "Inactive",
+  "currency": "SAR"
 }
