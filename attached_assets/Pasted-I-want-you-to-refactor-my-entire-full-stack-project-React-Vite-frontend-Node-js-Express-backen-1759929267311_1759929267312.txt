@@ -1,0 +1,53 @@
+I want you to refactor my entire full-stack project (React + Vite frontend, Node.js + Express backend) to fully support **bilingual functionality (Arabic + English)** in a professional and scalable way.  
+Follow these steps carefully:
+
+1. **i18next Configuration (Frontend):**
+   - Set up proper i18next configuration inside `frontend/src/i18n/config.js`.
+   - Configure both Arabic (ar) and English (en) as supported languages.
+   - Make **English the default language**.
+   - Enable language switching at runtime without page reload (using `i18next` and `react-i18next` best practices).
+   - Ensure the configuration includes `resources` with separate namespaces for cleaner structure (e.g., `common.json`, `auth.json`, `dashboard.json`).
+
+2. **Language Files:**
+   - Create language JSON files inside `frontend/src/i18n/locales/en` and `frontend/src/i18n/locales/ar`.
+   - Move **all UI text** (headings, labels, buttons, placeholders, validation messages, menus, notifications, modals, etc.) from the components into these JSON files.
+   - Translate the Arabic content into **professional English**, and make sure the Arabic version is clean, modern, and consistent (no dialect).
+   - Structure the files by feature or page for maintainability.
+
+3. **Frontend Integration:**
+   - Replace all hardcoded text in React components with translation keys using the `t()` function from `react-i18next`.
+   - Make sure **every page and component** (including forms, login page, dashboard, menus, error pages, modals, etc.) uses the translation system instead of hardcoded strings.
+   - Add a **language switcher component** (e.g., a toggle or dropdown in the header or top bar) that lets users switch between Arabic and English at any time.
+   - Ensure the UI switches text direction properly:
+     - English → LTR
+     - Arabic → RTL
+   - Add proper `<html dir="ltr|rtl">` switching or Tailwind classes depending on the language.
+
+4. **Backend Integration (Node + Express):**
+   - Update any response messages, error messages, or validation messages in the backend to support both Arabic and English.
+   - Create a simple language middleware that detects the preferred language from headers or query params (e.g., `?lang=ar`) and returns messages accordingly.
+   - Ensure backend validation responses (e.g., required fields, errors) can return either English or Arabic messages depending on the language setting.
+
+5. **Validation & Error Messages:**
+   - Move all frontend validation messages to i18next translation files.
+   - Translate them into English and Arabic clearly (e.g., “This field is required” vs “هذا الحقل مطلوب”).
+   - Do the same for backend validation responses.
+
+6. **Testing & Review:**
+   - Run the app and review **every page** in both English and Arabic:
+     - Make sure all text switches correctly.
+     - RTL layout for Arabic looks good.
+     - LTR layout for English remains clean.
+     - Navigation and functionality remain intact.
+   - Check both frontend UI and backend API responses with `lang=en` and `lang=ar`.
+
+7. **Clean Up & Commit:**
+   - Remove all leftover hardcoded text and unused strings.
+   - Make sure the code is clean and organized for future translation updates.
+   - Commit all changes with a clear message: “Add full bilingual (Arabic/English) support with i18next”.
+
+Finally, give me a detailed summary of:
+- All pages/components updated.
+- How i18n was structured.
+- Any special adjustments made for RTL layouts.
+- Confirmation that the project is now fully bilingual.
