@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../contexts/AuthContext';
-import { LanguageContext } from '../contexts/LanguageContext';
+import { LanguageContext } from '../contexts/LanguageContext.jsx';
 import Patients from '../components/Patients';
 import Appointments from '../components/Appointments';
 import Treatments from '../components/Treatments';
