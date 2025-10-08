@@ -27,9 +27,9 @@ const getPatients = async (req, res) => {
     
     let query = `
       SELECT DISTINCT p.*, 
-             COALESCE(p.full_name, u.full_name) as full_name,
-             COALESCE(p.email, u.email) as email,
-             COALESCE(p.phone, u.phone) as phone,
+             u.full_name,
+             u.email,
+             u.phone,
              u.username
       FROM patients p
       LEFT JOIN users u ON p.user_id = u.id
@@ -102,9 +102,9 @@ const getPatientById = async (req, res) => {
     
     let query = `
       SELECT p.*, 
-             COALESCE(p.full_name, u.full_name) as full_name,
-             COALESCE(p.email, u.email) as email,
-             COALESCE(p.phone, u.phone) as phone,
+             u.full_name,
+             u.email,
+             u.phone,
              u.username
       FROM patients p
       LEFT JOIN users u ON p.user_id = u.id
@@ -151,21 +151,12 @@ const getPatientById = async (req, res) => {
     `, [id]);
     const payments = paymentsResult.rows;
 
-    const documentsResult = await client.query(`
-      SELECT pd.*, u.full_name as uploaded_by_name
-      FROM patient_documents pd
-      LEFT JOIN users u ON pd.uploaded_by = u.id
-      WHERE pd.patient_id = $1
-      ORDER BY pd.created_at DESC
-    `, [id]);
-    const documents = documentsResult.rows;
-
     res.json({
       ...patient,
       appointments,
       treatments,
       payments,
-      documents
+      documents: []
     });
   } catch (error) {
     console.error(error);
@@ -291,14 +282,28 @@ const createPatient = async (req, res) => {
       return res.status(400).json({ error: 'الاسم ورقم الهاتف مطلوبان' });
     }
 
-    const patientResult = await client.query(
-      `INSERT INTO patients (full_name, phone, email, national_id, date_of_birth, address, medical_history, allergies, insurance_info, diagnosis)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    const userResult = await client.query(
+      `INSERT INTO users (username, password, full_name, role, email, phone)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id`,
       [
+        `patient_${Date.now()}`,
+        '$2b$10$defaultpasswordhash',
         full_name,
-        phone,
+        'patient',
         email || null,
+        phone
+      ]
+    );
+    
+    const userId = userResult.rows[0].id;
+
+    const patientResult = await client.query(
+      `INSERT INTO patients (user_id, national_id, date_of_birth, address, medical_history, allergies, insurance_info, diagnosis)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING id`,
+      [
+        userId,
         national_id || null,
         date_of_birth || null,
         address || null,
