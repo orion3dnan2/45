@@ -21,7 +21,8 @@ The system will feature a user-friendly interface designed for different user ro
 
 **Technical Implementations:**
 *   **Backend:** Developed with Express.js, utilizing PostgreSQL (Neon) as the database. Authentication is managed via JWT (JSON Web Tokens) with secure keys, and bcryptjs is used for password encryption. The backend serves the frontend from its public directory.
-*   **Frontend:** Built with React and Vite, using React Router for navigation.
+*   **Frontend:** Built with React and Vite, using React Router for navigation. Supports internationalization (i18n) with Arabic and English languages using react-i18next.
+*   **Internationalization (i18n):** Complete bilingual support for Arabic and English across all pages and reports. Includes RTL/LTR switching, language persistence in localStorage, and a language switcher component in the UI.
 *   **Security:** JWT_SECRET is protected in environment variables. Passwords are encrypted with bcrypt, and a robust role-based access control (RBAC) system ensures each role has specific, isolated permissions. Patient data is segregated, allowing doctors to view only their assigned patients.
 
 **Feature Specifications:**
@@ -50,4 +51,15 @@ The system is designed with specific Kuwaiti requirements in mind, including:
 *   **Database:** PostgreSQL (specifically Neon for managed hosting).
 *   **Authentication:** JWT (JSON Web Tokens) for secure API authentication.
 *   **Payment Gateways:** KNET (for local Kuwaiti electronic payments), Credit Card processing, Bank Transfer.
-*   **NPM Packages:** Express.js, React, Vite, React Router, bcryptjs.
+*   **NPM Packages:** Express.js, React, Vite, React Router, bcryptjs, i18next, react-i18next.
+
+## Recent Updates (October 2025)
+*   **Multilingual Support:** Added complete Arabic and English language support across the entire application
+    - Implemented i18next for internationalization
+    - Created comprehensive translation files for both languages
+    - Added Language Context for state management
+    - Implemented RTL/LTR automatic switching based on selected language
+    - Added language switcher component in Login page and Dashboard
+    - Language preference is saved in localStorage for persistence
+    - All pages (Login, Dashboard, Home) now support both languages
+    - Translation files located in `frontend/src/i18n/`
