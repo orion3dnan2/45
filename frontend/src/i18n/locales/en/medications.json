@@ -1,16 +1,27 @@
 {
-  "title": "Medications & Supplies Management",
+  "title": "Medication Management",
   "addMedication": "Add New Medication",
+  "searchPlaceholder": "🔍 Search for a medication...",
+  "name": "Name",
+  "description": "Description",
+  "unit": "Unit",
+  "quantity": "Quantity",
+  "minQuantity": "Minimum Quantity",
+  "unitPrice": "Unit Price",
+  "category": "Category",
+  "expiryDate": "Expiry Date",
+  "inStock": "In Stock",
+  "lowStock": "Low Stock",
+  "outOfStock": "Out of Stock",
+  "noMedications": "No medications found",
   "editMedication": "Edit Medication",
   "deleteMedication": "Delete Medication",
-  "medicationName": "Medication Name",
-  "quantity": "Quantity",
-  "price": "Price",
-  "supplier": "Supplier",
-  "selectSupplier": "Select Supplier",
-  "noMedications": "No medications found",
   "addSuccess": "Medication added successfully",
   "updateSuccess": "Medication updated successfully",
   "deleteSuccess": "Medication deleted successfully",
-  "deleteConfirm": "Are you sure you want to delete this medication?"
+  "deleteConfirm": "Are you sure you want to delete this medication?",
+  "placeholders": {
+    "category": "Example: Antibiotics, Painkillers, Supplies",
+    "unit": "Example: Tablet, Capsule, Box"
+  }
 }

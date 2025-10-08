@@ -1,7 +1,7 @@
 {
   "title": "Patient Management",
   "addPatient": "Add New Patient",
-  "searchPlaceholder": "Search for a patient...",
+  "searchPlaceholder": "🔍 Search by national ID or name...",
   "age": "Age",
   "gender": "Gender",
   "medicalHistory": "Medical History",
@@ -15,5 +15,12 @@
   "addSuccess": "Patient added successfully",
   "updateSuccess": "Patient updated successfully",
   "deleteSuccess": "Patient deleted successfully",
-  "deleteConfirm": "Are you sure you want to delete this patient?"
+  "deleteConfirm": "Are you sure you want to delete this patient?",
+  "placeholders": {
+    "nationalId": "Example: 12345678901",
+    "allergies": "Example: Penicillin allergy, latex allergy...",
+    "medicalHistory": "Example: Chronic diseases, previous surgeries, current medications...",
+    "diagnosis": "Example: Tooth decay, gum inflammation...",
+    "documentNotes": "Document notes (optional)"
+  }
 }

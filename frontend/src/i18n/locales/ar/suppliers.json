@@ -9,5 +9,12 @@
   "addSuccess": "تم إضافة المورد بنجاح",
   "updateSuccess": "تم تحديث المورد بنجاح",
   "deleteSuccess": "تم حذف المورد بنجاح",
-  "deleteConfirm": "هل أنت متأكد من حذف هذا المورد؟"
+  "deleteConfirm": "هل أنت متأكد من حذف هذا المورد؟",
+  "placeholders": {
+    "name": "أدخل اسم المورد",
+    "contactPerson": "اسم الشخص المسؤول",
+    "phone": "05xxxxxxxx",
+    "email": "example@domain.com",
+    "address": "عنوان المورد"
+  }
 }
