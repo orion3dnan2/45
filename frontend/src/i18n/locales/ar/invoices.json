@@ -39,5 +39,35 @@
     "description": "الوصف",
     "quantity": "الكمية",
     "price": "السعر"
+  },
+  "statusFilter": {
+    "all": "كل الحالات",
+    "draft": "مسودة",
+    "pending": "معلقة",
+    "paid": "مدفوعة",
+    "partiallyPaid": "مدفوعة جزئياً",
+    "overdue": "متأخرة",
+    "cancelled": "ملغاة"
+  },
+  "tableHeaders": {
+    "patient": "المريض",
+    "date": "التاريخ",
+    "dueDate": "تاريخ الاستحقاق",
+    "total": "الإجمالي",
+    "amountPaid": "المدفوع",
+    "balance": "الرصيد",
+    "status": "الحالة",
+    "actions": "الإجراءات"
+  },
+  "selectPatient": "اختر المريض",
+  "formLabels": {
+    "taxRate": "نسبة الضريبة (%)",
+    "discountRate": "نسبة الخصم (%)"
+  },
+  "totals": {
+    "subtotal": "المجموع الفرعي:",
+    "tax": "الضريبة",
+    "discount": "الخصم",
+    "total": "الإجمالي:"
   }
 }

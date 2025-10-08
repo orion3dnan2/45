@@ -12,5 +12,12 @@
   "addSuccess": "Appointment added successfully",
   "updateSuccess": "Appointment updated successfully",
   "deleteSuccess": "Appointment deleted successfully",
-  "deleteConfirm": "Are you sure you want to delete this appointment?"
+  "deleteConfirm": "Are you sure you want to delete this appointment?",
+  "status": {
+    "scheduled": "Scheduled",
+    "confirmed": "Confirmed",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  }
 }

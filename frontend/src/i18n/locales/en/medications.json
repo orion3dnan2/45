@@ -45,6 +45,7 @@
     "price": "Price",
     "expiryDate": "Expiry Date"
   },
+  "csvFilenamePrefix": "medications",
   "descriptionLabel": "Description:",
   "categoryLabel": "Category:",
   "filters": {

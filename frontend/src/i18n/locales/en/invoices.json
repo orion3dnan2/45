@@ -39,5 +39,35 @@
     "description": "Description",
     "quantity": "Quantity",
     "price": "Price"
+  },
+  "statusFilter": {
+    "all": "All Statuses",
+    "draft": "Draft",
+    "pending": "Pending",
+    "paid": "Paid",
+    "partiallyPaid": "Partially Paid",
+    "overdue": "Overdue",
+    "cancelled": "Cancelled"
+  },
+  "tableHeaders": {
+    "patient": "Patient",
+    "date": "Date",
+    "dueDate": "Due Date",
+    "total": "Total",
+    "amountPaid": "Amount Paid",
+    "balance": "Balance",
+    "status": "Status",
+    "actions": "Actions"
+  },
+  "selectPatient": "Select Patient",
+  "formLabels": {
+    "taxRate": "Tax Rate (%)",
+    "discountRate": "Discount Rate (%)"
+  },
+  "totals": {
+    "subtotal": "Subtotal:",
+    "tax": "Tax",
+    "discount": "Discount",
+    "total": "Total:"
   }
 }

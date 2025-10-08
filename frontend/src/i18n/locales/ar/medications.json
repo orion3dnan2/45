@@ -49,6 +49,7 @@
     "price": "السعر",
     "expiryDate": "تاريخ الانتهاء"
   },
+  "csvFilenamePrefix": "الأدوية",
   "descriptionLabel": "الوصف:",
   "categoryLabel": "الفئة:",
   "filters": {

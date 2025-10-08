@@ -24,8 +24,9 @@ export const api = {
     return response.json();
   },
 
-  async getPatients() {
-    const response = await fetch(`${API_URL}/patients`, {
+  async getPatients(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    const response = await fetch(`${API_URL}/patients?${queryString}`, {
       headers: getAuthHeader()
     });
     return response.json();

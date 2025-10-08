@@ -40,9 +40,12 @@
   "deleteError": "Failed to delete",
   "notSpecified": "Not specified",
   "none": "None",
+  "unknown": "Unknown",
   "available": "Available",
   "unavailable": "Unavailable",
   "active": "Active",
   "inactive": "Inactive",
-  "currency": "SAR"
+  "currency": "SAR",
+  "currencyKWD": "KWD",
+  "optional": "Optional"
 }

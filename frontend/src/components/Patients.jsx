@@ -26,7 +26,7 @@ const getCaseStatusStyle = (status) => {
 };
 
 const Patients = () => {
-  const { t } = useTranslation(['patients', 'common', 'errors']);
+  const { t } = useTranslation(['patients', 'common', 'errors', 'appointments']);
   const { user } = useContext(AuthContext);
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -75,12 +75,7 @@ const Patients = () => {
       if (showArchived) {
         params.archived = 'true';
       }
-      const response = await fetch(`/api/patients?${new URLSearchParams(params)}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
+      const data = await api.getPatients(params);
       setPatients(data);
     } catch (error) {
       console.error('Error loading patients:', error);
@@ -287,11 +282,11 @@ const Patients = () => {
             onClick={() => setShowArchived(!showArchived)} 
             style={showArchived ? styles.archiveActiveButton : styles.archiveButton}
           >
-            {showArchived ? '👥 عرض المرضى النشطين' : '📦 عرض الأرشيف'}
+            {showArchived ? t('patients:showActivePatients') : t('patients:showArchive')}
           </button>
           {canAddOrEdit && (
             <button onClick={() => { resetForm(); setShowAddModal(true); }} style={styles.addButton}>
-              ➕ إضافة مريض جديد
+              {t('patients:addNewPatient')}
             </button>
           )}
         </div>
@@ -299,7 +294,7 @@ const Patients = () => {
       
       <div style={styles.container}>
         <div style={styles.listSection}>
-          <h2 style={styles.sectionTitle}>قائمة المرضى ({filteredPatients.length})</h2>
+          <h2 style={styles.sectionTitle}>{t('patients:patientsList')} ({filteredPatients.length})</h2>
           <div style={styles.searchBox}>
             <input 
               type="text" 
@@ -319,9 +314,9 @@ const Patients = () => {
                 }} 
               >
                 <div style={styles.patientInfo} onClick={() => viewPatientDetails(patient.id)}>
-                  <h3 style={styles.patientName}>👤 {patient.full_name || 'غير محدد'}</h3>
-                  <p style={styles.patientDetail}>📞 {patient.phone || 'لا يوجد'}</p>
-                  <p style={styles.patientDetail}>🆔 الرقم المدني: {patient.national_id || 'لا يوجد'}</p>
+                  <h3 style={styles.patientName}>👤 {patient.full_name || t('common:notSpecified')}</h3>
+                  <p style={styles.patientDetail}>📞 {patient.phone || t('common:none')}</p>
+                  <p style={styles.patientDetail}>🆔 {t('patients:nationalIdLabel')} {patient.national_id || t('common:none')}</p>
                 </div>
                 {canDelete && (
                   <button 
@@ -345,7 +340,7 @@ const Patients = () => {
                       }
                     }}
                     style={styles.deleteIconBtn}
-                    title="حذف المريض"
+                    title={t('patients:deletePatient')}
                   >
                     🗑️
                   </button>
@@ -358,25 +353,25 @@ const Patients = () => {
         {selectedPatient && (
           <div style={styles.detailSection}>
             <div style={styles.detailHeader}>
-              <h2 style={styles.sectionTitle}>ملف المريض: {selectedPatient.full_name}</h2>
+              <h2 style={styles.sectionTitle}>{t('patients:patientFile')} {selectedPatient.full_name}</h2>
               <div style={styles.headerActions}>
                 {canAddOrEdit && (
                   <>
                     <button onClick={openEditModal} style={styles.editButton}>
-                      ✏️ تعديل
+                      {t('patients:editButton')}
                     </button>
                     <button 
                       onClick={handleArchivePatient} 
                       style={selectedPatient.archived ? styles.unarchiveButton : styles.archivePatientButton}
-                      title={selectedPatient.archived ? 'إلغاء الأرشفة' : 'أرشفة المريض'}
+                      title={selectedPatient.archived ? t('patients:unarchiveButton') : t('patients:archivePatientTitle')}
                     >
-                      {selectedPatient.archived ? '📤 إلغاء الأرشفة' : '📦 أرشفة'}
+                      {selectedPatient.archived ? t('patients:unarchiveButtonShort') : t('patients:archiveButtonShort')}
                     </button>
                   </>
                 )}
                 {canDelete && (
                   <button onClick={handleDeletePatient} style={styles.deleteButton}>
-                    🗑️ حذف
+                    {t('patients:deleteButton')}
                   </button>
                 )}
                 <button onClick={() => setSelectedPatient(null)} style={styles.closeBtn}>✕</button>
@@ -388,33 +383,33 @@ const Patients = () => {
                 onClick={() => setActiveTab('info')} 
                 style={activeTab === 'info' ? styles.activeTab : styles.tab}
               >
-                📋 المعلومات الشخصية
+                {t('patients:personalInfo')}
               </button>
               {user.role !== 'reception' && (
                 <button 
                   onClick={() => setActiveTab('medical')} 
                   style={activeTab === 'medical' ? styles.activeTab : styles.tab}
                 >
-                  🏥 التاريخ الطبي
+                  {t('patients:medicalHistory')}
                 </button>
               )}
               <button 
                 onClick={() => setActiveTab('appointments')} 
                 style={activeTab === 'appointments' ? styles.activeTab : styles.tab}
               >
-                📅 المواعيد ({selectedPatient.appointments?.length || 0})
+                {t('patients:appointments')} ({selectedPatient.appointments?.length || 0})
               </button>
               <button 
                 onClick={() => setActiveTab('treatments')} 
                 style={activeTab === 'treatments' ? styles.activeTab : styles.tab}
               >
-                🦷 العلاجات ({selectedPatient.treatments?.length || 0})
+                {t('patients:treatments')} ({selectedPatient.treatments?.length || 0})
               </button>
               <button 
                 onClick={() => setActiveTab('payments')} 
                 style={activeTab === 'payments' ? styles.activeTab : styles.tab}
               >
-                💰 المدفوعات ({selectedPatient.payments?.length || 0})
+                {t('patients:payments')} ({selectedPatient.payments?.length || 0})
               </button>
             </div>
             
@@ -422,46 +417,46 @@ const Patients = () => {
               {activeTab === 'info' && (
                 <div style={styles.infoGrid}>
                   <div style={styles.infoItem}>
-                    <span style={styles.infoLabel}>الاسم الكامل:</span>
-                    <span style={styles.infoValue}>{selectedPatient.full_name || 'غير محدد'}</span>
+                    <span style={styles.infoLabel}>{t('patients:fullNameLabel')}</span>
+                    <span style={styles.infoValue}>{selectedPatient.full_name || t('common:notSpecified')}</span>
                   </div>
                   <div style={styles.infoItem}>
-                    <span style={styles.infoLabel}>رقم الهاتف:</span>
-                    <span style={styles.infoValue}>{selectedPatient.phone || 'لا يوجد'}</span>
+                    <span style={styles.infoLabel}>{t('patients:phoneLabel')}</span>
+                    <span style={styles.infoValue}>{selectedPatient.phone || t('common:none')}</span>
                   </div>
                   <div style={styles.infoItem}>
-                    <span style={styles.infoLabel}>البريد الإلكتروني:</span>
-                    <span style={styles.infoValue}>{selectedPatient.email || 'لا يوجد'}</span>
+                    <span style={styles.infoLabel}>{t('patients:emailLabel')}</span>
+                    <span style={styles.infoValue}>{selectedPatient.email || t('common:none')}</span>
                   </div>
                   <div style={styles.infoItem}>
-                    <span style={styles.infoLabel}>الرقم المدني:</span>
-                    <span style={styles.infoValue}>{selectedPatient.national_id || 'لا يوجد'}</span>
+                    <span style={styles.infoLabel}>{t('patients:nationalIdLabel')}</span>
+                    <span style={styles.infoValue}>{selectedPatient.national_id || t('common:none')}</span>
                   </div>
                   <div style={styles.infoItem}>
-                    <span style={styles.infoLabel}>تاريخ الميلاد:</span>
+                    <span style={styles.infoLabel}>{t('patients:dateOfBirthLabel')}</span>
                     <span style={styles.infoValue}>
                       {selectedPatient.date_of_birth 
                         ? new Date(selectedPatient.date_of_birth).toLocaleDateString('ar-EG')
-                        : 'لا يوجد'}
+                        : t('common:none')}
                     </span>
                   </div>
                   <div style={styles.infoItem}>
-                    <span style={styles.infoLabel}>العنوان:</span>
-                    <span style={styles.infoValue}>{selectedPatient.address || 'لا يوجد'}</span>
+                    <span style={styles.infoLabel}>{t('patients:addressLabel')}</span>
+                    <span style={styles.infoValue}>{selectedPatient.address || t('common:none')}</span>
                   </div>
                   <div style={styles.infoItem}>
-                    <span style={styles.infoLabel}>معلومات التأمين:</span>
-                    <span style={styles.infoValue}>{selectedPatient.insurance_info || 'لا يوجد'}</span>
+                    <span style={styles.infoLabel}>{t('patients:insuranceInfoLabel')}</span>
+                    <span style={styles.infoValue}>{selectedPatient.insurance_info || t('common:none')}</span>
                   </div>
                   <div style={styles.infoItem}>
-                    <span style={styles.infoLabel}>حالة القضية:</span>
+                    <span style={styles.infoLabel}>{t('patients:caseStatusLabel')}</span>
                     <span style={{...styles.infoValue, ...getCaseStatusStyle(selectedPatient.case_status)}}>
                       {getCaseStatusLabel(selectedPatient.case_status, t)}
                     </span>
                   </div>
                   <div style={styles.infoItem}>
-                    <span style={styles.infoLabel}>الطبيب الرئيسي:</span>
-                    <span style={styles.infoValue}>{selectedPatient.primary_doctor_name || 'غير محدد'}</span>
+                    <span style={styles.infoLabel}>{t('patients:primaryDoctorLabel')}</span>
+                    <span style={styles.infoValue}>{selectedPatient.primary_doctor_name || t('common:notSpecified')}</span>
                   </div>
                 </div>
               )}
@@ -469,26 +464,26 @@ const Patients = () => {
               {activeTab === 'medical' && (
                 <div style={styles.medicalSection}>
                   <div style={styles.medicalBlock}>
-                    <h3 style={styles.blockTitle}>🩺 التشخيص</h3>
+                    <h3 style={styles.blockTitle}>{t('patients:diagnosis')}</h3>
                     <div style={styles.medicalContent}>
-                      {selectedPatient.diagnosis || 'لا يوجد تشخيص مسجل'}
+                      {selectedPatient.diagnosis || t('patients:noDiagnosis')}
                     </div>
                   </div>
                   <div style={styles.medicalBlock}>
-                    <h3 style={styles.blockTitle}>⚠️ الحساسيات</h3>
+                    <h3 style={styles.blockTitle}>{t('patients:allergies')}</h3>
                     <div style={styles.medicalContent}>
-                      {selectedPatient.allergies || 'لا توجد حساسيات مسجلة'}
+                      {selectedPatient.allergies || t('patients:noAllergies')}
                     </div>
                   </div>
                   <div style={styles.medicalBlock}>
-                    <h3 style={styles.blockTitle}>📝 التاريخ الطبي</h3>
+                    <h3 style={styles.blockTitle}>{t('patients:medicalHistoryTitle')}</h3>
                     <div style={styles.medicalContent}>
-                      {selectedPatient.medical_history || 'لا يوجد تاريخ طبي مسجل'}
+                      {selectedPatient.medical_history || t('patients:noMedicalHistory')}
                     </div>
                   </div>
                   
                   <div style={styles.medicalBlock}>
-                    <h3 style={styles.blockTitle}>📎 المستندات والملفات</h3>
+                    <h3 style={styles.blockTitle}>{t('patients:documentsTitle')}</h3>
                     {user.role === 'doctor' && (
                       <div style={styles.uploadSection}>
                         <div style={styles.fileInputGroup}>
@@ -525,7 +520,7 @@ const Patients = () => {
                             ...((!selectedFile || uploading) ? styles.uploadBtnDisabled : {})
                           }}
                         >
-                          {uploading ? '⏳ جاري الرفع...' : '📤 رفع المستند'}
+                          {uploading ? t('patients:uploadingDocument') : t('patients:uploadDocument')}
                         </button>
                       </div>
                     )}
@@ -543,7 +538,7 @@ const Patients = () => {
                               <div style={styles.documentDetails}>
                                 <div style={styles.documentName}>{doc.original_name}</div>
                                 <div style={styles.documentMeta}>
-                                  <span>👤 {doc.uploaded_by_name || 'غير معروف'}</span>
+                                  <span>👤 {doc.uploaded_by_name || t('common:unknown')}</span>
                                   <span>📅 {new Date(doc.created_at).toLocaleDateString('ar-EG')}</span>
                                   <span>📦 {(doc.file_size / 1024).toFixed(1)} KB</span>
                                 </div>
@@ -556,7 +551,7 @@ const Patients = () => {
                               <button 
                                 onClick={() => handleDownloadDocument(doc.id, doc.original_name)}
                                 style={styles.downloadBtn}
-                                title="تحميل"
+                                title={t('patients:download')}
                               >
                                 ⬇️
                               </button>
@@ -564,7 +559,7 @@ const Patients = () => {
                                 <button 
                                   onClick={() => handleDeleteDocument(doc.id)}
                                   style={styles.deleteDocBtn}
-                                  title="حذف"
+                                  title={t('patients:delete')}
                                 >
                                   🗑️
                                 </button>
@@ -573,7 +568,7 @@ const Patients = () => {
                           </div>
                         ))
                       ) : (
-                        <div style={styles.emptyDocuments}>لا توجد مستندات مرفقة</div>
+                        <div style={styles.emptyDocuments}>{t('patients:noDocuments')}</div>
                       )}
                     </div>
                   </div>
@@ -589,17 +584,17 @@ const Patients = () => {
                           <span style={styles.itemDate}>
                             📅 {new Date(app.appointment_date).toLocaleString('ar-EG')}
                           </span>
-                          <span style={getStatusStyle(app.status)}>{getStatusLabel(app.status)}</span>
+                          <span style={getStatusStyle(app.status)}>{getStatusLabel(app.status, t)}</span>
                         </div>
                         <div style={styles.itemBody}>
-                          <p><strong>الطبيب:</strong> {app.doctor_name}</p>
-                          <p><strong>المدة:</strong> {app.duration} دقيقة</p>
-                          {app.notes && <p><strong>ملاحظات:</strong> {app.notes}</p>}
+                          <p><strong>{t('patients:doctorLabel')}</strong> {app.doctor_name}</p>
+                          <p><strong>{t('patients:durationLabel')}</strong> {app.duration} {t('patients:minutes')}</p>
+                          {app.notes && <p><strong>{t('patients:notesLabel')}</strong> {app.notes}</p>}
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div style={styles.emptyState}>لا توجد مواعيد مسجلة</div>
+                    <div style={styles.emptyState}>{t('patients:noAppointments')}</div>
                   )}
                 </div>
               )}
@@ -614,20 +609,20 @@ const Patients = () => {
                             🦷 {treatment.treatment_date}
                           </span>
                           <span style={styles.costBadge}>
-                            {treatment.cost || 0} ريال
+                            {treatment.cost || 0} {t('patients:currency')}
                           </span>
                         </div>
                         <div style={styles.itemBody}>
-                          <p><strong>التشخيص:</strong> {treatment.diagnosis || 'لا يوجد'}</p>
-                          <p><strong>الإجراء:</strong> {treatment.procedure_done || 'لا يوجد'}</p>
-                          <p><strong>رقم السن:</strong> {treatment.tooth_number || 'لا يوجد'}</p>
-                          <p><strong>الطبيب:</strong> {treatment.doctor_name}</p>
-                          {treatment.notes && <p><strong>ملاحظات:</strong> {treatment.notes}</p>}
+                          <p><strong>{t('patients:diagnosisLabel')}</strong> {treatment.diagnosis || t('common:none')}</p>
+                          <p><strong>{t('patients:procedureLabel')}</strong> {treatment.procedure_done || t('common:none')}</p>
+                          <p><strong>{t('patients:toothNumberLabel')}</strong> {treatment.tooth_number || t('common:none')}</p>
+                          <p><strong>{t('patients:doctorLabel')}</strong> {treatment.doctor_name}</p>
+                          {treatment.notes && <p><strong>{t('patients:notesLabel')}</strong> {treatment.notes}</p>}
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div style={styles.emptyState}>لا توجد علاجات مسجلة</div>
+                    <div style={styles.emptyState}>{t('patients:noTreatments')}</div>
                   )}
                 </div>
               )}
@@ -642,18 +637,18 @@ const Patients = () => {
                             💰 {payment.payment_date}
                           </span>
                           <span style={styles.amountBadge}>
-                            {payment.amount} ريال
+                            {payment.amount} {t('patients:currency')}
                           </span>
                         </div>
                         <div style={styles.itemBody}>
-                          <p><strong>طريقة الدفع:</strong> {payment.payment_method}</p>
-                          <p><strong>الحالة:</strong> {payment.status === 'completed' ? 'مكتمل' : 'معلق'}</p>
-                          {payment.notes && <p><strong>ملاحظات:</strong> {payment.notes}</p>}
+                          <p><strong>{t('patients:paymentMethodLabel')}</strong> {payment.payment_method}</p>
+                          <p><strong>{t('patients:statusLabel')}</strong> {payment.status === 'completed' ? t('patients:completed') : t('patients:pending')}</p>
+                          {payment.notes && <p><strong>{t('patients:notesLabel')}</strong> {payment.notes}</p>}
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div style={styles.emptyState}>لا توجد مدفوعات مسجلة</div>
+                    <div style={styles.emptyState}>{t('patients:noPayments')}</div>
                   )}
                 </div>
               )}
@@ -665,11 +660,11 @@ const Patients = () => {
       {showAddModal && (
         <div style={styles.modalOverlay} onClick={() => setShowAddModal(false)}>
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h2 style={styles.modalTitle}>إضافة مريض جديد</h2>
+            <h2 style={styles.modalTitle}>{t('patients:addPatientModal')}</h2>
             <form onSubmit={handleAddPatient}>
               <div style={styles.formGrid}>
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>الاسم الكامل *</label>
+                  <label style={styles.label}>{t('patients:fullName')}</label>
                   <input 
                     type="text"
                     value={formData.full_name} 
@@ -680,7 +675,7 @@ const Patients = () => {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>رقم الهاتف *</label>
+                  <label style={styles.label}>{t('patients:phone')}</label>
                   <input 
                     type="tel"
                     value={formData.phone} 
@@ -691,7 +686,7 @@ const Patients = () => {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>البريد الإلكتروني</label>
+                  <label style={styles.label}>{t('patients:email')}</label>
                   <input 
                     type="email"
                     value={formData.email} 
@@ -701,7 +696,7 @@ const Patients = () => {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>الرقم المدني</label>
+                  <label style={styles.label}>{t('patients:nationalId')}</label>
                   <input 
                     type="text"
                     value={formData.national_id} 
@@ -712,7 +707,7 @@ const Patients = () => {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>تاريخ الميلاد</label>
+                  <label style={styles.label}>{t('patients:dateOfBirth')}</label>
                   <input 
                     type="date"
                     value={formData.date_of_birth} 
@@ -722,7 +717,7 @@ const Patients = () => {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>معلومات التأمين</label>
+                  <label style={styles.label}>{t('patients:insuranceInfo')}</label>
                   <input 
                     type="text"
                     value={formData.insurance_info} 
@@ -733,7 +728,7 @@ const Patients = () => {
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>العنوان</label>
+                <label style={styles.label}>{t('patients:address')}</label>
                 <input 
                   type="text"
                   value={formData.address} 
@@ -743,7 +738,7 @@ const Patients = () => {
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>الحساسيات</label>
+                <label style={styles.label}>{t('patients:allergiesField')}</label>
                 <textarea 
                   value={formData.allergies} 
                   onChange={(e) => setFormData({...formData, allergies: e.target.value})}
@@ -754,7 +749,7 @@ const Patients = () => {
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>التاريخ الطبي</label>
+                <label style={styles.label}>{t('patients:medicalHistoryField')}</label>
                 <textarea 
                   value={formData.medical_history} 
                   onChange={(e) => setFormData({...formData, medical_history: e.target.value})}
@@ -765,7 +760,7 @@ const Patients = () => {
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>التشخيص</label>
+                <label style={styles.label}>{t('patients:diagnosisField')}</label>
                 <textarea 
                   value={formData.diagnosis} 
                   onChange={(e) => setFormData({...formData, diagnosis: e.target.value})}
@@ -777,29 +772,29 @@ const Patients = () => {
 
               <div style={styles.formRow}>
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>حالة القضية *</label>
+                  <label style={styles.label}>{t('patients:caseStatus')}</label>
                   <select
                     value={formData.case_status}
                     onChange={(e) => setFormData({...formData, case_status: e.target.value})}
                     style={styles.input}
                     required
                   >
-                    <option value="new">جديد</option>
-                    <option value="active">نشط</option>
-                    <option value="completed">مكتمل</option>
-                    <option value="postponed">مؤجل</option>
-                    <option value="cancelled">ملغي</option>
+                    <option value="new">{t('patients:status.new')}</option>
+                    <option value="active">{t('patients:status.active')}</option>
+                    <option value="completed">{t('patients:status.completed')}</option>
+                    <option value="postponed">{t('patients:status.postponed')}</option>
+                    <option value="cancelled">{t('patients:status.cancelled')}</option>
                   </select>
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>الطبيب الرئيسي</label>
+                  <label style={styles.label}>{t('patients:primaryDoctor')}</label>
                   <select
                     value={formData.primary_doctor_id}
                     onChange={(e) => setFormData({...formData, primary_doctor_id: e.target.value})}
                     style={styles.input}
                   >
-                    <option value="">اختياري</option>
+                    <option value="">{t('patients:optional')}</option>
                     {doctors.map(doctor => (
                       <option key={doctor.id} value={doctor.id}>
                         {doctor.full_name}
@@ -810,8 +805,8 @@ const Patients = () => {
               </div>
 
               <div style={styles.modalActions}>
-                <button type="submit" style={styles.submitBtn}>حفظ</button>
-                <button type="button" onClick={() => setShowAddModal(false)} style={styles.cancelModalBtn}>إلغاء</button>
+                <button type="submit" style={styles.submitBtn}>{t('patients:save')}</button>
+                <button type="button" onClick={() => setShowAddModal(false)} style={styles.cancelModalBtn}>{t('patients:cancel')}</button>
               </div>
             </form>
           </div>
@@ -821,11 +816,11 @@ const Patients = () => {
       {showEditModal && selectedPatient && (
         <div style={styles.modalOverlay} onClick={() => setShowEditModal(false)}>
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h2 style={styles.modalTitle}>تعديل بيانات المريض</h2>
+            <h2 style={styles.modalTitle}>{t('patients:editPatientModal')}</h2>
             <form onSubmit={handleEditPatient}>
               <div style={styles.formGrid}>
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>الاسم الكامل *</label>
+                  <label style={styles.label}>{t('patients:fullName')}</label>
                   <input 
                     type="text"
                     value={formData.full_name} 
@@ -836,7 +831,7 @@ const Patients = () => {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>رقم الهاتف *</label>
+                  <label style={styles.label}>{t('patients:phone')}</label>
                   <input 
                     type="tel"
                     value={formData.phone} 
@@ -847,7 +842,7 @@ const Patients = () => {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>الرقم المدني</label>
+                  <label style={styles.label}>{t('patients:nationalId')}</label>
                   <input 
                     type="text"
                     value={formData.national_id} 
@@ -858,7 +853,7 @@ const Patients = () => {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>تاريخ الميلاد</label>
+                  <label style={styles.label}>{t('patients:dateOfBirth')}</label>
                   <input 
                     type="date"
                     value={formData.date_of_birth} 
@@ -868,7 +863,7 @@ const Patients = () => {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>معلومات التأمين</label>
+                  <label style={styles.label}>{t('patients:insuranceInfo')}</label>
                   <input 
                     type="text"
                     value={formData.insurance_info} 
@@ -879,7 +874,7 @@ const Patients = () => {
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>العنوان</label>
+                <label style={styles.label}>{t('patients:address')}</label>
                 <input 
                   type="text"
                   value={formData.address} 
@@ -889,7 +884,7 @@ const Patients = () => {
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>الحساسيات</label>
+                <label style={styles.label}>{t('patients:allergiesField')}</label>
                 <textarea 
                   value={formData.allergies} 
                   onChange={(e) => setFormData({...formData, allergies: e.target.value})}
@@ -899,7 +894,7 @@ const Patients = () => {
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>التاريخ الطبي</label>
+                <label style={styles.label}>{t('patients:medicalHistoryField')}</label>
                 <textarea 
                   value={formData.medical_history} 
                   onChange={(e) => setFormData({...formData, medical_history: e.target.value})}
@@ -909,7 +904,7 @@ const Patients = () => {
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>التشخيص</label>
+                <label style={styles.label}>{t('patients:diagnosisField')}</label>
                 <textarea 
                   value={formData.diagnosis} 
                   onChange={(e) => setFormData({...formData, diagnosis: e.target.value})}
@@ -921,29 +916,29 @@ const Patients = () => {
 
               <div style={styles.formRow}>
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>حالة القضية *</label>
+                  <label style={styles.label}>{t('patients:caseStatus')}</label>
                   <select
                     value={formData.case_status}
                     onChange={(e) => setFormData({...formData, case_status: e.target.value})}
                     style={styles.input}
                     required
                   >
-                    <option value="new">جديد</option>
-                    <option value="active">نشط</option>
-                    <option value="completed">مكتمل</option>
-                    <option value="postponed">مؤجل</option>
-                    <option value="cancelled">ملغي</option>
+                    <option value="new">{t('patients:status.new')}</option>
+                    <option value="active">{t('patients:status.active')}</option>
+                    <option value="completed">{t('patients:status.completed')}</option>
+                    <option value="postponed">{t('patients:status.postponed')}</option>
+                    <option value="cancelled">{t('patients:status.cancelled')}</option>
                   </select>
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>الطبيب الرئيسي</label>
+                  <label style={styles.label}>{t('patients:primaryDoctor')}</label>
                   <select
                     value={formData.primary_doctor_id}
                     onChange={(e) => setFormData({...formData, primary_doctor_id: e.target.value})}
                     style={styles.input}
                   >
-                    <option value="">اختياري</option>
+                    <option value="">{t('patients:optional')}</option>
                     {doctors.map(doctor => (
                       <option key={doctor.id} value={doctor.id}>
                         {doctor.full_name}
@@ -954,8 +949,8 @@ const Patients = () => {
               </div>
 
               <div style={styles.modalActions}>
-                <button type="submit" style={styles.submitBtn}>حفظ التعديلات</button>
-                <button type="button" onClick={() => setShowEditModal(false)} style={styles.cancelModalBtn}>إلغاء</button>
+                <button type="submit" style={styles.submitBtn}>{t('patients:saveChanges')}</button>
+                <button type="button" onClick={() => setShowEditModal(false)} style={styles.cancelModalBtn}>{t('patients:cancel')}</button>
               </div>
             </form>
           </div>
@@ -965,13 +960,13 @@ const Patients = () => {
   );
 };
 
-const getStatusLabel = (status) => {
+const getStatusLabel = (status, t) => {
   const labels = {
-    scheduled: 'مجدول',
-    confirmed: 'مؤكد',
-    in_progress: 'جاري',
-    completed: 'مكتمل',
-    cancelled: 'ملغي'
+    scheduled: t('appointments:status.scheduled'),
+    confirmed: t('appointments:status.confirmed'),
+    in_progress: t('appointments:status.in_progress'),
+    completed: t('appointments:status.completed'),
+    cancelled: t('appointments:status.cancelled')
   };
   return labels[status] || status;
 };

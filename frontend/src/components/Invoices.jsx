@@ -197,13 +197,13 @@ const Invoices = () => {
           onChange={(e) => setFilterStatus(e.target.value)}
           style={styles.filterSelect}
         >
-          <option value="all">كل الحالات</option>
-          <option value="draft">مسودة</option>
-          <option value="pending">معلقة</option>
-          <option value="paid">مدفوعة</option>
-          <option value="partially_paid">مدفوعة جزئياً</option>
-          <option value="overdue">متأخرة</option>
-          <option value="cancelled">ملغاة</option>
+          <option value="all">{t('invoices:statusFilter.all')}</option>
+          <option value="draft">{t('invoices:statusFilter.draft')}</option>
+          <option value="pending">{t('invoices:statusFilter.pending')}</option>
+          <option value="paid">{t('invoices:statusFilter.paid')}</option>
+          <option value="partially_paid">{t('invoices:statusFilter.partiallyPaid')}</option>
+          <option value="overdue">{t('invoices:statusFilter.overdue')}</option>
+          <option value="cancelled">{t('invoices:statusFilter.cancelled')}</option>
         </select>
       </div>
 
@@ -213,14 +213,14 @@ const Invoices = () => {
             <thead>
               <tr style={styles.tableHeaderRow}>
                 <th style={styles.tableHeader}>{t('invoices:invoiceNumber')}</th>
-                <th style={styles.tableHeader}>المريض</th>
-                <th style={styles.tableHeader}>التاريخ</th>
-                <th style={styles.tableHeader}>تاريخ الاستحقاق</th>
-                <th style={styles.tableHeader}>الإجمالي</th>
-                <th style={styles.tableHeader}>المدفوع</th>
-                <th style={styles.tableHeader}>الرصيد</th>
-                <th style={styles.tableHeader}>الحالة</th>
-                <th style={styles.tableHeader}>الإجراءات</th>
+                <th style={styles.tableHeader}>{t('invoices:tableHeaders.patient')}</th>
+                <th style={styles.tableHeader}>{t('invoices:tableHeaders.date')}</th>
+                <th style={styles.tableHeader}>{t('invoices:tableHeaders.dueDate')}</th>
+                <th style={styles.tableHeader}>{t('invoices:tableHeaders.total')}</th>
+                <th style={styles.tableHeader}>{t('invoices:tableHeaders.amountPaid')}</th>
+                <th style={styles.tableHeader}>{t('invoices:tableHeaders.balance')}</th>
+                <th style={styles.tableHeader}>{t('invoices:tableHeaders.status')}</th>
+                <th style={styles.tableHeader}>{t('invoices:tableHeaders.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -234,11 +234,11 @@ const Invoices = () => {
                   <td style={styles.tableCell}>
                     {invoice.due_date ? new Date(invoice.due_date).toLocaleDateString('ar-EG') : '-'}
                   </td>
-                  <td style={styles.tableCell}>{parseFloat(invoice.total_amount || 0).toFixed(3)} د.ك</td>
-                  <td style={styles.tableCell}>{parseFloat(invoice.amount_paid || 0).toFixed(3)} د.ك</td>
+                  <td style={styles.tableCell}>{parseFloat(invoice.total_amount || 0).toFixed(3)} {t('common:currencyKWD')}</td>
+                  <td style={styles.tableCell}>{parseFloat(invoice.amount_paid || 0).toFixed(3)} {t('common:currencyKWD')}</td>
                   <td style={styles.tableCell}>
                     <span style={{ fontWeight: '600', color: invoice.balance_due > 0 ? '#DC2626' : '#16A34A' }}>
-                      {parseFloat(invoice.balance_due || 0).toFixed(3)} د.ك
+                      {parseFloat(invoice.balance_due || 0).toFixed(3)} {t('common:currencyKWD')}
                     </span>
                   </td>
                   <td style={styles.tableCell}>
@@ -255,7 +255,7 @@ const Invoices = () => {
         ) : (
           <div style={styles.emptyState}>
             <div style={styles.emptyIcon}>📋</div>
-            <p style={styles.emptyText}>لا توجد فواتير</p>
+            <p style={styles.emptyText}>{t('invoices:noInvoices')}</p>
           </div>
         )}
       </div>
@@ -270,14 +270,14 @@ const Invoices = () => {
             <form onSubmit={handleCreateInvoice}>
               <div style={styles.formGrid}>
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>المريض *</label>
+                  <label style={styles.label}>{t('invoices:tableHeaders.patient')} *</label>
                   <select
                     value={invoiceForm.patient_id}
                     onChange={(e) => handlePatientChange(e.target.value)}
                     style={styles.input}
                     required
                   >
-                    <option value="">اختر المريض</option>
+                    <option value="">{t('invoices:selectPatient')}</option>
                     {patients.map(patient => (
                       <option key={patient.id} value={patient.id}>
                         {patient.full_name} - {patient.national_id}
@@ -287,13 +287,13 @@ const Invoices = () => {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>العلاج</label>
+                  <label style={styles.label}>{t('treatments:treatment')}</label>
                   <select
                     value={invoiceForm.treatment_id}
                     onChange={(e) => setInvoiceForm({ ...invoiceForm, treatment_id: e.target.value })}
                     style={styles.input}
                   >
-                    <option value="">اختياري</option>
+                    <option value="">{t('common:optional')}</option>
                     {treatments.map(treatment => (
                       <option key={treatment.id} value={treatment.id}>
                         {treatment.diagnosis} - {treatment.procedure_done}
@@ -303,7 +303,7 @@ const Invoices = () => {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>تاريخ الاستحقاق</label>
+                  <label style={styles.label}>{t('invoices:tableHeaders.dueDate')}</label>
                   <input
                     type="date"
                     value={invoiceForm.due_date}
@@ -313,7 +313,7 @@ const Invoices = () => {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>نسبة الضريبة (%)</label>
+                  <label style={styles.label}>{t('invoices:formLabels.taxRate')}</label>
                   <input
                     type="number"
                     step="0.01"
@@ -324,7 +324,7 @@ const Invoices = () => {
                 </div>
 
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>نسبة الخصم (%)</label>
+                  <label style={styles.label}>{t('invoices:formLabels.discountRate')}</label>
                   <input
                     type="number"
                     step="0.01"
@@ -371,7 +371,7 @@ const Invoices = () => {
                       required
                     />
                     <span style={styles.itemTotal}>
-                      {(parseFloat(item.quantity || 0) * parseFloat(item.unit_price || 0)).toFixed(3)} د.ك
+                      {(parseFloat(item.quantity || 0) * parseFloat(item.unit_price || 0)).toFixed(3)} {t('common:currencyKWD')}
                     </span>
                     {invoiceForm.items.length > 1 && (
                       <button
@@ -388,29 +388,29 @@ const Invoices = () => {
 
               <div style={styles.totalsSection}>
                 <div style={styles.totalRow}>
-                  <span style={styles.totalLabel}>المجموع الفرعي:</span>
-                  <span style={styles.totalValue}>{calculateSubtotal().toFixed(3)} د.ك</span>
+                  <span style={styles.totalLabel}>{t('invoices:totals.subtotal')}</span>
+                  <span style={styles.totalValue}>{calculateSubtotal().toFixed(3)} {t('common:currencyKWD')}</span>
                 </div>
                 <div style={styles.totalRow}>
-                  <span style={styles.totalLabel}>الضريبة ({invoiceForm.tax_rate}%):</span>
+                  <span style={styles.totalLabel}>{t('invoices:totals.tax')} ({invoiceForm.tax_rate}%):</span>
                   <span style={styles.totalValue}>
-                    {((calculateSubtotal() * parseFloat(invoiceForm.tax_rate || 0)) / 100).toFixed(3)} د.ك
+                    {((calculateSubtotal() * parseFloat(invoiceForm.tax_rate || 0)) / 100).toFixed(3)} {t('common:currencyKWD')}
                   </span>
                 </div>
                 <div style={styles.totalRow}>
-                  <span style={styles.totalLabel}>الخصم ({invoiceForm.discount_rate}%):</span>
+                  <span style={styles.totalLabel}>{t('invoices:totals.discount')} ({invoiceForm.discount_rate}%):</span>
                   <span style={styles.totalValue}>
-                    -{((calculateSubtotal() * parseFloat(invoiceForm.discount_rate || 0)) / 100).toFixed(3)} د.ك
+                    -{((calculateSubtotal() * parseFloat(invoiceForm.discount_rate || 0)) / 100).toFixed(3)} {t('common:currencyKWD')}
                   </span>
                 </div>
                 <div style={{...styles.totalRow, ...styles.grandTotal}}>
-                  <span style={styles.totalLabel}>الإجمالي:</span>
-                  <span style={styles.totalValue}>{calculateTotal().toFixed(3)} د.ك</span>
+                  <span style={styles.totalLabel}>{t('invoices:totals.total')}</span>
+                  <span style={styles.totalValue}>{calculateTotal().toFixed(3)} {t('common:currencyKWD')}</span>
                 </div>
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>ملاحظات</label>
+                <label style={styles.label}>{t('common:notes')}</label>
                 <textarea
                   value={invoiceForm.notes}
                   onChange={(e) => setInvoiceForm({ ...invoiceForm, notes: e.target.value })}
@@ -428,7 +428,7 @@ const Invoices = () => {
                   onClick={() => { setShowInvoiceModal(false); resetInvoiceForm(); }}
                   style={styles.cancelButton}
                 >
-                  إلغاء
+                  {t('common:cancel')}
                 </button>
               </div>
             </form>

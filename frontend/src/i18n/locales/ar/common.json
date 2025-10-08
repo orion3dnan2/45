@@ -40,9 +40,12 @@
   "deleteError": "فشل الحذف",
   "notSpecified": "غير محدد",
   "none": "لا يوجد",
+  "unknown": "غير معروف",
   "available": "متوفر",
   "unavailable": "غير متوفر",
   "active": "نشط",
   "inactive": "غير نشط",
-  "currency": "ر.س"
+  "currency": "ر.س",
+  "currencyKWD": "د.ك",
+  "optional": "اختياري"
 }

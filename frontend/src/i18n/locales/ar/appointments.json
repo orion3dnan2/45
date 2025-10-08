@@ -12,5 +12,12 @@
   "addSuccess": "تم إضافة الموعد بنجاح",
   "updateSuccess": "تم تحديث الموعد بنجاح",
   "deleteSuccess": "تم حذف الموعد بنجاح",
-  "deleteConfirm": "هل أنت متأكد من حذف هذا الموعد؟"
+  "deleteConfirm": "هل أنت متأكد من حذف هذا الموعد؟",
+  "status": {
+    "scheduled": "مجدول",
+    "confirmed": "مؤكد",
+    "in_progress": "جاري",
+    "completed": "مكتمل",
+    "cancelled": "ملغي"
+  }
 }
