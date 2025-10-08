@@ -20,7 +20,7 @@ const getAllInvoices = async (req, res) => {
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching invoices:', error);
-    res.status(500).json({ message: 'خطأ في جلب الفواتير' });
+    res.status(500).json({ message: req.t('errors', 'serverError') });
   }
 };
 
@@ -62,7 +62,7 @@ const getInvoiceById = async (req, res) => {
     res.json(invoice);
   } catch (error) {
     console.error('Error fetching invoice:', error);
-    res.status(500).json({ message: 'خطأ في جلب الفاتورة' });
+    res.status(500).json({ message: req.t('errors', 'serverError') });
   }
 };
 
@@ -146,7 +146,7 @@ const createInvoice = async (req, res) => {
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('Error creating invoice:', error);
-    res.status(500).json({ message: 'خطأ في إنشاء الفاتورة' });
+    res.status(500).json({ message: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -214,7 +214,7 @@ const updateInvoice = async (req, res) => {
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('Error updating invoice:', error);
-    res.status(500).json({ message: 'خطأ في تحديث الفاتورة' });
+    res.status(500).json({ message: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -233,7 +233,7 @@ const deleteInvoice = async (req, res) => {
     res.json({ message: 'تم حذف الفاتورة بنجاح' });
   } catch (error) {
     console.error('Error deleting invoice:', error);
-    res.status(500).json({ message: 'خطأ في حذف الفاتورة' });
+    res.status(500).json({ message: req.t('errors', 'serverError') });
   }
 };
 

@@ -11,8 +11,8 @@ const register = async (req, res) => {
   // في وضع الديمو، لا يمكن إنشاء حسابات جديدة
   if (isDemoMode) {
     return res.status(403).json({ 
-      error: 'التسجيل غير متاح في وضع الديمو',
-      message: 'يرجى استخدام الحسابات التجريبية: admin, doctor, reception (كلمة المرور: password)'
+      error: req.t('demo', 'registrationNotAvailable'),
+      message: req.t('demo', 'useDemoAccounts')
     });
   }
 
@@ -21,7 +21,7 @@ const register = async (req, res) => {
     const { username, password, full_name, role, email, phone } = req.body;
 
     if (!username || !password || !full_name || !role) {
-      return res.status(400).json({ error: 'جميع الحقول مطلوبة' });
+      return res.status(400).json({ error: req.t('auth', 'allFieldsRequired') });
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
@@ -35,13 +35,13 @@ const register = async (req, res) => {
 
     const userId = result.rows[0].id;
 
-    res.status(201).json({ message: 'تم إنشاء الحساب بنجاح', userId });
+    res.status(201).json({ message: req.t('auth', 'registrationSuccess'), userId });
   } catch (error) {
     if (error.message.includes('duplicate key') || error.code === '23505') {
-      return res.status(400).json({ error: 'اسم المستخدم موجود بالفعل' });
+      return res.status(400).json({ error: req.t('auth', 'userExists') });
     }
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -52,7 +52,7 @@ const login = async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
-      return res.status(400).json({ error: 'اسم المستخدم وكلمة المرور مطلوبة' });
+      return res.status(400).json({ error: req.t('auth', 'usernamePasswordRequired') });
     }
 
     // ========================================
@@ -63,7 +63,7 @@ const login = async (req, res) => {
       const demoUser = DEMO_USERS.find(u => u.username === username);
       
       if (!demoUser || !bcrypt.compareSync(password, demoUser.password)) {
-        return res.status(401).json({ error: 'اسم المستخدم أو كلمة المرور غير صحيحة' });
+        return res.status(401).json({ error: req.t('auth', 'invalidCredentials') });
       }
 
       // إنشاء JWT token للمستخدم التجريبي
@@ -96,7 +96,7 @@ const login = async (req, res) => {
       const user = result.rows[0];
 
       if (!user || !bcrypt.compareSync(password, user.password)) {
-        return res.status(401).json({ error: 'اسم المستخدم أو كلمة المرور غير صحيحة' });
+        return res.status(401).json({ error: req.t('auth', 'invalidCredentials') });
       }
 
       const token = jwt.sign(
@@ -170,7 +170,7 @@ const getUsersByRole = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   }
 };
 

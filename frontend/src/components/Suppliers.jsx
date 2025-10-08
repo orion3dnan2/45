@@ -201,7 +201,7 @@ const Suppliers = () => {
                   onChange={handleChange}
                   required
                   style={styles.input}
-                  placeholder="أدخل اسم المورد"
+                  placeholder={t('suppliers:placeholders.name')}
                 />
               </div>
 
@@ -213,7 +213,7 @@ const Suppliers = () => {
                   value={formData.contact_person}
                   onChange={handleChange}
                   style={styles.input}
-                  placeholder="اسم الشخص المسؤول"
+                  placeholder={t('suppliers:placeholders.contactPerson')}
                 />
               </div>
 
@@ -226,7 +226,7 @@ const Suppliers = () => {
                     value={formData.phone}
                     onChange={handleChange}
                     style={styles.input}
-                    placeholder="05xxxxxxxx"
+                    placeholder={t('suppliers:placeholders.phone')}
                   />
                 </div>
 
@@ -238,7 +238,7 @@ const Suppliers = () => {
                     value={formData.email}
                     onChange={handleChange}
                     style={styles.input}
-                    placeholder="example@domain.com"
+                    placeholder={t('suppliers:placeholders.email')}
                   />
                 </div>
               </div>
@@ -251,7 +251,7 @@ const Suppliers = () => {
                   value={formData.address}
                   onChange={handleChange}
                   style={styles.input}
-                  placeholder="عنوان المورد"
+                  placeholder={t('suppliers:placeholders.address')}
                 />
               </div>
 

@@ -72,7 +72,7 @@ const getNotifications = async (req, res) => {
     res.json(notifications);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -81,7 +81,7 @@ const getNotifications = async (req, res) => {
 const markAsRead = async (req, res) => {
   // في وضع الديمو، لا يمكن التعديل
   if (isDemoMode) {
-    return res.status(403).json({ error: 'التعديل غير متاح في وضع الديمو' });
+    return res.status(403).json({ error: req.t('demo', 'updateNotAvailable') });
   }
 
   const client = await pool.connect();
@@ -93,7 +93,7 @@ const markAsRead = async (req, res) => {
     res.json({ message: 'تم تحديث الإشعار بنجاح' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -102,7 +102,7 @@ const markAsRead = async (req, res) => {
 const markAllAsRead = async (req, res) => {
   // في وضع الديمو، لا يمكن التعديل
   if (isDemoMode) {
-    return res.status(403).json({ error: 'التعديل غير متاح في وضع الديمو' });
+    return res.status(403).json({ error: req.t('demo', 'updateNotAvailable') });
   }
 
   const client = await pool.connect();
@@ -122,7 +122,7 @@ const markAllAsRead = async (req, res) => {
     res.json({ message: 'تم تحديث جميع الإشعارات بنجاح' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }

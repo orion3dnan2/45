@@ -48,7 +48,7 @@ const getSuppliers = async (req, res) => {
     res.json(suppliersWithStatus);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -57,7 +57,7 @@ const getSuppliers = async (req, res) => {
 const createSupplier = async (req, res) => {
   // في وضع الديمو، لا يمكن الإضافة
   if (isDemoMode) {
-    return res.status(403).json({ error: 'إضافة الموردين غير متاحة في وضع الديمو' });
+    return res.status(403).json({ error: req.t('demo', 'addNotAvailable') });
   }
 
   const client = await pool.connect();
@@ -89,7 +89,7 @@ const createSupplier = async (req, res) => {
     res.status(201).json({ message: 'تم إضافة المورد بنجاح', supplierId: result.rows[0].id });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -98,7 +98,7 @@ const createSupplier = async (req, res) => {
 const updateSupplier = async (req, res) => {
   // في وضع الديمو، لا يمكن التعديل
   if (isDemoMode) {
-    return res.status(403).json({ error: 'التعديل غير متاح في وضع الديمو' });
+    return res.status(403).json({ error: req.t('demo', 'updateNotAvailable') });
   }
 
   const client = await pool.connect();
@@ -162,7 +162,7 @@ const updateSupplier = async (req, res) => {
     res.json({ message: 'تم تحديث المورد بنجاح' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -171,7 +171,7 @@ const updateSupplier = async (req, res) => {
 const deleteSupplier = async (req, res) => {
   // في وضع الديمو، لا يمكن الحذف
   if (isDemoMode) {
-    return res.status(403).json({ error: 'الحذف غير متاح في وضع الديمو' });
+    return res.status(403).json({ error: req.t('demo', 'deleteNotAvailable') });
   }
 
   const client = await pool.connect();
@@ -183,7 +183,7 @@ const deleteSupplier = async (req, res) => {
     res.json({ message: 'تم حذف المورد بنجاح' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }

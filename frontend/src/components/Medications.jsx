@@ -177,7 +177,7 @@ const Medications = () => {
         <div style={styles.searchBox}>
           <input
             type="text"
-            placeholder="🔍 ابحث عن دواء..."
+            placeholder={t('medications:searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={styles.searchInput}
@@ -294,7 +294,7 @@ const Medications = () => {
                   value={formData.category}
                   onChange={(e) => setFormData({...formData, category: e.target.value})}
                   style={styles.input}
-                  placeholder="مثال: مضادات حيوية، مسكنات، مستلزمات"
+                  placeholder={t('medications:placeholders.category')}
                 />
               </div>
 
@@ -306,7 +306,7 @@ const Medications = () => {
                   value={formData.unit}
                   onChange={(e) => setFormData({...formData, unit: e.target.value})}
                   style={styles.input}
-                  placeholder="مثال: قرص، كبسولة، علبة"
+                  placeholder={t('medications:placeholders.unit')}
                 />
               </div>
 

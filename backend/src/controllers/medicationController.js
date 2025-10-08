@@ -36,7 +36,7 @@ const getMedications = async (req, res) => {
     res.json(medications);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -45,7 +45,7 @@ const getMedications = async (req, res) => {
 const createMedication = async (req, res) => {
   // في وضع الديمو، لا يمكن الإضافة
   if (isDemoMode) {
-    return res.status(403).json({ error: 'إضافة الأدوية غير متاحة في وضع الديمو' });
+    return res.status(403).json({ error: req.t('demo', 'addNotAvailable') });
   }
 
   const client = await pool.connect();
@@ -90,7 +90,7 @@ const createMedication = async (req, res) => {
     res.status(201).json({ message: 'تم إضافة الدواء بنجاح', medicationId: result.rows[0].id });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -99,7 +99,7 @@ const createMedication = async (req, res) => {
 const updateMedication = async (req, res) => {
   // في وضع الديمو، لا يمكن التعديل
   if (isDemoMode) {
-    return res.status(403).json({ error: 'التعديل غير متاح في وضع الديمو' });
+    return res.status(403).json({ error: req.t('demo', 'updateNotAvailable') });
   }
 
   const client = await pool.connect();
@@ -197,7 +197,7 @@ const updateMedication = async (req, res) => {
     res.json({ message: 'تم تحديث الدواء بنجاح' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -206,7 +206,7 @@ const updateMedication = async (req, res) => {
 const deleteMedication = async (req, res) => {
   // في وضع الديمو، لا يمكن الحذف
   if (isDemoMode) {
-    return res.status(403).json({ error: 'الحذف غير متاح في وضع الديمو' });
+    return res.status(403).json({ error: req.t('demo', 'deleteNotAvailable') });
   }
 
   const client = await pool.connect();
@@ -218,7 +218,7 @@ const deleteMedication = async (req, res) => {
     res.json({ message: 'تم حذف الدواء بنجاح' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }

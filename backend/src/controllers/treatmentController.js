@@ -7,7 +7,7 @@ const isDemoMode = process.env.DEMO_MODE === 'true';
 const createTreatment = async (req, res) => {
   // في وضع الديمو، لا يمكن الإضافة
   if (isDemoMode) {
-    return res.status(403).json({ error: 'إضافة العلاجات غير متاحة في وضع الديمو' });
+    return res.status(403).json({ error: req.t('demo', 'addNotAvailable') });
   }
 
   const client = await pool.connect();
@@ -15,7 +15,7 @@ const createTreatment = async (req, res) => {
     const { patient_id, doctor_id, appointment_id, treatment_date, diagnosis, procedure_done, tooth_number, cost, notes, medications } = req.body;
 
     if (!patient_id || !doctor_id || !treatment_date) {
-      return res.status(400).json({ error: 'جميع الحقول المطلوبة يجب ملؤها' });
+      return res.status(400).json({ error: req.t('validation', 'allRequiredFields') });
     }
 
     const result = await client.query(
@@ -56,7 +56,7 @@ const createTreatment = async (req, res) => {
     res.status(201).json({ message: 'تم إضافة العلاج بنجاح', treatmentId });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -137,7 +137,7 @@ const getTreatments = async (req, res) => {
     res.json(treatments);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -146,7 +146,7 @@ const getTreatments = async (req, res) => {
 const updateTreatment = async (req, res) => {
   // في وضع الديمو، لا يمكن التعديل
   if (isDemoMode) {
-    return res.status(403).json({ error: 'التعديل غير متاح في وضع الديمو' });
+    return res.status(403).json({ error: req.t('demo', 'updateNotAvailable') });
   }
 
   const client = await pool.connect();
@@ -200,7 +200,7 @@ const updateTreatment = async (req, res) => {
     res.json({ message: 'تم تحديث العلاج بنجاح' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }

@@ -9,16 +9,27 @@ const messages = {
       loginFailed: 'Login failed. Please check your credentials',
       userNotFound: 'User not found',
       invalidCredentials: 'Invalid username or password',
+      usernamePasswordRequired: 'Username and password are required',
       userExists: 'Username already exists',
-      registrationSuccess: 'Registration successful',
-      registrationFailed: 'Registration failed'
+      registrationSuccess: 'Account created successfully',
+      registrationFailed: 'Registration failed',
+      allFieldsRequired: 'All fields are required'
+    },
+    demo: {
+      registrationNotAvailable: 'Registration is not available in demo mode',
+      useDemoAccounts: 'Please use the demo accounts: admin, doctor, reception (password: password)',
+      addNotAvailable: 'Adding is not available in demo mode',
+      updateNotAvailable: 'Update is not available in demo mode',
+      deleteNotAvailable: 'Delete is not available in demo mode',
+      uploadNotAvailable: 'Upload is not available in demo mode'
     },
     validation: {
       required: 'This field is required',
       invalidEmail: 'Invalid email address',
       invalidPhone: 'Invalid phone number',
       minLength: 'Minimum length is {{min}} characters',
-      maxLength: 'Maximum length is {{max}} characters'
+      maxLength: 'Maximum length is {{max}} characters',
+      allRequiredFields: 'All required fields must be filled'
     },
     errors: {
       serverError: 'Internal server error',
@@ -44,19 +55,30 @@ const messages = {
       loginFailed: 'فشل تسجيل الدخول. يرجى التحقق من بيانات الاعتماد',
       userNotFound: 'المستخدم غير موجود',
       invalidCredentials: 'اسم المستخدم أو كلمة المرور غير صحيحة',
+      usernamePasswordRequired: 'اسم المستخدم وكلمة المرور مطلوبة',
       userExists: 'اسم المستخدم موجود بالفعل',
-      registrationSuccess: 'تم التسجيل بنجاح',
-      registrationFailed: 'فشل التسجيل'
+      registrationSuccess: 'تم إنشاء الحساب بنجاح',
+      registrationFailed: 'فشل التسجيل',
+      allFieldsRequired: 'جميع الحقول مطلوبة'
+    },
+    demo: {
+      registrationNotAvailable: 'التسجيل غير متاح في وضع الديمو',
+      useDemoAccounts: 'يرجى استخدام الحسابات التجريبية: admin, doctor, reception (كلمة المرور: password)',
+      addNotAvailable: 'إضافة المواعيد غير متاحة في وضع الديمو',
+      updateNotAvailable: 'التعديل غير متاح في وضع الديمو',
+      deleteNotAvailable: 'الحذف غير متاح في وضع الديمو',
+      uploadNotAvailable: 'رفع المستندات غير متاح في وضع الديمو'
     },
     validation: {
       required: 'هذا الحقل مطلوب',
       invalidEmail: 'عنوان البريد الإلكتروني غير صالح',
       invalidPhone: 'رقم الهاتف غير صالح',
       minLength: 'الحد الأدنى {{min}} أحرف',
-      maxLength: 'الحد الأقصى {{max}} حرف'
+      maxLength: 'الحد الأقصى {{max}} حرف',
+      allRequiredFields: 'جميع الحقول المطلوبة يجب ملؤها'
     },
     errors: {
-      serverError: 'خطأ في الخادم الداخلي',
+      serverError: 'خطأ في الخادم',
       notFound: 'المورد غير موجود',
       badRequest: 'طلب غير صحيح',
       databaseError: 'حدث خطأ في قاعدة البيانات',

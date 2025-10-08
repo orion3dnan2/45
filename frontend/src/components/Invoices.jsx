@@ -186,7 +186,7 @@ const Invoices = () => {
       <div style={styles.filtersContainer}>
         <input
           type="text"
-          placeholder="بحث برقم الفاتورة أو اسم المريض أو الرقم المدني..."
+          placeholder={t('invoices:placeholders.search')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           style={styles.searchInput}
@@ -347,7 +347,7 @@ const Invoices = () => {
                   <div key={index} style={styles.itemRow}>
                     <input
                       type="text"
-                      placeholder="الوصف"
+                      placeholder={t('invoices:placeholders.description')}
                       value={item.description}
                       onChange={(e) => updateInvoiceItem(index, 'description', e.target.value)}
                       style={{...styles.input, flex: 2}}
@@ -355,7 +355,7 @@ const Invoices = () => {
                     />
                     <input
                       type="number"
-                      placeholder="الكمية"
+                      placeholder={t('invoices:placeholders.quantity')}
                       value={item.quantity}
                       onChange={(e) => updateInvoiceItem(index, 'quantity', e.target.value)}
                       style={{...styles.input, width: '80px'}}
@@ -364,7 +364,7 @@ const Invoices = () => {
                     <input
                       type="number"
                       step="0.001"
-                      placeholder="السعر"
+                      placeholder={t('invoices:placeholders.price')}
                       value={item.unit_price}
                       onChange={(e) => updateInvoiceItem(index, 'unit_price', e.target.value)}
                       style={{...styles.input, width: '100px'}}

@@ -303,7 +303,7 @@ const Patients = () => {
           <div style={styles.searchBox}>
             <input 
               type="text" 
-              placeholder="🔍 البحث بالرقم المدني أو الاسم..."
+              placeholder={t('patients:searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={styles.searchInput}
@@ -512,7 +512,7 @@ const Patients = () => {
                         </div>
                         <input 
                           type="text"
-                          placeholder="ملاحظات عن المستند (اختياري)"
+                          placeholder={t('patients:placeholders.documentNotes')}
                           value={uploadNotes}
                           onChange={(e) => setUploadNotes(e.target.value)}
                           style={styles.notesInput}
@@ -707,7 +707,7 @@ const Patients = () => {
                     value={formData.national_id} 
                     onChange={(e) => setFormData({...formData, national_id: e.target.value})}
                     style={styles.input}
-                    placeholder="مثال: 12345678901"
+                    placeholder={t('patients:placeholders.nationalId')}
                   />
                 </div>
 
@@ -749,7 +749,7 @@ const Patients = () => {
                   onChange={(e) => setFormData({...formData, allergies: e.target.value})}
                   style={styles.textarea}
                   rows="2"
-                  placeholder="مثال: حساسية من البنسلين، حساسية من اللاتكس..."
+                  placeholder={t('patients:placeholders.allergies')}
                 />
               </div>
 
@@ -760,7 +760,7 @@ const Patients = () => {
                   onChange={(e) => setFormData({...formData, medical_history: e.target.value})}
                   style={styles.textarea}
                   rows="3"
-                  placeholder="مثال: أمراض مزمنة، عمليات سابقة، أدوية حالية..."
+                  placeholder={t('patients:placeholders.medicalHistory')}
                 />
               </div>
 
@@ -771,7 +771,7 @@ const Patients = () => {
                   onChange={(e) => setFormData({...formData, diagnosis: e.target.value})}
                   style={styles.textarea}
                   rows="2"
-                  placeholder="مثال: تسوس الأسنان، التهاب اللثة..."
+                  placeholder={t('patients:placeholders.diagnosis')}
                 />
               </div>
 
@@ -853,7 +853,7 @@ const Patients = () => {
                     value={formData.national_id} 
                     onChange={(e) => setFormData({...formData, national_id: e.target.value})}
                     style={styles.input}
-                    placeholder="مثال: 12345678901"
+                    placeholder={t('patients:placeholders.nationalId')}
                   />
                 </div>
 
@@ -915,7 +915,7 @@ const Patients = () => {
                   onChange={(e) => setFormData({...formData, diagnosis: e.target.value})}
                   style={styles.textarea}
                   rows="2"
-                  placeholder="مثال: تسوس الأسنان، التهاب اللثة..."
+                  placeholder={t('patients:placeholders.diagnosis')}
                 />
               </div>
 

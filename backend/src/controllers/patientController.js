@@ -65,7 +65,7 @@ const getPatients = async (req, res) => {
     res.json(patients);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -160,7 +160,7 @@ const getPatientById = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -169,7 +169,7 @@ const getPatientById = async (req, res) => {
 const updatePatient = async (req, res) => {
   // في وضع الديمو، لا يمكن التعديل
   if (isDemoMode) {
-    return res.status(403).json({ error: 'التعديل غير متاح في وضع الديمو' });
+    return res.status(403).json({ error: req.t('demo', 'updateNotAvailable') });
   }
 
   const client = await pool.connect();
@@ -262,7 +262,7 @@ const updatePatient = async (req, res) => {
     res.json({ message: 'تم تحديث بيانات المريض بنجاح' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -271,7 +271,7 @@ const updatePatient = async (req, res) => {
 const createPatient = async (req, res) => {
   // في وضع الديمو، لا يمكن الإضافة
   if (isDemoMode) {
-    return res.status(403).json({ error: 'إضافة المرضى غير متاحة في وضع الديمو' });
+    return res.status(403).json({ error: req.t('demo', 'addNotAvailable') });
   }
 
   const client = await pool.connect();
@@ -344,7 +344,7 @@ const createPatient = async (req, res) => {
     if (error.message.includes('duplicate key') || error.code === '23505') {
       return res.status(400).json({ error: 'الرقم الوطني موجود بالفعل' });
     }
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -353,7 +353,7 @@ const createPatient = async (req, res) => {
 const deletePatient = async (req, res) => {
   // في وضع الديمو، لا يمكن الحذف
   if (isDemoMode) {
-    return res.status(403).json({ error: 'الحذف غير متاح في وضع الديمو' });
+    return res.status(403).json({ error: req.t('demo', 'deleteNotAvailable') });
   }
 
   const client = await pool.connect();
@@ -365,7 +365,7 @@ const deletePatient = async (req, res) => {
     res.json({ message: 'تم حذف المريض بنجاح' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -374,7 +374,7 @@ const deletePatient = async (req, res) => {
 const archivePatient = async (req, res) => {
   // في وضع الديمو، لا يمكن الأرشفة
   if (isDemoMode) {
-    return res.status(403).json({ error: 'الأرشفة غير متاحة في وضع الديمو' });
+    return res.status(403).json({ error: req.t('demo', 'updateNotAvailable') });
   }
 
   const client = await pool.connect();
@@ -390,7 +390,7 @@ const archivePatient = async (req, res) => {
     res.json({ message: archived ? 'تم أرشفة المريض بنجاح' : 'تم إلغاء أرشفة المريض بنجاح' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في الخادم' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }

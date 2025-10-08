@@ -41,7 +41,7 @@ const upload = multer({
 
 const uploadDocument = (req, res) => {
   if (isDemoMode) {
-    return res.status(403).json({ error: 'رفع المستندات غير متاح في وضع الديمو' });
+    return res.status(403).json({ error: req.t('demo', 'uploadNotAvailable') });
   }
 
   upload(req, res, async (err) => {
@@ -83,7 +83,7 @@ const uploadDocument = (req, res) => {
         await fs.unlink(req.file.path).catch(console.error);
       }
       console.error(error);
-      res.status(500).json({ error: 'خطأ في رفع المستند' });
+      res.status(500).json({ error: req.t('errors', 'serverError') });
     } finally {
       client.release();
     }
@@ -111,7 +111,7 @@ const getPatientDocuments = async (req, res) => {
     res.json(result.rows);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في جلب المستندات' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -119,7 +119,7 @@ const getPatientDocuments = async (req, res) => {
 
 const downloadDocument = async (req, res) => {
   if (isDemoMode) {
-    return res.status(403).json({ error: 'تحميل المستندات غير متاح في وضع الديمو' });
+    return res.status(403).json({ error: req.t('demo', 'updateNotAvailable') });
   }
 
   const client = await pool.connect();
@@ -141,7 +141,7 @@ const downloadDocument = async (req, res) => {
     res.download(filePath, document.original_name);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في تحميل المستند' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
@@ -149,7 +149,7 @@ const downloadDocument = async (req, res) => {
 
 const deleteDocument = async (req, res) => {
   if (isDemoMode) {
-    return res.status(403).json({ error: 'حذف المستندات غير متاح في وضع الديمو' });
+    return res.status(403).json({ error: req.t('demo', 'deleteNotAvailable') });
   }
 
   const client = await pool.connect();
@@ -175,7 +175,7 @@ const deleteDocument = async (req, res) => {
     res.json({ message: 'تم حذف المستند بنجاح' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'خطأ في حذف المستند' });
+    res.status(500).json({ error: req.t('errors', 'serverError') });
   } finally {
     client.release();
   }
