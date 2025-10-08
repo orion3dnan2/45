@@ -4,6 +4,8 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import { AuthContext } from './contexts/AuthContext';
+import { LanguageProvider } from './contexts/LanguageContext';
+import './i18n/config';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -36,16 +38,18 @@ function App() {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      <Router>
-        <Routes>
-          <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
-          <Route path="/signup" element={user ? <Navigate to="/dashboard" /> : <Signup />} />
-          <Route path="/dashboard/*" element={user ? <Dashboard /> : <Navigate to="/login" />} />
-          <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
-        </Routes>
-      </Router>
-    </AuthContext.Provider>
+    <LanguageProvider>
+      <AuthContext.Provider value={{ user, login, logout }}>
+        <Router>
+          <Routes>
+            <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
+            <Route path="/signup" element={user ? <Navigate to="/dashboard" /> : <Signup />} />
+            <Route path="/dashboard/*" element={user ? <Dashboard /> : <Navigate to="/login" />} />
+            <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
+          </Routes>
+        </Router>
+      </AuthContext.Provider>
+    </LanguageProvider>
   );
 }
 

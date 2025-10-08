@@ -1,10 +1,15 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../contexts/AuthContext';
+import { LanguageContext } from '../contexts/LanguageContext';
 import { api } from '../services/api';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { direction } = useContext(LanguageContext);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -26,7 +31,7 @@ const Login = () => {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError('حدث خطأ أثناء تسجيل الدخول');
+      setError(t('login.loginError'));
     } finally {
       setLoading(false);
     }
@@ -48,39 +53,42 @@ const Login = () => {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError('حدث خطأ أثناء تسجيل الدخول');
+      setError(t('login.loginError'));
     } finally {
       setLoading(false);
     }
   };
 
   const demoAccounts = [
-    { username: 'reception', password: 'password', role: 'استقبال', icon: '👩‍💼', color: '#10B981' },
-    { username: 'doctor', password: 'password', role: 'طبيب', icon: '👨‍⚕️', color: '#0EA5E9' },
-    { username: 'admin', password: 'password', role: 'إداري', icon: '👨‍💻', color: '#8B5CF6' }
+    { username: 'reception', password: 'password', role: t('roles.reception'), icon: '👩‍💼', color: '#10B981' },
+    { username: 'doctor', password: 'password', role: t('roles.doctor'), icon: '👨‍⚕️', color: '#0EA5E9' },
+    { username: 'admin', password: 'password', role: t('roles.admin'), icon: '👨‍💻', color: '#8B5CF6' }
   ];
 
   return (
-    <div style={styles.container}>
+    <div style={{...styles.container, direction}}>
       <div style={styles.leftPanel}>
+        <div style={styles.langSwitcherTop}>
+          <LanguageSwitcher />
+        </div>
         <div style={styles.brandSection}>
           <div style={styles.logoCircle}>
             <span style={styles.toothIcon}>🦷</span>
           </div>
-          <h1 style={styles.brandTitle}>مركز العيادات التخصصية - عيادة الاسنان</h1>
-          <p style={styles.brandSubtitle}>نظام إدارة متطور لعيادات الأسنان</p>
+          <h1 style={styles.brandTitle}>{t('login.brandTitle')}</h1>
+          <p style={styles.brandSubtitle}>{t('login.brandSubtitle')}</p>
           <div style={styles.features}>
             <div style={styles.feature}>
               <span style={styles.checkIcon}>✓</span>
-              <span>إدارة المرضى والمواعيد</span>
+              <span>{t('login.feature1')}</span>
             </div>
             <div style={styles.feature}>
               <span style={styles.checkIcon}>✓</span>
-              <span>متابعة العلاجات والمخزون</span>
+              <span>{t('login.feature2')}</span>
             </div>
             <div style={styles.feature}>
               <span style={styles.checkIcon}>✓</span>
-              <span>تقارير مالية شاملة</span>
+              <span>{t('login.feature3')}</span>
             </div>
           </div>
         </div>
@@ -89,62 +97,62 @@ const Login = () => {
       <div style={styles.rightPanel}>
         <div style={styles.loginCard}>
           <div style={styles.loginHeader}>
-            <h2 style={styles.loginTitle}>تسجيل الدخول</h2>
-            <p style={styles.loginSubtitle}>مرحباً بك، يرجى تسجيل الدخول للمتابعة</p>
+            <h2 style={styles.loginTitle}>{t('login.title')}</h2>
+            <p style={styles.loginSubtitle}>{t('login.subtitle')}</p>
           </div>
           
           {error && <div style={styles.error}>{error}</div>}
           
           <form onSubmit={handleSubmit} style={styles.form}>
             <div style={styles.formGroup}>
-              <label style={styles.label}>اسم المستخدم</label>
+              <label style={styles.label}>{t('login.username')}</label>
               <div style={styles.inputWrapper}>
-                <span style={styles.inputIcon}>👤</span>
+                <span style={{...styles.inputIcon, [direction === 'rtl' ? 'right' : 'left']: '16px'}}>👤</span>
                 <input
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  style={styles.input}
-                  placeholder="أدخل اسم المستخدم"
+                  style={{...styles.input, [direction === 'rtl' ? 'paddingRight' : 'paddingLeft']: '50px'}}
+                  placeholder={t('login.usernamePlaceholder')}
                   required
                 />
               </div>
             </div>
             
             <div style={styles.formGroup}>
-              <label style={styles.label}>كلمة المرور</label>
+              <label style={styles.label}>{t('login.password')}</label>
               <div style={styles.inputWrapper}>
-                <span style={styles.inputIcon}>🔒</span>
+                <span style={{...styles.inputIcon, [direction === 'rtl' ? 'right' : 'left']: '16px'}}>🔒</span>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  style={styles.input}
-                  placeholder="أدخل كلمة المرور"
+                  style={{...styles.input, [direction === 'rtl' ? 'paddingRight' : 'paddingLeft']: '50px'}}
+                  placeholder={t('login.passwordPlaceholder')}
                   required
                 />
               </div>
             </div>
             
             <button type="submit" style={styles.button} disabled={loading}>
-              {loading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
+              {loading ? t('login.loggingIn') : t('login.loginButton')}
             </button>
           </form>
 
           <div style={styles.signupLink}>
             <p style={styles.signupText}>
-              ليس لديك حساب؟{' '}
+              {t('login.noAccount')}{' '}
               <button 
                 onClick={() => navigate('/signup')} 
                 style={styles.linkButton}
               >
-                إنشاء حساب جديد
+                {t('login.createAccount')}
               </button>
             </p>
           </div>
           
           <div style={styles.demoInfo}>
-            <p style={styles.demoTitle}>🔑 حسابات تجريبية - اضغط للدخول السريع:</p>
+            <p style={styles.demoTitle}>🔑 {t('login.demoAccounts')}</p>
             <div style={styles.demoGrid}>
               {demoAccounts.map((account) => (
                 <button
@@ -152,7 +160,7 @@ const Login = () => {
                   onClick={() => handleDemoLogin(account.username, account.password)}
                   style={{
                     ...styles.demoButton,
-                    borderLeft: `4px solid ${account.color}`
+                    [direction === 'rtl' ? 'borderLeft' : 'borderRight']: `4px solid ${account.color}`
                   }}
                   disabled={loading}
                 >
@@ -163,7 +171,7 @@ const Login = () => {
                       <span style={styles.demoCredentials}>{account.username}</span>
                     </div>
                   </div>
-                  <span style={styles.arrowIcon}>←</span>
+                  <span style={styles.arrowIcon}>{direction === 'rtl' ? '←' : '→'}</span>
                 </button>
               ))}
             </div>
@@ -178,7 +186,6 @@ const styles = {
   container: {
     display: 'flex',
     minHeight: '100vh',
-    direction: 'rtl',
     flexWrap: 'wrap'
   },
   leftPanel: {
@@ -191,6 +198,12 @@ const styles = {
     position: 'relative',
     overflow: 'hidden',
     minHeight: '400px'
+  },
+  langSwitcherTop: {
+    position: 'absolute',
+    top: '20px',
+    right: '20px',
+    zIndex: 10
   },
   brandSection: {
     textAlign: 'center',
@@ -323,7 +336,6 @@ const styles = {
   },
   inputIcon: {
     position: 'absolute',
-    right: '16px',
     fontSize: '20px',
     opacity: 0.5,
     pointerEvents: 'none',
@@ -331,7 +343,7 @@ const styles = {
   },
   input: {
     width: '100%',
-    padding: '14px 16px 14px 50px',
+    padding: '14px 16px',
     border: '2px solid #E2E8F0',
     borderRadius: '12px',
     fontSize: '16px',
