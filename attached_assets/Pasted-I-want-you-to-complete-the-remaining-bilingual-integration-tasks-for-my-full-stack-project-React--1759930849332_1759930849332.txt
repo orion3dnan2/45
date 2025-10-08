@@ -1,0 +1,30 @@
+I want you to complete the remaining bilingual integration tasks for my full-stack project (React + Vite frontend, Node.js backend).  
+
+Specifically, finish the following steps:
+
+1. **Improve Language Switching Feature (Frontend):**
+   - Implement a clean and user-friendly language switcher in the app’s header or top navigation bar.
+   - Use a dropdown or toggle that shows both languages with flags (🇬🇧 English / 🇸🇦 Arabic).
+   - Make sure switching languages updates all visible text immediately without requiring a page reload.
+   - Ensure the app updates `dir` (direction) to `rtl` or `ltr` correctly when switching languages.
+   - Save the user’s language preference in `localStorage` and automatically apply it on page reload.
+
+2. **Testing in Both Languages:**
+   - Systematically test every page (home, dashboard, login, forms, error pages, modals, menus, validation messages, etc.) in both Arabic and English.
+   - Verify that:
+     - All text changes correctly when switching languages.
+     - Layout direction (RTL/LTR) switches properly.
+     - No untranslated or leftover Arabic/English text remains.
+     - Both frontend and backend error/validation messages are returned in the selected language.
+   - Fix any language switching issues found during testing.
+
+3. **Remove Leftover Text & Organize Code:**
+   - Search the entire project for any **hardcoded text** in components, backend responses, or validation messages, and replace them with proper translation keys.
+   - Remove any unused variables, old translation strings, or Arabic-only text that is no longer needed.
+   - Organize the translation files to make them consistent and well-structured.
+   - Clean up the codebase to ensure it's maintainable and ready for production.
+
+After completing these steps, give me a final summary including:
+- Confirmation that language switching is working perfectly.
+- A list of pages/components where fixes were made.
+- A note on any remaining issues (if any).
