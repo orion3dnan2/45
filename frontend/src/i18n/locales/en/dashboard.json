@@ -1,0 +1,48 @@
+{
+  "title": "Dental Clinic",
+  "logout": "Logout",
+  "menu": {
+    "home": "Home",
+    "patients": "Patients",
+    "appointments": "Appointments",
+    "treatments": "Treatments",
+    "medications": "Medications & Supplies",
+    "suppliers": "Suppliers",
+    "invoices": "Invoices",
+    "notifications": "Notifications"
+  },
+  "home": {
+    "welcome": "Welcome, {{name}}",
+    "systemTitle": "Specialized Clinics Center Management System - Dental Clinic",
+    "patientsManagement": "Patient Management",
+    "appointmentsTitle": "Appointments",
+    "treatmentsTitle": "Treatments",
+    "medicationsTitle": "Medications & Supplies",
+    "suppliersTitle": "Suppliers",
+    "invoicesTitle": "Invoices",
+    "todayAppointments": "Today's Appointments",
+    "recentNotifications": "Recent Notifications",
+    "newNotifications": "{{count}} New",
+    "paymentStats": "Payment Statistics",
+    "totalCompleted": "Total Completed Payments",
+    "totalPending": "Pending Payments",
+    "totalPayments": "Total Transactions",
+    "noAppointments": "No appointments for today",
+    "patient": "Patient",
+    "doctor": "Doctor"
+  },
+  "appointmentStatus": {
+    "scheduled": "Scheduled",
+    "confirmed": "Confirmed",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "notificationTypes": {
+    "low_stock": "Low Stock",
+    "supplier_subscription": "Supplier Subscription",
+    "payment_due": "Payment Due",
+    "appointment_reminder": "Appointment Reminder",
+    "general": "General"
+  }
+}

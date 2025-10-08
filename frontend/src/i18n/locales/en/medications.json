@@ -1,0 +1,16 @@
+{
+  "title": "Medications & Supplies Management",
+  "addMedication": "Add New Medication",
+  "editMedication": "Edit Medication",
+  "deleteMedication": "Delete Medication",
+  "medicationName": "Medication Name",
+  "quantity": "Quantity",
+  "price": "Price",
+  "supplier": "Supplier",
+  "selectSupplier": "Select Supplier",
+  "noMedications": "No medications found",
+  "addSuccess": "Medication added successfully",
+  "updateSuccess": "Medication updated successfully",
+  "deleteSuccess": "Medication deleted successfully",
+  "deleteConfirm": "Are you sure you want to delete this medication?"
+}

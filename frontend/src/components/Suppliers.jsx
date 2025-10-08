@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import { AuthContext } from '../contexts/AuthContext';
 
 const Suppliers = () => {
+  const { t } = useTranslation(['suppliers', 'common', 'errors']);
   const { user } = useContext(AuthContext);
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,11 +44,11 @@ const Suppliers = () => {
     try {
       if (editingSupplier) {
         await api.updateSupplier(editingSupplier.id, formData);
-        alert('تم تحديث المورد بنجاح');
+        alert(t('suppliers:updateSuccess'));
         setShowEditModal(false);
       } else {
         await api.createSupplier(formData);
-        alert('تم إضافة المورد بنجاح');
+        alert(t('suppliers:addSuccess'));
         setShowAddModal(false);
       }
       resetForm();
@@ -77,7 +79,7 @@ const Suppliers = () => {
     
     try {
       await api.deleteSupplier(id);
-      alert('تم حذف المورد بنجاح');
+      alert(t('suppliers:deleteSuccess'));
       loadSuppliers();
     } catch (error) {
       console.error('خطأ:', error);
@@ -106,12 +108,12 @@ const Suppliers = () => {
     });
   };
 
-  if (loading) return <div style={styles.loading}>جاري التحميل...</div>;
+  if (loading) return <div style={styles.loading}>{t('common:loading')}</div>;
 
   return (
     <div>
       <div style={styles.header}>
-        <h1 style={styles.title}>إدارة الموردين</h1>
+        <h1 style={styles.title}>{t('suppliers:title')}</h1>
         {canManage && (
           <button onClick={() => setShowAddModal(true)} style={styles.addButton}>
             + إضافة مورد جديد

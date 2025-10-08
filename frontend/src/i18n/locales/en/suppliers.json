@@ -1,0 +1,13 @@
+{
+  "title": "Supplier Management",
+  "addSupplier": "Add New Supplier",
+  "editSupplier": "Edit Supplier",
+  "deleteSupplier": "Delete Supplier",
+  "supplierName": "Supplier Name",
+  "contact": "Contact Person",
+  "noSuppliers": "No suppliers found",
+  "addSuccess": "Supplier added successfully",
+  "updateSuccess": "Supplier updated successfully",
+  "deleteSuccess": "Supplier deleted successfully",
+  "deleteConfirm": "Are you sure you want to delete this supplier?"
+}

@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import { AuthContext } from '../contexts/AuthContext';
 
 const Invoices = () => {
+  const { t } = useTranslation(['invoices', 'common', 'errors']);
   const { user } = useContext(AuthContext);
   const [invoices, setInvoices] = useState([]);
   const [patients, setPatients] = useState([]);
@@ -109,7 +111,7 @@ const Invoices = () => {
       setShowInvoiceModal(false);
       resetInvoiceForm();
       loadData();
-      alert('تم إنشاء الفاتورة بنجاح');
+      alert(t('invoices:addSuccess'));
     } catch (error) {
       console.error('خطأ في إنشاء الفاتورة:', error);
       alert('فشل في إنشاء الفاتورة');
@@ -164,14 +166,14 @@ const Invoices = () => {
   };
 
   if (loading) {
-    return <div style={styles.loading}>جاري التحميل...</div>;
+    return <div style={styles.loading}>{t('common:loading')}</div>;
   }
 
   return (
     <div>
       <div style={styles.header}>
         <div>
-          <h1 style={styles.title}>📋 الفواتير</h1>
+          <h1 style={styles.title}>📋 {t('invoices:title')}</h1>
           <p style={styles.subtitle}>إدارة الفواتير والمدفوعات</p>
         </div>
         {(user.role === 'admin' || user.role === 'accountant') && (

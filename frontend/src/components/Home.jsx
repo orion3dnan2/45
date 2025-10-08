@@ -6,7 +6,7 @@ import { AuthContext } from '../contexts/AuthContext';
 
 const Home = () => {
   const { user } = useContext(AuthContext);
-  const { t } = useTranslation();
+  const { t } = useTranslation(['dashboard', 'auth', 'common']);
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [notifications, setNotifications] = useState([]);
@@ -28,7 +28,7 @@ const Home = () => {
       }
 
     } catch (error) {
-      console.error('خطأ في تحميل البيانات:', error);
+      console.error('Error loading data:', error);
     }
   };
 
@@ -51,11 +51,11 @@ const Home = () => {
     <div>
       <div style={styles.header}>
         <div>
-          <h1 style={styles.title}>{t('home.welcome', { name: user.full_name })} 👋</h1>
-          <p style={styles.subtitle}>{t('home.systemTitle')}</p>
+          <h1 style={styles.title}>{t('dashboard:home.welcome', { name: user.full_name })} 👋</h1>
+          <p style={styles.subtitle}>{t('dashboard:home.systemTitle')}</p>
         </div>
         <div style={styles.headerBadge}>
-          <span style={styles.badgeText}>{t(`roles.${user.role}`)}</span>
+          <span style={styles.badgeText}>{t(`auth:roles.${user.role}`)}</span>
         </div>
       </div>
 
@@ -65,7 +65,7 @@ const Home = () => {
           onClick={() => navigateTo('/dashboard/patients')}
         >
           <span style={styles.tabIcon}>👥</span>
-          <span style={styles.tabLabel}>{t('home.patientsManagement')}</span>
+          <span style={styles.tabLabel}>{t('dashboard:home.patientsManagement')}</span>
         </div>
 
         <div 
@@ -73,7 +73,7 @@ const Home = () => {
           onClick={() => navigateTo('/dashboard/appointments')}
         >
           <span style={styles.tabIcon}>📅</span>
-          <span style={styles.tabLabel}>{t('home.appointmentsTitle')}</span>
+          <span style={styles.tabLabel}>{t('dashboard:home.appointmentsTitle')}</span>
         </div>
 
         <div 
@@ -81,7 +81,7 @@ const Home = () => {
           onClick={() => navigateTo('/dashboard/treatments')}
         >
           <span style={styles.tabIcon}>🦷</span>
-          <span style={styles.tabLabel}>{t('home.treatmentsTitle')}</span>
+          <span style={styles.tabLabel}>{t('dashboard:home.treatmentsTitle')}</span>
         </div>
 
         <div 
@@ -89,7 +89,7 @@ const Home = () => {
           onClick={() => navigateTo('/dashboard/medications')}
         >
           <span style={styles.tabIcon}>💊</span>
-          <span style={styles.tabLabel}>{t('home.medicationsTitle')}</span>
+          <span style={styles.tabLabel}>{t('dashboard:home.medicationsTitle')}</span>
         </div>
 
         {(user.role === 'reception' || user.role === 'admin') && (
@@ -98,7 +98,7 @@ const Home = () => {
             onClick={() => navigateTo('/dashboard/suppliers')}
           >
             <span style={styles.tabIcon}>🚚</span>
-            <span style={styles.tabLabel}>{t('home.suppliersTitle')}</span>
+            <span style={styles.tabLabel}>{t('dashboard:home.suppliersTitle')}</span>
           </div>
         )}
 
@@ -108,7 +108,7 @@ const Home = () => {
             onClick={() => navigateTo('/dashboard/invoices')}
           >
             <span style={styles.tabIcon}>📋</span>
-            <span style={styles.tabLabel}>{t('home.invoicesTitle')}</span>
+            <span style={styles.tabLabel}>{t('dashboard:home.invoicesTitle')}</span>
           </div>
         )}
       </div>
@@ -116,12 +116,12 @@ const Home = () => {
       {(user.role === 'reception' || user.role === 'admin' || user.role === 'doctor' || user.role === 'accountant') && (
         <div style={styles.appointmentsSection}>
           <div style={styles.sectionHeader}>
-            <h2 style={styles.sectionTitle}>📅 {t('home.todayAppointments')}</h2>
+            <h2 style={styles.sectionTitle}>📅 {t('dashboard:home.todayAppointments')}</h2>
             <button 
               onClick={() => navigateTo('/dashboard/appointments')}
               style={styles.viewAllBtn}
             >
-              {t('common.viewAll')}
+              {t('common:viewAll')}
             </button>
           </div>
           <div style={styles.appointmentsTable}>
@@ -129,11 +129,11 @@ const Home = () => {
               <table style={styles.table}>
                 <thead>
                   <tr style={styles.tableHeaderRow}>
-                    <th style={styles.tableHeader}>{t('home.time')}</th>
-                    <th style={styles.tableHeader}>{t('home.patient')}</th>
-                    <th style={styles.tableHeader}>{t('home.doctor')}</th>
-                    <th style={styles.tableHeader}>{t('home.status')}</th>
-                    <th style={styles.tableHeader}>{t('home.notes')}</th>
+                    <th style={styles.tableHeader}>{t('common:time')}</th>
+                    <th style={styles.tableHeader}>{t('dashboard:home.patient')}</th>
+                    <th style={styles.tableHeader}>{t('dashboard:home.doctor')}</th>
+                    <th style={styles.tableHeader}>{t('common:status')}</th>
+                    <th style={styles.tableHeader}>{t('common:notes')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -146,7 +146,7 @@ const Home = () => {
                       <td style={styles.tableCell}>{appointment.doctor_name || '-'}</td>
                       <td style={styles.tableCell}>
                         <span style={{...styles.statusBadge, ...getStatusStyle(appointment.status)}}>
-                          {t(`appointmentStatus.${appointment.status}`)}
+                          {t(`dashboard:appointmentStatus.${appointment.status}`)}
                         </span>
                       </td>
                       <td style={styles.tableCell}>{appointment.notes || '-'}</td>
@@ -157,7 +157,7 @@ const Home = () => {
             ) : (
               <div style={styles.emptyState}>
                 <div style={styles.emptyIcon}>📅</div>
-                <p style={styles.emptyText}>{t('home.noAppointments')}</p>
+                <p style={styles.emptyText}>{t('dashboard:home.noAppointments')}</p>
               </div>
             )}
           </div>
@@ -167,8 +167,8 @@ const Home = () => {
       {notifications.length > 0 && (
         <div style={styles.notificationsSection}>
           <div style={styles.sectionHeader}>
-            <h2 style={styles.sectionTitle}>🔔 {t('home.recentNotifications')}</h2>
-            <span style={styles.notifBadge}>{t('home.newNotifications', { count: notifications.length })}</span>
+            <h2 style={styles.sectionTitle}>🔔 {t('dashboard:home.recentNotifications')}</h2>
+            <span style={styles.notifBadge}>{t('dashboard:home.newNotifications', { count: notifications.length })}</span>
           </div>
           <div style={styles.notificationsList}>
             {notifications.map(notif => (
@@ -188,22 +188,22 @@ const Home = () => {
 
       {stats && (
         <div style={styles.statsSection}>
-          <h2 style={styles.sectionTitle}>💰 {t('home.paymentStats')}</h2>
+          <h2 style={styles.sectionTitle}>💰 {t('dashboard:home.paymentStats')}</h2>
           <div style={styles.statsGrid}>
             <div style={{...styles.statCard, background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)'}}>
               <div style={styles.statIcon}>✓</div>
               <h3 style={styles.statValue}>{stats.summary.total_completed || 0} ج.م</h3>
-              <p style={styles.statLabel}>{t('home.totalCompleted')}</p>
+              <p style={styles.statLabel}>{t('dashboard:home.totalCompleted')}</p>
             </div>
             <div style={{...styles.statCard, background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)'}}>
               <div style={styles.statIcon}>⏳</div>
               <h3 style={styles.statValue}>{stats.summary.total_pending || 0} ج.م</h3>
-              <p style={styles.statLabel}>{t('home.totalPending')}</p>
+              <p style={styles.statLabel}>{t('dashboard:home.totalPending')}</p>
             </div>
             <div style={{...styles.statCard, background: 'linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)'}}>
               <div style={styles.statIcon}>📊</div>
               <h3 style={styles.statValue}>{stats.summary.total_payments || 0}</h3>
-              <p style={styles.statLabel}>{t('home.totalPayments')}</p>
+              <p style={styles.statLabel}>{t('dashboard:home.totalPayments')}</p>
             </div>
           </div>
         </div>

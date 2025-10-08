@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import { AuthContext } from '../contexts/AuthContext';
 
 const Treatments = () => {
+  const { t } = useTranslation(['treatments', 'common', 'errors']);
   const { user } = useContext(AuthContext);
   const [treatments, setTreatments] = useState([]);
   const [patients, setPatients] = useState([]);
@@ -56,11 +58,11 @@ const Treatments = () => {
 
       if (editingTreatment) {
         await api.updateTreatment(editingTreatment.id, submitData);
-        alert('تم تحديث العلاج بنجاح');
+        alert(t('treatments:updateSuccess'));
         setShowEditModal(false);
       } else {
         await api.createTreatment(submitData);
-        alert('تم إضافة العلاج بنجاح');
+        alert(t('treatments:addSuccess'));
         setShowAddModal(false);
       }
       resetForm();
@@ -91,7 +93,7 @@ const Treatments = () => {
     
     try {
       await api.deleteTreatment(id);
-      alert('تم حذف العلاج بنجاح');
+      alert(t('treatments:deleteSuccess'));
       loadData();
     } catch (error) {
       console.error('خطأ:', error);
@@ -124,12 +126,12 @@ const Treatments = () => {
     return matchesSearch && matchesStatus;
   });
 
-  if (loading) return <div style={styles.loading}>جاري التحميل...</div>;
+  if (loading) return <div style={styles.loading}>{t('common:loading')}</div>;
 
   return (
     <div>
       <div style={styles.header}>
-        <h1 style={styles.title}>🦷 إدارة العلاجات</h1>
+        <h1 style={styles.title}>🦷 {t('treatments:title')}</h1>
         {canManage && (
           <button onClick={() => setShowAddModal(true)} style={styles.addBtn}>
             ➕ إضافة علاج جديد

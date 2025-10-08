@@ -1,0 +1,16 @@
+{
+  "title": "إدارة المواعيد",
+  "addAppointment": "إضافة موعد جديد",
+  "editAppointment": "تعديل الموعد",
+  "deleteAppointment": "حذف الموعد",
+  "patient": "المريض",
+  "doctor": "الطبيب",
+  "selectPatient": "اختر المريض",
+  "selectDoctor": "اختر الطبيب",
+  "selectStatus": "اختر الحالة",
+  "noAppointments": "لا توجد مواعيد",
+  "addSuccess": "تم إضافة الموعد بنجاح",
+  "updateSuccess": "تم تحديث الموعد بنجاح",
+  "deleteSuccess": "تم حذف الموعد بنجاح",
+  "deleteConfirm": "هل أنت متأكد من حذف هذا الموعد؟"
+}

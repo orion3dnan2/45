@@ -1,0 +1,14 @@
+{
+  "title": "Treatment Management",
+  "addTreatment": "Add New Treatment",
+  "editTreatment": "Edit Treatment",
+  "deleteTreatment": "Delete Treatment",
+  "treatmentName": "Treatment Name",
+  "cost": "Cost",
+  "duration": "Duration",
+  "noTreatments": "No treatments found",
+  "addSuccess": "Treatment added successfully",
+  "updateSuccess": "Treatment updated successfully",
+  "deleteSuccess": "Treatment deleted successfully",
+  "deleteConfirm": "Are you sure you want to delete this treatment?"
+}

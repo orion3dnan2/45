@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import { AuthContext } from '../contexts/AuthContext';
 
@@ -25,6 +26,7 @@ const getCaseStatusStyle = (status) => {
 };
 
 const Patients = () => {
+  const { t } = useTranslation(['patients', 'common', 'errors']);
   const { user } = useContext(AuthContext);
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -104,7 +106,7 @@ const Patients = () => {
       setShowAddModal(false);
       resetForm();
       loadPatients();
-      alert('تم إضافة المريض بنجاح');
+      alert(t('patients:addSuccess'));
     } catch (error) {
       console.error('خطأ في إضافة المريض:', error);
       alert('فشل في إضافة المريض');
@@ -130,7 +132,7 @@ const Patients = () => {
       setShowEditModal(false);
       loadPatients();
       viewPatientDetails(selectedPatient.id);
-      alert('تم تحديث بيانات المريض بنجاح');
+      alert(t('patients:updateSuccess'));
     } catch (error) {
       console.error('خطأ في تحديث المريض:', error);
       alert('فشل في تحديث المريض');
@@ -274,12 +276,12 @@ const Patients = () => {
     );
   });
 
-  if (loading) return <div style={styles.loading}>جاري التحميل...</div>;
+  if (loading) return <div style={styles.loading}>{t('common:loading')}</div>;
 
   return (
     <div>
       <div style={styles.header}>
-        <h1 style={styles.title}>إدارة المرضى</h1>
+        <h1 style={styles.title}>{t('patients:title')}</h1>
         <div style={styles.headerActions}>
           <button 
             onClick={() => setShowArchived(!showArchived)} 
@@ -333,7 +335,7 @@ const Patients = () => {
                               if (selectedPatient?.id === patient.id) {
                                 setSelectedPatient(null);
                               }
-                              alert('تم حذف المريض بنجاح');
+                              alert(t('patients:deleteSuccess'));
                             })
                             .catch(err => {
                               console.error('خطأ في حذف المريض:', err);

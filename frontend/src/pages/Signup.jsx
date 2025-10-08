@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { LanguageContext } from '../contexts/LanguageContext.jsx';
 import { api } from '../services/api';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const Signup = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation(['auth', 'errors']);
+  const { direction } = useContext(LanguageContext);
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -17,9 +22,9 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
 
   const roles = [
-    { value: 'reception', label: 'استقبال', icon: '👩‍💼', color: '#10B981', description: 'فتح ملف مريض - تحديد مواعيد - متابعة مواعيد' },
-    { value: 'doctor', label: 'طبيب', icon: '👨‍⚕️', color: '#0EA5E9', description: 'إرفاق التشخيص - المواعيد - التحكم في التسعيرة' },
-    { value: 'admin', label: 'إداري', icon: '👨‍💻', color: '#8B5CF6', description: 'كل الصلاحيات - التعديل والحذف والإضافة' }
+    { value: 'reception', label: t('auth:roles.reception'), icon: '👩‍💼', color: '#10B981', description: t('auth:roles.receptionDesc') },
+    { value: 'doctor', label: t('auth:roles.doctor'), icon: '👨‍⚕️', color: '#0EA5E9', description: t('auth:roles.doctorDesc') },
+    { value: 'admin', label: t('auth:roles.admin'), icon: '👨‍💻', color: '#8B5CF6', description: t('auth:roles.adminDesc') }
   ];
 
   const handleChange = (e) => {
@@ -39,41 +44,44 @@ const Signup = () => {
       const data = await api.register(formData);
 
       if (data.error) {
-        setError(data.error || data.message || 'حدث خطأ أثناء إنشاء الحساب');
+        setError(data.error || data.message || t('errors:signupError'));
       } else {
-        setSuccess('تم إنشاء الحساب بنجاح! سيتم تحويلك لصفحة تسجيل الدخول...');
+        setSuccess(t('errors:signupSuccess'));
         setTimeout(() => {
           navigate('/login');
         }, 2000);
       }
     } catch (err) {
-      setError('حدث خطأ أثناء الاتصال بالخادم');
+      setError(t('errors:serverError'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={styles.container}>
+    <div style={{...styles.container, direction}}>
       <div style={styles.leftPanel}>
+        <div style={styles.langSwitcherTop}>
+          <LanguageSwitcher />
+        </div>
         <div style={styles.brandSection}>
           <div style={styles.logoCircle}>
             <span style={styles.toothIcon}>🦷</span>
           </div>
-          <h1 style={styles.brandTitle}>مركز العيادات التخصصية - عيادة الاسنان</h1>
-          <p style={styles.brandSubtitle}>انضم إلى فريق العمل</p>
+          <h1 style={styles.brandTitle}>{t('auth:login.brandTitle')}</h1>
+          <p style={styles.brandSubtitle}>{t('auth:signup.brandSubtitle')}</p>
           <div style={styles.features}>
             <div style={styles.feature}>
               <span style={styles.checkIcon}>✓</span>
-              <span>نظام إدارة متطور</span>
+              <span>{t('auth:signup.features.feature1')}</span>
             </div>
             <div style={styles.feature}>
               <span style={styles.checkIcon}>✓</span>
-              <span>واجهة سهلة الاستخدام</span>
+              <span>{t('auth:signup.features.feature2')}</span>
             </div>
             <div style={styles.feature}>
               <span style={styles.checkIcon}>✓</span>
-              <span>صلاحيات مخصصة</span>
+              <span>{t('auth:signup.features.feature3')}</span>
             </div>
           </div>
         </div>
@@ -82,8 +90,8 @@ const Signup = () => {
       <div style={styles.rightPanel}>
         <div style={styles.signupCard}>
           <div style={styles.signupHeader}>
-            <h2 style={styles.signupTitle}>إنشاء حساب جديد</h2>
-            <p style={styles.signupSubtitle}>املأ البيانات التالية للانضمام</p>
+            <h2 style={styles.signupTitle}>{t('auth:signup.title')}</h2>
+            <p style={styles.signupSubtitle}>{t('auth:signup.subtitle')}</p>
           </div>
           
           {error && <div style={styles.error}>{error}</div>}
@@ -91,85 +99,85 @@ const Signup = () => {
           
           <form onSubmit={handleSubmit} style={styles.form}>
             <div style={styles.formGroup}>
-              <label style={styles.label}>الاسم الكامل</label>
+              <label style={styles.label}>{t('auth:signup.fullName')}</label>
               <div style={styles.inputWrapper}>
-                <span style={styles.inputIcon}>👤</span>
+                <span style={{...styles.inputIcon, [direction === 'rtl' ? 'right' : 'left']: '16px'}}>👤</span>
                 <input
                   type="text"
                   name="full_name"
                   value={formData.full_name}
                   onChange={handleChange}
-                  style={styles.input}
-                  placeholder="أدخل الاسم الكامل"
+                  style={{...styles.input, [direction === 'rtl' ? 'paddingRight' : 'paddingLeft']: '50px'}}
+                  placeholder={t('auth:signup.fullNamePlaceholder')}
                   required
                 />
               </div>
             </div>
 
             <div style={styles.formGroup}>
-              <label style={styles.label}>اسم المستخدم</label>
+              <label style={styles.label}>{t('auth:signup.username')}</label>
               <div style={styles.inputWrapper}>
-                <span style={styles.inputIcon}>🔑</span>
+                <span style={{...styles.inputIcon, [direction === 'rtl' ? 'right' : 'left']: '16px'}}>🔑</span>
                 <input
                   type="text"
                   name="username"
                   value={formData.username}
                   onChange={handleChange}
-                  style={styles.input}
-                  placeholder="أدخل اسم المستخدم"
+                  style={{...styles.input, [direction === 'rtl' ? 'paddingRight' : 'paddingLeft']: '50px'}}
+                  placeholder={t('auth:signup.usernamePlaceholder')}
                   required
                 />
               </div>
             </div>
             
             <div style={styles.formGroup}>
-              <label style={styles.label}>كلمة المرور</label>
+              <label style={styles.label}>{t('auth:signup.password')}</label>
               <div style={styles.inputWrapper}>
-                <span style={styles.inputIcon}>🔒</span>
+                <span style={{...styles.inputIcon, [direction === 'rtl' ? 'right' : 'left']: '16px'}}>🔒</span>
                 <input
                   type="password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  style={styles.input}
-                  placeholder="أدخل كلمة المرور"
+                  style={{...styles.input, [direction === 'rtl' ? 'paddingRight' : 'paddingLeft']: '50px'}}
+                  placeholder={t('auth:signup.passwordPlaceholder')}
                   required
                 />
               </div>
             </div>
 
             <div style={styles.formGroup}>
-              <label style={styles.label}>البريد الإلكتروني</label>
+              <label style={styles.label}>{t('auth:signup.email')}</label>
               <div style={styles.inputWrapper}>
-                <span style={styles.inputIcon}>✉️</span>
+                <span style={{...styles.inputIcon, [direction === 'rtl' ? 'right' : 'left']: '16px'}}>✉️</span>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  style={styles.input}
-                  placeholder="example@email.com"
+                  style={{...styles.input, [direction === 'rtl' ? 'paddingRight' : 'paddingLeft']: '50px'}}
+                  placeholder={t('auth:signup.emailPlaceholder')}
                 />
               </div>
             </div>
 
             <div style={styles.formGroup}>
-              <label style={styles.label}>رقم الهاتف</label>
+              <label style={styles.label}>{t('auth:signup.phone')}</label>
               <div style={styles.inputWrapper}>
-                <span style={styles.inputIcon}>📱</span>
+                <span style={{...styles.inputIcon, [direction === 'rtl' ? 'right' : 'left']: '16px'}}>📱</span>
                 <input
                   type="tel"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  style={styles.input}
-                  placeholder="05XXXXXXXX"
+                  style={{...styles.input, [direction === 'rtl' ? 'paddingRight' : 'paddingLeft']: '50px'}}
+                  placeholder={t('auth:signup.phonePlaceholder')}
                 />
               </div>
             </div>
 
             <div style={styles.formGroup}>
-              <label style={styles.label}>الوظيفة</label>
+              <label style={styles.label}>{t('auth:signup.role')}</label>
               <div style={styles.roleGrid}>
                 {roles.map((role) => (
                   <label
@@ -202,18 +210,18 @@ const Signup = () => {
             </div>
             
             <button type="submit" style={styles.button} disabled={loading}>
-              {loading ? 'جاري إنشاء الحساب...' : 'إنشاء الحساب'}
+              {loading ? t('auth:signup.creating') : t('auth:signup.createButton')}
             </button>
           </form>
 
           <div style={styles.loginLink}>
             <p style={styles.loginText}>
-              لديك حساب بالفعل؟{' '}
+              {t('auth:signup.haveAccount')}{' '}
               <button 
                 onClick={() => navigate('/login')} 
                 style={styles.linkButton}
               >
-                تسجيل الدخول
+                {t('auth:signup.loginLink')}
               </button>
             </p>
           </div>
@@ -227,7 +235,6 @@ const styles = {
   container: {
     display: 'flex',
     minHeight: '100vh',
-    direction: 'rtl',
     flexWrap: 'wrap'
   },
   leftPanel: {
@@ -240,6 +247,12 @@ const styles = {
     position: 'relative',
     overflow: 'hidden',
     minHeight: '400px'
+  },
+  langSwitcherTop: {
+    position: 'absolute',
+    top: '20px',
+    right: '20px',
+    zIndex: 10
   },
   brandSection: {
     textAlign: 'center',
@@ -383,7 +396,6 @@ const styles = {
   },
   inputIcon: {
     position: 'absolute',
-    right: '16px',
     fontSize: '20px',
     opacity: 0.5,
     pointerEvents: 'none',
@@ -391,7 +403,7 @@ const styles = {
   },
   input: {
     width: '100%',
-    padding: '14px 16px 14px 50px',
+    padding: '14px 16px',
     border: '2px solid #E2E8F0',
     borderRadius: '12px',
     fontSize: '16px',
@@ -418,6 +430,7 @@ const styles = {
   },
   radioInput: {
     marginLeft: '12px',
+    marginRight: '12px',
     cursor: 'pointer',
     width: '20px',
     height: '20px'

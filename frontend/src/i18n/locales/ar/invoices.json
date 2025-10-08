@@ -1,0 +1,18 @@
+{
+  "title": "إدارة الفواتير",
+  "addInvoice": "إضافة فاتورة جديدة",
+  "editInvoice": "تعديل الفاتورة",
+  "deleteInvoice": "حذف الفاتورة",
+  "invoiceNumber": "رقم الفاتورة",
+  "amount": "المبلغ",
+  "patient": "المريض",
+  "paymentStatus": "حالة الدفع",
+  "paid": "مدفوع",
+  "pending": "معلق",
+  "overdue": "متأخر",
+  "noInvoices": "لا توجد فواتير",
+  "addSuccess": "تم إضافة الفاتورة بنجاح",
+  "updateSuccess": "تم تحديث الفاتورة بنجاح",
+  "deleteSuccess": "تم حذف الفاتورة بنجاح",
+  "deleteConfirm": "هل أنت متأكد من حذف هذه الفاتورة؟"
+}

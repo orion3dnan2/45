@@ -1,0 +1,19 @@
+{
+  "title": "إدارة المرضى",
+  "addPatient": "إضافة مريض جديد",
+  "searchPlaceholder": "ابحث عن مريض...",
+  "age": "العمر",
+  "gender": "الجنس",
+  "medicalHistory": "التاريخ الطبي",
+  "noPatients": "لا يوجد مرضى",
+  "male": "ذكر",
+  "female": "أنثى",
+  "editPatient": "تعديل المريض",
+  "deletePatient": "حذف المريض",
+  "patientDetails": "تفاصيل المريض",
+  "viewHistory": "عرض السجل",
+  "addSuccess": "تم إضافة المريض بنجاح",
+  "updateSuccess": "تم تحديث المريض بنجاح",
+  "deleteSuccess": "تم حذف المريض بنجاح",
+  "deleteConfirm": "هل أنت متأكد من حذف هذا المريض؟"
+}

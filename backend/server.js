@@ -15,6 +15,7 @@ const notificationRoutes = require('./src/routes/notifications');
 const locationRoutes = require('./src/routes/locations');
 const invoiceRoutes = require('./src/routes/invoices');
 const documentRoutes = require('./src/routes/documents');
+const languageMiddleware = require('./src/middleware/language');
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -28,6 +29,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(languageMiddleware);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/appointments', appointmentRoutes);
@@ -41,7 +43,10 @@ app.use('/api/invoices', invoiceRoutes);
 app.use('/api', documentRoutes);
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'نظام عيادة الأسنان يعمل بشكل صحيح' });
+  const message = req.lang === 'ar' 
+    ? 'نظام عيادة الأسنان يعمل بشكل صحيح' 
+    : 'Dental Clinic System is running properly';
+  res.json({ status: 'OK', message, language: req.lang });
 });
 
 app.use(express.static(path.join(__dirname, 'public')));

@@ -1,0 +1,11 @@
+{
+  "required": "هذا الحقل مطلوب",
+  "invalidEmail": "الرجاء إدخال بريد إلكتروني صالح",
+  "invalidPhone": "الرجاء إدخال رقم هاتف صالح",
+  "minLength": "الحد الأدنى {{min}} أحرف",
+  "maxLength": "الحد الأقصى {{max}} حرف",
+  "passwordMismatch": "كلمات المرور غير متطابقة",
+  "invalidDate": "الرجاء إدخال تاريخ صالح",
+  "invalidNumber": "الرجاء إدخال رقم صالح",
+  "mustBePositive": "يجب أن تكون القيمة موجبة"
+}

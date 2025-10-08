@@ -1,0 +1,13 @@
+{
+  "title": "إدارة الموردين",
+  "addSupplier": "إضافة مورد جديد",
+  "editSupplier": "تعديل المورد",
+  "deleteSupplier": "حذف المورد",
+  "supplierName": "اسم المورد",
+  "contact": "جهة الاتصال",
+  "noSuppliers": "لا يوجد موردين",
+  "addSuccess": "تم إضافة المورد بنجاح",
+  "updateSuccess": "تم تحديث المورد بنجاح",
+  "deleteSuccess": "تم حذف المورد بنجاح",
+  "deleteConfirm": "هل أنت متأكد من حذف هذا المورد؟"
+}

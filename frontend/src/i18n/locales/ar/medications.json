@@ -1,0 +1,16 @@
+{
+  "title": "إدارة الأدوية والمستلزمات",
+  "addMedication": "إضافة دواء جديد",
+  "editMedication": "تعديل الدواء",
+  "deleteMedication": "حذف الدواء",
+  "medicationName": "اسم الدواء",
+  "quantity": "الكمية",
+  "price": "السعر",
+  "supplier": "المورد",
+  "selectSupplier": "اختر المورد",
+  "noMedications": "لا توجد أدوية",
+  "addSuccess": "تم إضافة الدواء بنجاح",
+  "updateSuccess": "تم تحديث الدواء بنجاح",
+  "deleteSuccess": "تم حذف الدواء بنجاح",
+  "deleteConfirm": "هل أنت متأكد من حذف هذا الدواء؟"
+}

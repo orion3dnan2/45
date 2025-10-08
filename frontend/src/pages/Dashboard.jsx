@@ -16,7 +16,7 @@ import LanguageSwitcher from '../components/LanguageSwitcher';
 const Dashboard = () => {
   const { user, logout } = useContext(AuthContext);
   const { direction } = useContext(LanguageContext);
-  const { t } = useTranslation();
+  const { t } = useTranslation(['dashboard', 'auth']);
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -27,14 +27,14 @@ const Dashboard = () => {
   };
 
   const menuItems = [
-    { path: '/dashboard', label: t('menu.home'), icon: '🏠', roles: ['doctor', 'reception', 'admin', 'accountant'] },
-    { path: '/dashboard/patients', label: t('menu.patients'), icon: '👥', roles: ['doctor', 'reception', 'admin', 'accountant'] },
-    { path: '/dashboard/appointments', label: t('menu.appointments'), icon: '📅', roles: ['doctor', 'reception', 'admin', 'accountant'] },
-    { path: '/dashboard/treatments', label: t('menu.treatments'), icon: '🦷', roles: ['doctor', 'admin'] },
-    { path: '/dashboard/medications', label: t('menu.medications'), icon: '💊', roles: ['doctor', 'reception', 'admin'] },
-    { path: '/dashboard/suppliers', label: t('menu.suppliers'), icon: '🚚', roles: ['reception', 'admin'] },
-    { path: '/dashboard/invoices', label: t('menu.invoices'), icon: '📋', roles: ['reception', 'admin', 'accountant'] },
-    { path: '/dashboard/notifications', label: t('menu.notifications'), icon: '🔔', roles: ['doctor', 'reception', 'admin', 'accountant'] }
+    { path: '/dashboard', label: t('dashboard:menu.home'), icon: '🏠', roles: ['doctor', 'reception', 'admin', 'accountant'] },
+    { path: '/dashboard/patients', label: t('dashboard:menu.patients'), icon: '👥', roles: ['doctor', 'reception', 'admin', 'accountant'] },
+    { path: '/dashboard/appointments', label: t('dashboard:menu.appointments'), icon: '📅', roles: ['doctor', 'reception', 'admin', 'accountant'] },
+    { path: '/dashboard/treatments', label: t('dashboard:menu.treatments'), icon: '🦷', roles: ['doctor', 'admin'] },
+    { path: '/dashboard/medications', label: t('dashboard:menu.medications'), icon: '💊', roles: ['doctor', 'reception', 'admin'] },
+    { path: '/dashboard/suppliers', label: t('dashboard:menu.suppliers'), icon: '🚚', roles: ['reception', 'admin'] },
+    { path: '/dashboard/invoices', label: t('dashboard:menu.invoices'), icon: '📋', roles: ['reception', 'admin', 'accountant'] },
+    { path: '/dashboard/notifications', label: t('dashboard:menu.notifications'), icon: '🔔', roles: ['doctor', 'reception', 'admin', 'accountant'] }
   ];
 
   const filteredMenuItems = menuItems.filter(item => item.roles.includes(user?.role));
@@ -45,7 +45,7 @@ const Dashboard = () => {
         <div style={styles.sidebarHeader}>
           <div style={styles.logoSection}>
             <div style={styles.logoIcon}>🦷</div>
-            {sidebarOpen && <h2 style={styles.sidebarTitle}>{t('dashboard.title')}</h2>}
+            {sidebarOpen && <h2 style={styles.sidebarTitle}>{t('dashboard:title')}</h2>}
           </div>
           <button onClick={() => setSidebarOpen(!sidebarOpen)} style={styles.toggleBtn}>
             {sidebarOpen ? (direction === 'rtl' ? '◀' : '▶') : (direction === 'rtl' ? '▶' : '◀')}
@@ -75,7 +75,7 @@ const Dashboard = () => {
           {sidebarOpen && (
             <div style={styles.userDetails}>
               <p style={styles.userName}>{user?.full_name}</p>
-              <p style={styles.userRole}>{t(`roles.${user?.role}`)}</p>
+              <p style={styles.userRole}>{t(`auth:roles.${user?.role}`)}</p>
             </div>
           )}
         </div>
@@ -87,7 +87,7 @@ const Dashboard = () => {
         <div style={styles.logoutSection}>
           <button onClick={handleLogout} style={styles.logoutBtn}>
             <span style={styles.logoutIcon}>🚪</span>
-            {sidebarOpen && <span>{t('dashboard.logout')}</span>}
+            {sidebarOpen && <span>{t('dashboard:logout')}</span>}
           </button>
         </div>
       </div>

@@ -8,7 +8,7 @@ import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t } = useTranslation(['auth', 'errors']);
   const { direction } = useContext(LanguageContext);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -31,7 +31,7 @@ const Login = () => {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError(t('login.loginError'));
+      setError(t('errors:loginError'));
     } finally {
       setLoading(false);
     }
@@ -53,16 +53,16 @@ const Login = () => {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError(t('login.loginError'));
+      setError(t('errors:loginError'));
     } finally {
       setLoading(false);
     }
   };
 
   const demoAccounts = [
-    { username: 'reception', password: 'password', role: t('roles.reception'), icon: '👩‍💼', color: '#10B981' },
-    { username: 'doctor', password: 'password', role: t('roles.doctor'), icon: '👨‍⚕️', color: '#0EA5E9' },
-    { username: 'admin', password: 'password', role: t('roles.admin'), icon: '👨‍💻', color: '#8B5CF6' }
+    { username: 'reception', password: 'password', role: t('auth:roles.reception'), icon: '👩‍💼', color: '#10B981' },
+    { username: 'doctor', password: 'password', role: t('auth:roles.doctor'), icon: '👨‍⚕️', color: '#0EA5E9' },
+    { username: 'admin', password: 'password', role: t('auth:roles.admin'), icon: '👨‍💻', color: '#8B5CF6' }
   ];
 
   return (
@@ -75,20 +75,20 @@ const Login = () => {
           <div style={styles.logoCircle}>
             <span style={styles.toothIcon}>🦷</span>
           </div>
-          <h1 style={styles.brandTitle}>{t('login.brandTitle')}</h1>
-          <p style={styles.brandSubtitle}>{t('login.brandSubtitle')}</p>
+          <h1 style={styles.brandTitle}>{t('auth:login.brandTitle')}</h1>
+          <p style={styles.brandSubtitle}>{t('auth:login.brandSubtitle')}</p>
           <div style={styles.features}>
             <div style={styles.feature}>
               <span style={styles.checkIcon}>✓</span>
-              <span>{t('login.feature1')}</span>
+              <span>{t('auth:login.feature1')}</span>
             </div>
             <div style={styles.feature}>
               <span style={styles.checkIcon}>✓</span>
-              <span>{t('login.feature2')}</span>
+              <span>{t('auth:login.feature2')}</span>
             </div>
             <div style={styles.feature}>
               <span style={styles.checkIcon}>✓</span>
-              <span>{t('login.feature3')}</span>
+              <span>{t('auth:login.feature3')}</span>
             </div>
           </div>
         </div>
@@ -97,15 +97,15 @@ const Login = () => {
       <div style={styles.rightPanel}>
         <div style={styles.loginCard}>
           <div style={styles.loginHeader}>
-            <h2 style={styles.loginTitle}>{t('login.title')}</h2>
-            <p style={styles.loginSubtitle}>{t('login.subtitle')}</p>
+            <h2 style={styles.loginTitle}>{t('auth:login.title')}</h2>
+            <p style={styles.loginSubtitle}>{t('auth:login.subtitle')}</p>
           </div>
           
           {error && <div style={styles.error}>{error}</div>}
           
           <form onSubmit={handleSubmit} style={styles.form}>
             <div style={styles.formGroup}>
-              <label style={styles.label}>{t('login.username')}</label>
+              <label style={styles.label}>{t('auth:login.username')}</label>
               <div style={styles.inputWrapper}>
                 <span style={{...styles.inputIcon, [direction === 'rtl' ? 'right' : 'left']: '16px'}}>👤</span>
                 <input
@@ -113,14 +113,14 @@ const Login = () => {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   style={{...styles.input, [direction === 'rtl' ? 'paddingRight' : 'paddingLeft']: '50px'}}
-                  placeholder={t('login.usernamePlaceholder')}
+                  placeholder={t('auth:login.usernamePlaceholder')}
                   required
                 />
               </div>
             </div>
             
             <div style={styles.formGroup}>
-              <label style={styles.label}>{t('login.password')}</label>
+              <label style={styles.label}>{t('auth:login.password')}</label>
               <div style={styles.inputWrapper}>
                 <span style={{...styles.inputIcon, [direction === 'rtl' ? 'right' : 'left']: '16px'}}>🔒</span>
                 <input
@@ -128,31 +128,31 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   style={{...styles.input, [direction === 'rtl' ? 'paddingRight' : 'paddingLeft']: '50px'}}
-                  placeholder={t('login.passwordPlaceholder')}
+                  placeholder={t('auth:login.passwordPlaceholder')}
                   required
                 />
               </div>
             </div>
             
             <button type="submit" style={styles.button} disabled={loading}>
-              {loading ? t('login.loggingIn') : t('login.loginButton')}
+              {loading ? t('auth:login.loggingIn') : t('auth:login.loginButton')}
             </button>
           </form>
 
           <div style={styles.signupLink}>
             <p style={styles.signupText}>
-              {t('login.noAccount')}{' '}
+              {t('auth:login.noAccount')}{' '}
               <button 
                 onClick={() => navigate('/signup')} 
                 style={styles.linkButton}
               >
-                {t('login.createAccount')}
+                {t('auth:login.createAccount')}
               </button>
             </p>
           </div>
           
           <div style={styles.demoInfo}>
-            <p style={styles.demoTitle}>🔑 {t('login.demoAccounts')}</p>
+            <p style={styles.demoTitle}>🔑 {t('auth:login.demoAccounts')}</p>
             <div style={styles.demoGrid}>
               {demoAccounts.map((account) => (
                 <button

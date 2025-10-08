@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import { AuthContext } from '../contexts/AuthContext';
 
 const Notifications = () => {
+  const { t } = useTranslation(['notifications', 'common', 'errors']);
   const { user } = useContext(AuthContext);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -45,17 +47,17 @@ const Notifications = () => {
     }
   };
 
-  if (loading) return <div style={styles.loading}>جاري التحميل...</div>;
+  if (loading) return <div style={styles.loading}>{t('common:loading')}</div>;
 
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
   return (
     <div>
       <div style={styles.header}>
-        <h1 style={styles.title}>الإشعارات ({unreadCount} غير مقروءة)</h1>
+        <h1 style={styles.title}>{t('notifications:title')} ({unreadCount} {t('notifications:unread')})</h1>
         {unreadCount > 0 && (
           <button onClick={markAllAsRead} style={styles.markAllBtn}>
-            تحديد الكل كمقروء
+            {t('notifications:markAllAsRead')}
           </button>
         )}
       </div>

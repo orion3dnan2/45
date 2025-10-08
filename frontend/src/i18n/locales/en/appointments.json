@@ -1,0 +1,16 @@
+{
+  "title": "Appointment Management",
+  "addAppointment": "Add New Appointment",
+  "editAppointment": "Edit Appointment",
+  "deleteAppointment": "Delete Appointment",
+  "patient": "Patient",
+  "doctor": "Doctor",
+  "selectPatient": "Select Patient",
+  "selectDoctor": "Select Doctor",
+  "selectStatus": "Select Status",
+  "noAppointments": "No appointments found",
+  "addSuccess": "Appointment added successfully",
+  "updateSuccess": "Appointment updated successfully",
+  "deleteSuccess": "Appointment deleted successfully",
+  "deleteConfirm": "Are you sure you want to delete this appointment?"
+}

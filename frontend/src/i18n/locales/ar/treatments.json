@@ -1,0 +1,14 @@
+{
+  "title": "إدارة العلاجات",
+  "addTreatment": "إضافة علاج جديد",
+  "editTreatment": "تعديل العلاج",
+  "deleteTreatment": "حذف العلاج",
+  "treatmentName": "اسم العلاج",
+  "cost": "التكلفة",
+  "duration": "المدة",
+  "noTreatments": "لا توجد علاجات",
+  "addSuccess": "تم إضافة العلاج بنجاح",
+  "updateSuccess": "تم تحديث العلاج بنجاح",
+  "deleteSuccess": "تم حذف العلاج بنجاح",
+  "deleteConfirm": "هل أنت متأكد من حذف هذا العلاج؟"
+}

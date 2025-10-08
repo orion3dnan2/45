@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import { AuthContext } from '../contexts/AuthContext';
 
 const Appointments = () => {
+  const { t } = useTranslation(['appointments', 'common', 'errors']);
   const { user } = useContext(AuthContext);
   const [appointments, setAppointments] = useState([]);
   const [patients, setPatients] = useState([]);
@@ -92,7 +94,7 @@ const Appointments = () => {
         notes: ''
       });
       loadAppointments();
-      alert('تم إضافة الموعد بنجاح');
+      alert(t('appointments:addSuccess'));
     } catch (error) {
       console.error('خطأ في إضافة الموعد:', error);
       alert('فشل في إضافة الموعد');
@@ -110,7 +112,7 @@ const Appointments = () => {
       setShowEditModal(false);
       setSelectedAppointment(null);
       loadAppointments();
-      alert('تم تحديث الموعد بنجاح');
+      alert(t('appointments:updateSuccess'));
     } catch (error) {
       console.error('خطأ في تحديث الموعد:', error);
       alert('فشل في تحديث الموعد');
@@ -234,14 +236,14 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
     window.open(whatsappUrl, '_blank');
   };
 
-  if (loading) return <div style={styles.loading}>جاري التحميل...</div>;
+  if (loading) return <div style={styles.loading}>{t('common:loading')}</div>;
 
   const canAddOrEdit = user.role === 'doctor' || user.role === 'reception';
 
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h1 style={styles.title}>📅 إدارة المواعيد</h1>
+        <h1 style={styles.title}>📅 {t('appointments:title')}</h1>
         {canAddOrEdit && (
           <button onClick={openAddModal} style={styles.addButton}>
             ➕ إضافة موعد جديد

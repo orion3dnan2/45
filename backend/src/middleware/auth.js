@@ -7,25 +7,29 @@ const authMiddleware = (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
     
     if (!token) {
-      return res.status(401).json({ error: 'لا يوجد رمز مصادقة' });
+      const message = req.t ? req.t('auth', 'noToken') : 'No authentication token provided';
+      return res.status(401).json({ error: message });
     }
 
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
     next();
   } catch (error) {
-    return res.status(401).json({ error: 'رمز مصادقة غير صالح' });
+    const message = req.t ? req.t('auth', 'invalidToken') : 'Invalid authentication token';
+    return res.status(401).json({ error: message });
   }
 };
 
 const checkRole = (...allowedRoles) => {
   return (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ error: 'غير مصرح' });
+      const message = req.t ? req.t('auth', 'unauthorized') : 'Unauthorized';
+      return res.status(401).json({ error: message });
     }
 
     if (!allowedRoles.includes(req.user.role)) {
-      return res.status(403).json({ error: 'ليس لديك صلاحية للوصول لهذا المورد' });
+      const message = req.t ? req.t('auth', 'noPermission') : 'You do not have permission to access this resource';
+      return res.status(403).json({ error: message });
     }
 
     next();

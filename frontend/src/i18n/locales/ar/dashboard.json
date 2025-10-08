@@ -1,0 +1,48 @@
+{
+  "title": "عيادة الأسنان",
+  "logout": "تسجيل الخروج",
+  "menu": {
+    "home": "الرئيسية",
+    "patients": "المرضى",
+    "appointments": "المواعيد",
+    "treatments": "العلاجات",
+    "medications": "الأدوية والمستلزمات",
+    "suppliers": "الموردين",
+    "invoices": "الفواتير",
+    "notifications": "الإشعارات"
+  },
+  "home": {
+    "welcome": "مرحباً، {{name}}",
+    "systemTitle": "نظام إدارة مركز العيادات التخصصية - عيادة الاسنان",
+    "patientsManagement": "إدارة المرضى",
+    "appointmentsTitle": "المواعيد",
+    "treatmentsTitle": "العلاجات",
+    "medicationsTitle": "الأدوية والمستلزمات",
+    "suppliersTitle": "الموردين",
+    "invoicesTitle": "الفواتير",
+    "todayAppointments": "مواعيد اليوم",
+    "recentNotifications": "الإشعارات الحديثة",
+    "newNotifications": "{{count}} جديد",
+    "paymentStats": "إحصائيات الدفعات",
+    "totalCompleted": "إجمالي المدفوعات المكتملة",
+    "totalPending": "المدفوعات المعلقة",
+    "totalPayments": "عدد المعاملات",
+    "noAppointments": "لا توجد مواعيد لليوم",
+    "patient": "المريض",
+    "doctor": "الطبيب"
+  },
+  "appointmentStatus": {
+    "scheduled": "مجدول",
+    "confirmed": "مؤكد",
+    "in_progress": "جاري",
+    "completed": "مكتمل",
+    "cancelled": "ملغي"
+  },
+  "notificationTypes": {
+    "low_stock": "مخزون منخفض",
+    "supplier_subscription": "اشتراك مورد",
+    "payment_due": "دفعة مستحقة",
+    "appointment_reminder": "تذكير موعد",
+    "general": "عام"
+  }
+}

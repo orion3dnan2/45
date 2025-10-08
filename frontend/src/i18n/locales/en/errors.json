@@ -1,0 +1,13 @@
+{
+  "loginError": "An error occurred during login",
+  "signupError": "An error occurred during account creation",
+  "serverError": "An error occurred while connecting to the server",
+  "networkError": "Network error. Please check your connection",
+  "notFound": "The requested resource was not found",
+  "unauthorized": "You are not authorized to perform this action",
+  "forbidden": "Access denied",
+  "validationError": "Please check the entered data",
+  "unknownError": "An unknown error occurred",
+  "signupSuccess": "Account created successfully! Redirecting to login page...",
+  "operationSuccess": "Operation completed successfully"
+}

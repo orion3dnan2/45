@@ -5,7 +5,7 @@ export const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
   const { i18n } = useTranslation();
-  const [language, setLanguage] = useState(localStorage.getItem('language') || 'ar');
+  const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
   const [direction, setDirection] = useState(language === 'ar' ? 'rtl' : 'ltr');
 
   useEffect(() => {
