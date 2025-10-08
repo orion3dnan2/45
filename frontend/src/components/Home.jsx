@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import { AuthContext } from '../contexts/AuthContext';
 
 const Home = () => {
   const { user } = useContext(AuthContext);
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [notifications, setNotifications] = useState([]);
@@ -16,11 +18,9 @@ const Home = () => {
 
   const loadData = async () => {
     try {
-      // تحميل الإشعارات
       const notifs = await api.getNotifications({ is_read: 'false' });
       setNotifications(notifs.slice(0, 5));
 
-      // تحميل المواعيد لمستخدمي الاستقبال
       if (user.role === 'reception' || user.role === 'admin') {
         const today = new Date().toISOString().split('T')[0];
         const appointmentsData = await api.getAppointments({ date: today });
@@ -32,31 +32,40 @@ const Home = () => {
     }
   };
 
-  // دالة للانتقال إلى الصفحات المختلفة
   const navigateTo = (path) => {
     navigate(path);
+  };
+
+  const getNotificationIcon = (type) => {
+    const icons = {
+      low_stock: '⚠️',
+      supplier_subscription: '📋',
+      payment_due: '💰',
+      appointment_reminder: '📅',
+      general: '📢'
+    };
+    return icons[type] || '📢';
   };
 
   return (
     <div>
       <div style={styles.header}>
         <div>
-          <h1 style={styles.title}>مرحباً، {user.full_name} 👋</h1>
-          <p style={styles.subtitle}>نظام إدارة مركز العيادات التخصصية - عيادة الاسنان</p>
+          <h1 style={styles.title}>{t('home.welcome', { name: user.full_name })} 👋</h1>
+          <p style={styles.subtitle}>{t('home.systemTitle')}</p>
         </div>
         <div style={styles.headerBadge}>
-          <span style={styles.badgeText}>{getRoleLabel(user.role)}</span>
+          <span style={styles.badgeText}>{t(`roles.${user.role}`)}</span>
         </div>
       </div>
 
-      {/* شريط التبويبات الأفقي */}
       <div style={styles.tabsContainer}>
         <div 
           style={styles.tab}
           onClick={() => navigateTo('/dashboard/patients')}
         >
           <span style={styles.tabIcon}>👥</span>
-          <span style={styles.tabLabel}>إدارة المرضى</span>
+          <span style={styles.tabLabel}>{t('home.patientsManagement')}</span>
         </div>
 
         <div 
@@ -64,7 +73,7 @@ const Home = () => {
           onClick={() => navigateTo('/dashboard/appointments')}
         >
           <span style={styles.tabIcon}>📅</span>
-          <span style={styles.tabLabel}>المواعيد</span>
+          <span style={styles.tabLabel}>{t('home.appointmentsTitle')}</span>
         </div>
 
         <div 
@@ -72,7 +81,7 @@ const Home = () => {
           onClick={() => navigateTo('/dashboard/treatments')}
         >
           <span style={styles.tabIcon}>🦷</span>
-          <span style={styles.tabLabel}>العلاجات</span>
+          <span style={styles.tabLabel}>{t('home.treatmentsTitle')}</span>
         </div>
 
         <div 
@@ -80,7 +89,7 @@ const Home = () => {
           onClick={() => navigateTo('/dashboard/medications')}
         >
           <span style={styles.tabIcon}>💊</span>
-          <span style={styles.tabLabel}>الأدوية والمستلزمات</span>
+          <span style={styles.tabLabel}>{t('home.medicationsTitle')}</span>
         </div>
 
         {(user.role === 'reception' || user.role === 'admin') && (
@@ -89,7 +98,7 @@ const Home = () => {
             onClick={() => navigateTo('/dashboard/suppliers')}
           >
             <span style={styles.tabIcon}>🚚</span>
-            <span style={styles.tabLabel}>الموردين</span>
+            <span style={styles.tabLabel}>{t('home.suppliersTitle')}</span>
           </div>
         )}
 
@@ -99,21 +108,20 @@ const Home = () => {
             onClick={() => navigateTo('/dashboard/invoices')}
           >
             <span style={styles.tabIcon}>📋</span>
-            <span style={styles.tabLabel}>الفواتير</span>
+            <span style={styles.tabLabel}>{t('home.invoicesTitle')}</span>
           </div>
         )}
       </div>
 
-      {/* جدول المواعيد اليومية */}
       {(user.role === 'reception' || user.role === 'admin' || user.role === 'doctor' || user.role === 'accountant') && (
         <div style={styles.appointmentsSection}>
           <div style={styles.sectionHeader}>
-            <h2 style={styles.sectionTitle}>📅 مواعيد اليوم</h2>
+            <h2 style={styles.sectionTitle}>📅 {t('home.todayAppointments')}</h2>
             <button 
               onClick={() => navigateTo('/dashboard/appointments')}
               style={styles.viewAllBtn}
             >
-              عرض الكل
+              {t('common.viewAll')}
             </button>
           </div>
           <div style={styles.appointmentsTable}>
@@ -121,11 +129,11 @@ const Home = () => {
               <table style={styles.table}>
                 <thead>
                   <tr style={styles.tableHeaderRow}>
-                    <th style={styles.tableHeader}>الوقت</th>
-                    <th style={styles.tableHeader}>المريض</th>
-                    <th style={styles.tableHeader}>الطبيب</th>
-                    <th style={styles.tableHeader}>الحالة</th>
-                    <th style={styles.tableHeader}>الملاحظات</th>
+                    <th style={styles.tableHeader}>{t('home.time')}</th>
+                    <th style={styles.tableHeader}>{t('home.patient')}</th>
+                    <th style={styles.tableHeader}>{t('home.doctor')}</th>
+                    <th style={styles.tableHeader}>{t('home.status')}</th>
+                    <th style={styles.tableHeader}>{t('home.notes')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -138,7 +146,7 @@ const Home = () => {
                       <td style={styles.tableCell}>{appointment.doctor_name || '-'}</td>
                       <td style={styles.tableCell}>
                         <span style={{...styles.statusBadge, ...getStatusStyle(appointment.status)}}>
-                          {getStatusLabel(appointment.status)}
+                          {t(`appointmentStatus.${appointment.status}`)}
                         </span>
                       </td>
                       <td style={styles.tableCell}>{appointment.notes || '-'}</td>
@@ -149,19 +157,18 @@ const Home = () => {
             ) : (
               <div style={styles.emptyState}>
                 <div style={styles.emptyIcon}>📅</div>
-                <p style={styles.emptyText}>لا توجد مواعيد لليوم</p>
+                <p style={styles.emptyText}>{t('home.noAppointments')}</p>
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* الإشعارات */}
       {notifications.length > 0 && (
         <div style={styles.notificationsSection}>
           <div style={styles.sectionHeader}>
-            <h2 style={styles.sectionTitle}>🔔 الإشعارات الحديثة</h2>
-            <span style={styles.notifBadge}>{notifications.length} جديد</span>
+            <h2 style={styles.sectionTitle}>🔔 {t('home.recentNotifications')}</h2>
+            <span style={styles.notifBadge}>{t('home.newNotifications', { count: notifications.length })}</span>
           </div>
           <div style={styles.notificationsList}>
             {notifications.map(notif => (
@@ -179,63 +186,30 @@ const Home = () => {
         </div>
       )}
 
-      {/* إحصائيات الدفعات للإداريين */}
       {stats && (
         <div style={styles.statsSection}>
-          <h2 style={styles.sectionTitle}>💰 إحصائيات الدفعات</h2>
+          <h2 style={styles.sectionTitle}>💰 {t('home.paymentStats')}</h2>
           <div style={styles.statsGrid}>
             <div style={{...styles.statCard, background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)'}}>
               <div style={styles.statIcon}>✓</div>
               <h3 style={styles.statValue}>{stats.summary.total_completed || 0} ج.م</h3>
-              <p style={styles.statLabel}>إجمالي المدفوعات المكتملة</p>
+              <p style={styles.statLabel}>{t('home.totalCompleted')}</p>
             </div>
             <div style={{...styles.statCard, background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)'}}>
               <div style={styles.statIcon}>⏳</div>
               <h3 style={styles.statValue}>{stats.summary.total_pending || 0} ج.م</h3>
-              <p style={styles.statLabel}>المدفوعات المعلقة</p>
+              <p style={styles.statLabel}>{t('home.totalPending')}</p>
             </div>
             <div style={{...styles.statCard, background: 'linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)'}}>
               <div style={styles.statIcon}>📊</div>
               <h3 style={styles.statValue}>{stats.summary.total_payments || 0}</h3>
-              <p style={styles.statLabel}>عدد المعاملات</p>
+              <p style={styles.statLabel}>{t('home.totalPayments')}</p>
             </div>
           </div>
         </div>
       )}
     </div>
   );
-};
-
-const getRoleLabel = (role) => {
-  const labels = {
-    doctor: 'طبيب',
-    reception: 'استقبال',
-    admin: 'إداري',
-    accountant: 'محاسب'
-  };
-  return labels[role] || role;
-};
-
-const getNotificationIcon = (type) => {
-  const icons = {
-    low_stock: '⚠️',
-    supplier_subscription: '📋',
-    payment_due: '💰',
-    appointment_reminder: '📅',
-    general: '📢'
-  };
-  return icons[type] || '📢';
-};
-
-const getStatusLabel = (status) => {
-  const labels = {
-    scheduled: 'مجدول',
-    confirmed: 'مؤكد',
-    in_progress: 'جاري',
-    completed: 'مكتمل',
-    cancelled: 'ملغي'
-  };
-  return labels[status] || status;
 };
 
 const getStatusStyle = (status) => {

@@ -1,6 +1,8 @@
 import React, { useState, useContext } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../contexts/AuthContext';
+import { LanguageContext } from '../contexts/LanguageContext';
 import Patients from '../components/Patients';
 import Appointments from '../components/Appointments';
 import Treatments from '../components/Treatments';
@@ -9,9 +11,12 @@ import Suppliers from '../components/Suppliers';
 import Notifications from '../components/Notifications';
 import Invoices from '../components/Invoices';
 import Home from '../components/Home';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const Dashboard = () => {
   const { user, logout } = useContext(AuthContext);
+  const { direction } = useContext(LanguageContext);
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -22,28 +27,28 @@ const Dashboard = () => {
   };
 
   const menuItems = [
-    { path: '/dashboard', label: 'الرئيسية', icon: '🏠', roles: ['doctor', 'reception', 'admin', 'accountant'] },
-    { path: '/dashboard/patients', label: 'المرضى', icon: '👥', roles: ['doctor', 'reception', 'admin', 'accountant'] },
-    { path: '/dashboard/appointments', label: 'المواعيد', icon: '📅', roles: ['doctor', 'reception', 'admin', 'accountant'] },
-    { path: '/dashboard/treatments', label: 'العلاجات', icon: '🦷', roles: ['doctor', 'admin'] },
-    { path: '/dashboard/medications', label: 'الأدوية والمستلزمات', icon: '💊', roles: ['doctor', 'reception', 'admin'] },
-    { path: '/dashboard/suppliers', label: 'الموردين', icon: '🚚', roles: ['reception', 'admin'] },
-    { path: '/dashboard/invoices', label: 'الفواتير', icon: '📋', roles: ['reception', 'admin', 'accountant'] },
-    { path: '/dashboard/notifications', label: 'الإشعارات', icon: '🔔', roles: ['doctor', 'reception', 'admin', 'accountant'] }
+    { path: '/dashboard', label: t('menu.home'), icon: '🏠', roles: ['doctor', 'reception', 'admin', 'accountant'] },
+    { path: '/dashboard/patients', label: t('menu.patients'), icon: '👥', roles: ['doctor', 'reception', 'admin', 'accountant'] },
+    { path: '/dashboard/appointments', label: t('menu.appointments'), icon: '📅', roles: ['doctor', 'reception', 'admin', 'accountant'] },
+    { path: '/dashboard/treatments', label: t('menu.treatments'), icon: '🦷', roles: ['doctor', 'admin'] },
+    { path: '/dashboard/medications', label: t('menu.medications'), icon: '💊', roles: ['doctor', 'reception', 'admin'] },
+    { path: '/dashboard/suppliers', label: t('menu.suppliers'), icon: '🚚', roles: ['reception', 'admin'] },
+    { path: '/dashboard/invoices', label: t('menu.invoices'), icon: '📋', roles: ['reception', 'admin', 'accountant'] },
+    { path: '/dashboard/notifications', label: t('menu.notifications'), icon: '🔔', roles: ['doctor', 'reception', 'admin', 'accountant'] }
   ];
 
   const filteredMenuItems = menuItems.filter(item => item.roles.includes(user?.role));
 
   return (
-    <div style={styles.container}>
+    <div style={{...styles.container, direction}}>
       <div style={sidebarOpen ? styles.sidebar : { ...styles.sidebar, width: '80px' }}>
         <div style={styles.sidebarHeader}>
           <div style={styles.logoSection}>
             <div style={styles.logoIcon}>🦷</div>
-            {sidebarOpen && <h2 style={styles.sidebarTitle}>عيادة الأسنان</h2>}
+            {sidebarOpen && <h2 style={styles.sidebarTitle}>{t('dashboard.title')}</h2>}
           </div>
           <button onClick={() => setSidebarOpen(!sidebarOpen)} style={styles.toggleBtn}>
-            {sidebarOpen ? '◀' : '▶'}
+            {sidebarOpen ? (direction === 'rtl' ? '◀' : '▶') : (direction === 'rtl' ? '▶' : '◀')}
           </button>
         </div>
         
@@ -70,15 +75,19 @@ const Dashboard = () => {
           {sidebarOpen && (
             <div style={styles.userDetails}>
               <p style={styles.userName}>{user?.full_name}</p>
-              <p style={styles.userRole}>{getRoleLabel(user?.role)}</p>
+              <p style={styles.userRole}>{t(`roles.${user?.role}`)}</p>
             </div>
           )}
+        </div>
+
+        <div style={styles.langSwitcherContainer}>
+          <LanguageSwitcher style={sidebarOpen ? {} : { padding: '10px', justifyContent: 'center' }} />
         </div>
         
         <div style={styles.logoutSection}>
           <button onClick={handleLogout} style={styles.logoutBtn}>
             <span style={styles.logoutIcon}>🚪</span>
-            {sidebarOpen && <span>تسجيل الخروج</span>}
+            {sidebarOpen && <span>{t('dashboard.logout')}</span>}
           </button>
         </div>
       </div>
@@ -99,22 +108,11 @@ const Dashboard = () => {
   );
 };
 
-const getRoleLabel = (role) => {
-  const labels = {
-    doctor: 'طبيب',
-    reception: 'استقبال',
-    admin: 'إداري',
-    accountant: 'محاسب'
-  };
-  return labels[role] || role;
-};
-
 const styles = {
   container: {
     display: 'flex',
     height: '100vh',
-    overflow: 'hidden',
-    direction: 'rtl'
+    overflow: 'hidden'
   },
   sidebar: {
     width: '280px',
@@ -242,6 +240,10 @@ const styles = {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis'
+  },
+  langSwitcherContainer: {
+    padding: '15px 20px',
+    borderTop: '1px solid rgba(255,255,255,0.15)'
   },
   logoutSection: {
     padding: '20px'
