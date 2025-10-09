@@ -192,12 +192,12 @@ const Home = () => {
           <div style={styles.statsGrid}>
             <div style={{...styles.statCard, background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)'}}>
               <div style={styles.statIcon}>✓</div>
-              <h3 style={styles.statValue}>{stats.summary.total_completed || 0} ج.م</h3>
+              <h3 style={styles.statValue}>{stats.summary.total_completed || 0} {t('common:currencyKWD')}</h3>
               <p style={styles.statLabel}>{t('dashboard:home.totalCompleted')}</p>
             </div>
             <div style={{...styles.statCard, background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)'}}>
               <div style={styles.statIcon}>⏳</div>
-              <h3 style={styles.statValue}>{stats.summary.total_pending || 0} ج.م</h3>
+              <h3 style={styles.statValue}>{stats.summary.total_pending || 0} {t('common:currencyKWD')}</h3>
               <p style={styles.statLabel}>{t('dashboard:home.totalPending')}</p>
             </div>
             <div style={{...styles.statCard, background: 'linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)'}}>

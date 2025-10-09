@@ -23,7 +23,7 @@ const Notifications = () => {
       const data = await api.getNotifications(params);
       setNotifications(data);
     } catch (error) {
-      console.error('خطأ في تحميل الإشعارات:', error);
+      console.error('Error loading notifications:', error);
     } finally {
       setLoading(false);
     }
@@ -34,7 +34,7 @@ const Notifications = () => {
       await api.markNotificationAsRead(id);
       loadNotifications();
     } catch (error) {
-      console.error('خطأ في تحديث الإشعار:', error);
+      console.error('Error updating notification:', error);
     }
   };
 
@@ -43,7 +43,7 @@ const Notifications = () => {
       await api.markAllNotificationsAsRead(user.id);
       loadNotifications();
     } catch (error) {
-      console.error('خطأ في تحديث الإشعارات:', error);
+      console.error('Error updating notifications:', error);
     }
   };
 

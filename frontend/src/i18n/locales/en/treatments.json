@@ -47,5 +47,25 @@
     "cancelled": "Cancelled"
   },
   "noSearchResults": "No search results",
-  "noTreatmentsRecorded": "No treatments recorded"
+  "noTreatmentsRecorded": "No treatments recorded",
+  "labels": {
+    "patient": "Patient *",
+    "selectPatient": "Select patient",
+    "treatmentDate": "Treatment Date *",
+    "diagnosis": "Diagnosis",
+    "procedureDone": "Procedure Done",
+    "toothNumber": "Tooth Number",
+    "status": "Status",
+    "cost": "Cost (KWD)",
+    "notes": "Notes"
+  },
+  "buttons": {
+    "saveChanges": "💾 Save Changes",
+    "add": "➕ Add",
+    "cancel": "❌ Cancel"
+  },
+  "modalTitles": {
+    "add": "Add New Treatment",
+    "edit": "Edit Treatment"
+  }
 }

@@ -208,17 +208,17 @@ const Treatments = () => {
       {(showAddModal || showEditModal) && (
         <div style={styles.modalOverlay} onClick={() => { setShowAddModal(false); setShowEditModal(false); resetForm(); }}>
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h2 style={styles.modalTitle}>{editingTreatment ? 'تعديل العلاج' : 'إضافة علاج جديد'}</h2>
+            <h2 style={styles.modalTitle}>{editingTreatment ? t('treatments:modalTitles.edit') : t('treatments:modalTitles.add')}</h2>
             <form onSubmit={handleSubmit} style={styles.form}>
               <div style={styles.formRow}>
-                <label style={styles.label}>المريض *</label>
+                <label style={styles.label}>{t('treatments:labels.patient')}</label>
                 <select
                   required
                   value={formData.patient_id}
                   onChange={(e) => setFormData({...formData, patient_id: e.target.value})}
                   style={styles.select}
                 >
-                  <option value="">اختر المريض</option>
+                  <option value="">{t('treatments:labels.selectPatient')}</option>
                   {patients.map(patient => (
                     <option key={patient.id} value={patient.id}>
                       {patient.full_name}
@@ -228,7 +228,7 @@ const Treatments = () => {
               </div>
 
               <div style={styles.formRow}>
-                <label style={styles.label}>تاريخ العلاج *</label>
+                <label style={styles.label}>{t('treatments:labels.treatmentDate')}</label>
                 <input
                   type="date"
                   required
@@ -239,7 +239,7 @@ const Treatments = () => {
               </div>
 
               <div style={styles.formRow}>
-                <label style={styles.label}>التشخيص</label>
+                <label style={styles.label}>{t('treatments:labels.diagnosis')}</label>
                 <textarea
                   value={formData.diagnosis}
                   onChange={(e) => setFormData({...formData, diagnosis: e.target.value})}
@@ -249,7 +249,7 @@ const Treatments = () => {
               </div>
 
               <div style={styles.formRow}>
-                <label style={styles.label}>الإجراء المنفذ</label>
+                <label style={styles.label}>{t('treatments:labels.procedureDone')}</label>
                 <input
                   type="text"
                   value={formData.procedure_done}
@@ -261,7 +261,7 @@ const Treatments = () => {
 
               <div style={styles.formGrid}>
                 <div style={styles.formRow}>
-                  <label style={styles.label}>رقم السن</label>
+                  <label style={styles.label}>{t('treatments:labels.toothNumber')}</label>
                   <input
                     type="text"
                     value={formData.tooth_number}
@@ -272,22 +272,22 @@ const Treatments = () => {
                 </div>
 
                 <div style={styles.formRow}>
-                  <label style={styles.label}>الحالة</label>
+                  <label style={styles.label}>{t('treatments:labels.status')}</label>
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({...formData, status: e.target.value})}
                     style={styles.select}
                   >
-                    <option value="planned">مخطط</option>
-                    <option value="in_progress">جاري</option>
-                    <option value="completed">مكتمل</option>
-                    <option value="cancelled">ملغي</option>
+                    <option value="planned">{t('treatments:status.planned')}</option>
+                    <option value="in_progress">{t('treatments:status.in_progress')}</option>
+                    <option value="completed">{t('treatments:status.completed')}</option>
+                    <option value="cancelled">{t('treatments:status.cancelled')}</option>
                   </select>
                 </div>
               </div>
 
               <div style={styles.formRow}>
-                <label style={styles.label}>التكلفة (د.ك)</label>
+                <label style={styles.label}>{t('treatments:labels.cost')}</label>
                 <input
                   type="number"
                   step="0.001"
@@ -299,7 +299,7 @@ const Treatments = () => {
               </div>
 
               <div style={styles.formRow}>
-                <label style={styles.label}>ملاحظات</label>
+                <label style={styles.label}>{t('treatments:labels.notes')}</label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({...formData, notes: e.target.value})}
@@ -310,7 +310,7 @@ const Treatments = () => {
 
               <div style={styles.formActions}>
                 <button type="submit" style={styles.submitBtn}>
-                  {editingTreatment ? '💾 حفظ التعديلات' : '➕ إضافة'}
+                  {editingTreatment ? t('treatments:buttons.saveChanges') : t('treatments:buttons.add')}
                 </button>
                 <button 
                   type="button" 
@@ -321,7 +321,7 @@ const Treatments = () => {
                   }} 
                   style={styles.cancelBtn}
                 >
-                  ❌ إلغاء
+                  {t('treatments:buttons.cancel')}
                 </button>
               </div>
             </form>
@@ -330,16 +330,6 @@ const Treatments = () => {
       )}
     </div>
   );
-};
-
-const getStatusLabel = (status) => {
-  const labels = {
-    planned: 'مخطط',
-    in_progress: 'جاري',
-    completed: 'مكتمل',
-    cancelled: 'ملغي'
-  };
-  return labels[status] || status;
 };
 
 const getStatusStyle = (status) => {

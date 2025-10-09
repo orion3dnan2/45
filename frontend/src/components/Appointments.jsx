@@ -161,25 +161,35 @@ const Appointments = () => {
       minute: '2-digit'
     });
 
-    const message = `
-🦷 *إشعار موعد - مركز العيادات التخصصية - عيادة الاسنان*
+    const statusLabel = t(`appointments:status.${appointment.status}`);
+    const patientName = appointment.patient_name || t('appointments:labels.notSpecified');
+    const patientPhone = appointment.patient_phone || t('appointments:labels.noPhone');
 
-السلام عليكم ورحمة الله وبركاته د. ${appointment.doctor_name}
+    const messageParts = [
+      t('appointments:whatsapp.doctorTitle'),
+      '',
+      t('appointments:whatsapp.doctorGreeting', { doctorName: appointment.doctor_name }),
+      '',
+      t('appointments:whatsapp.doctorReminder'),
+      '',
+      t('appointments:whatsapp.doctorDetails'),
+      t('appointments:whatsapp.doctorDateTime', { date: formattedDate }),
+      t('appointments:whatsapp.doctorPatient', { patientName }),
+      t('appointments:whatsapp.doctorPatientPhone', { phone: patientPhone }),
+      t('appointments:whatsapp.doctorDuration', { duration: appointment.duration }),
+      t('appointments:whatsapp.doctorStatus', { status: statusLabel }),
+    ];
 
-نود تذكيركم بموعد قادم لديكم في العيادة:
+    if (appointment.notes) {
+      messageParts.push(t('appointments:whatsapp.doctorNotes', { notes: appointment.notes }));
+    }
 
-📅 *تفاصيل الموعد:*
-▫️ التاريخ والوقت: ${formattedDate}
-▫️ اسم المريض: ${appointment.patient_name || 'غير محدد'}
-▫️ رقم هاتف المريض: ${appointment.patient_phone || 'لا يوجد'}
-▫️ مدة الموعد المتوقعة: ${appointment.duration} دقيقة
-▫️ حالة الموعد: ${getStatusLabel(appointment.status)}
-${appointment.notes ? `▫️ ملاحظات خاصة: ${appointment.notes}` : ''}
+    messageParts.push('');
+    messageParts.push(t('appointments:whatsapp.doctorClosing'));
+    messageParts.push('');
+    messageParts.push(t('appointments:whatsapp.doctorSignature'));
 
-نرجو منكم الالتزام بالموعد المحدد، ونتمنى لكم التوفيق في عملكم 🌟
-
-مع تحيات إدارة العيادة
-    `.trim();
+    const message = messageParts.join('\n').trim();
 
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
@@ -206,29 +216,37 @@ ${appointment.notes ? `▫️ ملاحظات خاصة: ${appointment.notes}` : '
       minute: '2-digit'
     });
 
-    const message = `
-🦷 *تذكير بموعدك - مركز العيادات التخصصية - عيادة الاسنان*
+    const patientName = appointment.patient_name || t('appointments:labels.notSpecified');
 
-السلام عليكم ورحمة الله وبركاته
+    const messageParts = [
+      t('appointments:whatsapp.patientTitle'),
+      '',
+      t('appointments:whatsapp.patientGreeting'),
+      '',
+      t('appointments:whatsapp.patientDear', { patientName }),
+      '',
+      t('appointments:whatsapp.patientReminder'),
+      '',
+      t('appointments:whatsapp.patientDetails'),
+      t('appointments:whatsapp.patientDateTime', { date: formattedDate }),
+      t('appointments:whatsapp.patientDoctor', { doctorName: appointment.doctor_name }),
+      t('appointments:whatsapp.patientDuration', { duration: appointment.duration }),
+    ];
 
-عزيزي/عزيزتي ${appointment.patient_name || 'المريض الكريم'}
+    if (appointment.notes) {
+      messageParts.push(t('appointments:whatsapp.patientNotes', { notes: appointment.notes }));
+    }
 
-نود تذكيركم بموعدكم القادم في عيادتنا:
+    messageParts.push('');
+    messageParts.push(t('appointments:whatsapp.patientImportant'));
+    messageParts.push(t('appointments:whatsapp.patientArrival'));
+    messageParts.push(t('appointments:whatsapp.patientCancellation'));
+    messageParts.push('');
+    messageParts.push(t('appointments:whatsapp.patientClosing'));
+    messageParts.push('');
+    messageParts.push(t('appointments:whatsapp.patientSignature'));
 
-📅 *تفاصيل الموعد:*
-▫️ التاريخ والوقت: ${formattedDate}
-▫️ الطبيب المعالج: ${appointment.doctor_name}
-▫️ مدة الجلسة المتوقعة: ${appointment.duration} دقيقة
-${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
-
-⏰ *تنبيه مهم:*
-• يرجى الحضور قبل الموعد بـ 10 دقائق
-• في حال الرغبة بالإلغاء أو التأجيل، يرجى إبلاغنا قبل 24 ساعة
-
-نحن في انتظاركم، ونتمنى لكم دوام الصحة والعافية 💙
-
-مع تحيات فريق العيادة
-    `.trim();
+    const message = messageParts.join('\n').trim();
 
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
@@ -246,23 +264,23 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
         <h1 style={styles.title}>📅 {t('appointments:title')}</h1>
         {canAddOrEdit && (
           <button onClick={openAddModal} style={styles.addButton}>
-            ➕ إضافة موعد جديد
+            {t('appointments:addAppointmentButton')}
           </button>
         )}
       </div>
       
       <div style={styles.filters}>
         <button onClick={() => setFilter('all')} style={filter === 'all' ? styles.activeFilter : styles.filterBtn}>
-          الكل ({appointments.length})
+          {t('appointments:filters.all', { count: appointments.length })}
         </button>
         <button onClick={() => setFilter('scheduled')} style={filter === 'scheduled' ? styles.activeFilter : styles.filterBtn}>
-          مجدول
+          {t('appointments:filters.scheduled')}
         </button>
         <button onClick={() => setFilter('confirmed')} style={filter === 'confirmed' ? styles.activeFilter : styles.filterBtn}>
-          مؤكد
+          {t('appointments:filters.confirmed')}
         </button>
         <button onClick={() => setFilter('completed')} style={filter === 'completed' ? styles.activeFilter : styles.filterBtn}>
-          مكتمل
+          {t('appointments:filters.completed')}
         </button>
       </div>
 
@@ -270,14 +288,14 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
         <table style={styles.table}>
           <thead>
             <tr style={styles.tableHeaderRow}>
-              <th style={styles.th}>التاريخ والوقت</th>
-              <th style={styles.th}>اسم المريض</th>
-              <th style={styles.th}>الطبيب</th>
-              <th style={styles.th}>رقم الهاتف</th>
-              <th style={styles.th}>المدة</th>
-              <th style={styles.th}>الحالة</th>
-              <th style={styles.th}>الملاحظات</th>
-              <th style={styles.th}>الإجراءات</th>
+              <th style={styles.th}>{t('appointments:table.dateTime')}</th>
+              <th style={styles.th}>{t('appointments:table.patientName')}</th>
+              <th style={styles.th}>{t('appointments:table.doctor')}</th>
+              <th style={styles.th}>{t('appointments:table.phone')}</th>
+              <th style={styles.th}>{t('appointments:table.duration')}</th>
+              <th style={styles.th}>{t('appointments:table.status')}</th>
+              <th style={styles.th}>{t('appointments:table.notes')}</th>
+              <th style={styles.th}>{t('appointments:table.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -307,7 +325,7 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
                 <td style={styles.td}>
                   <div style={styles.patientCell}>
                     <span style={styles.patientIcon}>👤</span>
-                    <span style={styles.boldText}>{appointment.patient_name || 'غير محدد'}</span>
+                    <span style={styles.boldText}>{appointment.patient_name || t('appointments:labels.notSpecified')}</span>
                   </div>
                 </td>
                 <td style={styles.td}>
@@ -317,13 +335,13 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
                   </div>
                 </td>
                 <td style={styles.td}>
-                  <span style={styles.phoneText}>{appointment.patient_phone || 'لا يوجد'}</span>
+                  <span style={styles.phoneText}>{appointment.patient_phone || t('appointments:labels.noPhone')}</span>
                 </td>
                 <td style={styles.td}>
-                  <span style={styles.durationBadge}>{appointment.duration} دقيقة</span>
+                  <span style={styles.durationBadge}>{appointment.duration} {t('appointments:labels.minutes')}</span>
                 </td>
                 <td style={styles.td}>
-                  <span style={getStatusStyle(appointment.status)}>{getStatusLabel(appointment.status)}</span>
+                  <span style={getStatusStyle(appointment.status)}>{t(`appointments:status.${appointment.status}`)}</span>
                 </td>
                 <td style={styles.td}>
                   <span style={styles.notesText}>{appointment.notes || '-'}</span>
@@ -331,36 +349,36 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
                 <td style={styles.td}>
                   <div style={styles.actionButtons}>
                     {appointment.status === 'scheduled' && (
-                      <button onClick={() => updateStatus(appointment.id, 'confirmed')} style={styles.confirmBtn} title="تأكيد الموعد">
-                        ✓ تأكيد
+                      <button onClick={() => updateStatus(appointment.id, 'confirmed')} style={styles.confirmBtn} title={t('appointments:buttons.confirmTooltip')}>
+                        {t('appointments:buttons.confirm')}
                       </button>
                     )}
                     {appointment.status === 'confirmed' && (
-                      <button onClick={() => updateStatus(appointment.id, 'in_progress')} style={styles.startBtn} title="بدء الموعد - تسجيل الدخول">
-                        ▶ بدء
+                      <button onClick={() => updateStatus(appointment.id, 'in_progress')} style={styles.startBtn} title={t('appointments:buttons.startTooltip')}>
+                        {t('appointments:buttons.start')}
                       </button>
                     )}
                     {appointment.status === 'in_progress' && (
-                      <button onClick={() => updateStatus(appointment.id, 'completed')} style={styles.completeBtn} title="إنهاء الموعد">
-                        ✓ إنهاء
+                      <button onClick={() => updateStatus(appointment.id, 'completed')} style={styles.completeBtn} title={t('appointments:buttons.completeTooltip')}>
+                        {t('appointments:buttons.complete')}
                       </button>
                     )}
                     {canAddOrEdit && appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
-                      <button onClick={() => openEditModal(appointment)} style={styles.editBtn} title="تعديل">
-                        ✏️
+                      <button onClick={() => openEditModal(appointment)} style={styles.editBtn} title={t('appointments:buttons.editTooltip')}>
+                        {t('appointments:buttons.edit')}
                       </button>
                     )}
                     {appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
-                      <button onClick={() => updateStatus(appointment.id, 'cancelled')} style={styles.cancelBtn} title="إلغاء">
-                        ✕
+                      <button onClick={() => updateStatus(appointment.id, 'cancelled')} style={styles.cancelBtn} title={t('appointments:buttons.cancelTooltip')}>
+                        {t('appointments:buttons.cancel')}
                       </button>
                     )}
                     {(user.role === 'reception' || user.role === 'admin') && appointment.status !== 'cancelled' && (
                       <>
-                        <button onClick={() => sendWhatsAppToDoctor(appointment)} style={styles.whatsappBtn} title="إرسال للطبيب">
+                        <button onClick={() => sendWhatsAppToDoctor(appointment)} style={styles.whatsappBtn} title={t('appointments:buttons.sendDoctorTooltip')}>
                           👨‍⚕️
                         </button>
-                        <button onClick={() => sendWhatsAppToPatient(appointment)} style={styles.whatsappBtn} title="إرسال للمريض">
+                        <button onClick={() => sendWhatsAppToPatient(appointment)} style={styles.whatsappBtn} title={t('appointments:buttons.sendPatientTooltip')}>
                           🧑
                         </button>
                       </>
@@ -376,24 +394,24 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
       {appointments.length === 0 && (
         <div style={styles.empty}>
           <div style={styles.emptyIcon}>📋</div>
-          <div style={styles.emptyText}>لا توجد مواعيد</div>
+          <div style={styles.emptyText}>{t('appointments:noAppointments')}</div>
         </div>
       )}
 
       {showAddModal && (
         <div style={styles.modalOverlay} onClick={() => setShowAddModal(false)}>
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h2 style={styles.modalTitle}>إضافة موعد جديد</h2>
+            <h2 style={styles.modalTitle}>{t('appointments:modalTitles.add')}</h2>
             <form onSubmit={handleAddAppointment}>
               <div style={styles.formGroup}>
-                <label style={styles.label}>المريض *</label>
+                <label style={styles.label}>{t('appointments:labels.patient')}</label>
                 <select 
                   value={formData.patient_id} 
                   onChange={(e) => setFormData({...formData, patient_id: e.target.value})}
                   style={styles.input}
                   required
                 >
-                  <option value="">اختر المريض</option>
+                  <option value="">{t('appointments:selectPatient')}</option>
                   {patients.map(patient => (
                     <option key={patient.id} value={patient.id}>
                       {patient.patient_name || patient.national_id}
@@ -404,14 +422,14 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
 
               {user.role === 'reception' && (
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>الطبيب *</label>
+                  <label style={styles.label}>{t('appointments:labels.doctor')}</label>
                   <select 
                     value={formData.doctor_id} 
                     onChange={(e) => setFormData({...formData, doctor_id: e.target.value})}
                     style={styles.input}
                     required
                   >
-                    <option value="">اختر الطبيب</option>
+                    <option value="">{t('appointments:selectDoctor')}</option>
                     {doctors.map(doctor => (
                       <option key={doctor.id} value={doctor.id}>
                         {doctor.full_name}
@@ -422,7 +440,7 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
               )}
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>التاريخ والوقت *</label>
+                <label style={styles.label}>{t('appointments:labels.dateTime')}</label>
                 <input 
                   type="datetime-local"
                   value={formData.appointment_date} 
@@ -433,7 +451,7 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>المدة (بالدقائق) *</label>
+                <label style={styles.label}>{t('appointments:labels.duration')}</label>
                 <input 
                   type="number"
                   value={formData.duration} 
@@ -446,7 +464,7 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>ملاحظات</label>
+                <label style={styles.label}>{t('appointments:labels.notes')}</label>
                 <textarea 
                   value={formData.notes} 
                   onChange={(e) => setFormData({...formData, notes: e.target.value})}
@@ -456,8 +474,8 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
               </div>
 
               <div style={styles.modalActions}>
-                <button type="submit" style={styles.submitBtn}>حفظ</button>
-                <button type="button" onClick={() => setShowAddModal(false)} style={styles.cancelModalBtn}>إلغاء</button>
+                <button type="submit" style={styles.submitBtn}>{t('appointments:buttons.save')}</button>
+                <button type="button" onClick={() => setShowAddModal(false)} style={styles.cancelModalBtn}>{t('appointments:buttons.cancelModal')}</button>
               </div>
             </form>
           </div>
@@ -467,20 +485,20 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
       {showEditModal && selectedAppointment && (
         <div style={styles.modalOverlay} onClick={() => setShowEditModal(false)}>
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h2 style={styles.modalTitle}>تعديل الموعد</h2>
+            <h2 style={styles.modalTitle}>{t('appointments:modalTitles.edit')}</h2>
             <form onSubmit={handleEditAppointment}>
               <div style={styles.formGroup}>
-                <label style={styles.label}>المريض</label>
+                <label style={styles.label}>{t('appointments:patient')}</label>
                 <input 
                   type="text"
-                  value={selectedAppointment.patient_name || 'غير محدد'}
+                  value={selectedAppointment.patient_name || t('appointments:labels.notSpecified')}
                   style={{...styles.input, backgroundColor: '#f5f5f5'}}
                   disabled
                 />
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>الطبيب</label>
+                <label style={styles.label}>{t('appointments:doctor')}</label>
                 <input 
                   type="text"
                   value={selectedAppointment.doctor_name}
@@ -490,7 +508,7 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>التاريخ والوقت *</label>
+                <label style={styles.label}>{t('appointments:labels.dateTime')}</label>
                 <input 
                   type="datetime-local"
                   value={formData.appointment_date} 
@@ -501,7 +519,7 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>المدة (بالدقائق) *</label>
+                <label style={styles.label}>{t('appointments:labels.duration')}</label>
                 <input 
                   type="number"
                   value={formData.duration} 
@@ -514,7 +532,7 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>ملاحظات</label>
+                <label style={styles.label}>{t('appointments:labels.notes')}</label>
                 <textarea 
                   value={formData.notes} 
                   onChange={(e) => setFormData({...formData, notes: e.target.value})}
@@ -524,8 +542,8 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
               </div>
 
               <div style={styles.modalActions}>
-                <button type="submit" style={styles.submitBtn}>حفظ التعديلات</button>
-                <button type="button" onClick={() => setShowEditModal(false)} style={styles.cancelModalBtn}>إلغاء</button>
+                <button type="submit" style={styles.submitBtn}>{t('appointments:buttons.save')}</button>
+                <button type="button" onClick={() => setShowEditModal(false)} style={styles.cancelModalBtn}>{t('appointments:buttons.cancelModal')}</button>
               </div>
             </form>
           </div>
@@ -533,17 +551,6 @@ ${appointment.notes ? `▫️ ملاحظات: ${appointment.notes}` : ''}
       )}
     </div>
   );
-};
-
-const getStatusLabel = (status) => {
-  const labels = {
-    scheduled: 'مجدول',
-    confirmed: 'مؤكد',
-    in_progress: 'جاري',
-    completed: 'مكتمل',
-    cancelled: 'ملغي'
-  };
-  return labels[status] || status;
 };
 
 const getStatusStyle = (status) => {
