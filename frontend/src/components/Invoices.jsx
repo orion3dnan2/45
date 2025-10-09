@@ -37,10 +37,12 @@ const Invoices = () => {
         api.getInvoices(),
         api.getPatients()
       ]);
-      setInvoices(invoicesData);
-      setPatients(patientsData);
+      setInvoices(Array.isArray(invoicesData) ? invoicesData : []);
+      setPatients(Array.isArray(patientsData) ? patientsData : []);
     } catch (error) {
       console.error('Error loading data:', error);
+      setInvoices([]);
+      setPatients([]);
     } finally {
       setLoading(false);
     }
@@ -49,9 +51,10 @@ const Invoices = () => {
   const loadPatientTreatments = async (patientId) => {
     try {
       const treatmentsData = await api.getTreatments({ patient_id: patientId, status: 'completed' });
-      setTreatments(treatmentsData);
+      setTreatments(Array.isArray(treatmentsData) ? treatmentsData : []);
     } catch (error) {
       console.error('Error loading treatments:', error);
+      setTreatments([]);
     }
   };
 
