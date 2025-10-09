@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n/config';
 import { api } from '../services/api';
 import { AuthContext } from '../contexts/AuthContext';
 
@@ -436,7 +437,7 @@ const Patients = () => {
                     <span style={styles.infoLabel}>{t('patients:dateOfBirthLabel')}</span>
                     <span style={styles.infoValue}>
                       {selectedPatient.date_of_birth 
-                        ? new Date(selectedPatient.date_of_birth).toLocaleDateString('ar-EG')
+                        ? new Date(selectedPatient.date_of_birth).toLocaleDateString(i18n.language === 'ar' ? 'ar-SA' : 'en-US')
                         : t('common:none')}
                     </span>
                   </div>
@@ -539,7 +540,7 @@ const Patients = () => {
                                 <div style={styles.documentName}>{doc.original_name}</div>
                                 <div style={styles.documentMeta}>
                                   <span>👤 {doc.uploaded_by_name || t('common:unknown')}</span>
-                                  <span>📅 {new Date(doc.created_at).toLocaleDateString('ar-EG')}</span>
+                                  <span>📅 {new Date(doc.created_at).toLocaleDateString(i18n.language === 'ar' ? 'ar-SA' : 'en-US')}</span>
                                   <span>📦 {(doc.file_size / 1024).toFixed(1)} KB</span>
                                 </div>
                                 {doc.notes && (

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n/config';
 import { api } from '../services/api';
 import { AuthContext } from '../contexts/AuthContext';
 
@@ -152,7 +153,7 @@ const Appointments = () => {
 
     const phoneNumber = doctorPhone.replace(/[^0-9]/g, '');
     
-    const formattedDate = new Date(appointment.appointment_date).toLocaleString('ar-SA', {
+    const formattedDate = new Date(appointment.appointment_date).toLocaleString(i18n.language === 'ar' ? 'ar-SA' : 'en-US', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -207,7 +208,7 @@ const Appointments = () => {
 
     const phoneNumber = patientPhone.replace(/[^0-9]/g, '');
     
-    const formattedDate = new Date(appointment.appointment_date).toLocaleString('ar-SA', {
+    const formattedDate = new Date(appointment.appointment_date).toLocaleString(i18n.language === 'ar' ? 'ar-SA' : 'en-US', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -306,7 +307,7 @@ const Appointments = () => {
                     <span style={styles.dateIcon}>🗓️</span>
                     <div>
                       <div style={styles.dateText}>
-                        {new Date(appointment.appointment_date).toLocaleDateString('ar-SA', {
+                        {new Date(appointment.appointment_date).toLocaleDateString(i18n.language === 'ar' ? 'ar-SA' : 'en-US', {
                           weekday: 'short',
                           year: 'numeric',
                           month: 'short',
@@ -314,7 +315,7 @@ const Appointments = () => {
                         })}
                       </div>
                       <div style={styles.timeText}>
-                        {new Date(appointment.appointment_date).toLocaleTimeString('ar-SA', {
+                        {new Date(appointment.appointment_date).toLocaleTimeString(i18n.language === 'ar' ? 'ar-SA' : 'en-US', {
                           hour: '2-digit',
                           minute: '2-digit'
                         })}

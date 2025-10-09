@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n/config';
 import { api } from '../services/api';
 import { AuthContext } from '../contexts/AuthContext';
 
@@ -140,7 +141,7 @@ const Home = () => {
                   {appointments.map((appointment, index) => (
                     <tr key={appointment.id} style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
                       <td style={styles.tableCell}>
-                        {new Date(appointment.appointment_date).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(appointment.appointment_date).toLocaleTimeString(i18n.language === 'ar' ? 'ar-SA' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
                       </td>
                       <td style={styles.tableCell}>{appointment.patient_name || '-'}</td>
                       <td style={styles.tableCell}>{appointment.doctor_name || '-'}</td>

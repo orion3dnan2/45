@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n/config';
 import { api } from '../services/api';
 import { AuthContext } from '../contexts/AuthContext';
 
@@ -229,10 +230,10 @@ const Invoices = () => {
                   <td style={styles.tableCell}>{invoice.invoice_number}</td>
                   <td style={styles.tableCell}>{invoice.patient_name || '-'}</td>
                   <td style={styles.tableCell}>
-                    {invoice.issue_date ? new Date(invoice.issue_date).toLocaleDateString('ar-EG') : '-'}
+                    {invoice.issue_date ? new Date(invoice.issue_date).toLocaleDateString(i18n.language === 'ar' ? 'ar-SA' : 'en-US') : '-'}
                   </td>
                   <td style={styles.tableCell}>
-                    {invoice.due_date ? new Date(invoice.due_date).toLocaleDateString('ar-EG') : '-'}
+                    {invoice.due_date ? new Date(invoice.due_date).toLocaleDateString(i18n.language === 'ar' ? 'ar-SA' : 'en-US') : '-'}
                   </td>
                   <td style={styles.tableCell}>{parseFloat(invoice.total_amount || 0).toFixed(3)} {t('common:currencyKWD')}</td>
                   <td style={styles.tableCell}>{parseFloat(invoice.amount_paid || 0).toFixed(3)} {t('common:currencyKWD')}</td>
