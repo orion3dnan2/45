@@ -1,6 +1,7 @@
 {
   "title": "Treatment Management",
   "addTreatment": "Add New Treatment",
+  "addTreatmentButton": "➕ Add New Treatment",
   "editTreatment": "Edit Treatment",
   "deleteTreatment": "Delete Treatment",
   "treatmentName": "Treatment Name",
@@ -10,5 +11,19 @@
   "addSuccess": "Treatment added successfully",
   "updateSuccess": "Treatment updated successfully",
   "deleteSuccess": "Treatment deleted successfully",
-  "deleteConfirm": "Are you sure you want to delete this treatment?"
+  "deleteConfirm": "Are you sure you want to delete this treatment?",
+  "deleteConfirmWithName": "Are you sure you want to delete {{name}}?",
+  "searchPlaceholder": "🔍 Search for treatment...",
+  "allStatuses": "All Statuses",
+  "errors": {
+    "operationFailed": "Operation failed",
+    "deleteFailed": "Failed to delete treatment"
+  },
+  "placeholders": {
+    "diagnosis": "Diagnosis description...",
+    "procedure": "e.g., Filling, Cleaning, Extraction",
+    "toothNumber": "e.g., 16",
+    "cost": "0.000",
+    "notes": "Additional notes..."
+  }
 }

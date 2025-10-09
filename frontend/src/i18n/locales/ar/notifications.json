@@ -3,7 +3,11 @@
   "markAsRead": "وضع علامة مقروء",
   "markAllAsRead": "وضع علامة على الكل كمقروء",
   "noNotifications": "لا توجد إشعارات",
+  "noUnreadNotifications": "لا توجد إشعارات غير مقروءة",
   "new": "جديد",
   "read": "مقروء",
-  "unread": "غير مقروء"
+  "unread": "غير مقروء",
+  "all": "الكل",
+  "unreadFilter": "غير مقروءة",
+  "readFilter": "مقروءة"
 }

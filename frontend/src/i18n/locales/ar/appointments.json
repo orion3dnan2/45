@@ -13,6 +13,12 @@
   "updateSuccess": "تم تحديث الموعد بنجاح",
   "deleteSuccess": "تم حذف الموعد بنجاح",
   "deleteConfirm": "هل أنت متأكد من حذف هذا الموعد؟",
+  "errors": {
+    "addFailed": "فشل في إضافة الموعد",
+    "updateFailed": "فشل في تحديث الموعد",
+    "doctorPhoneNotAvailable": "رقم هاتف الطبيب غير متوفر",
+    "patientPhoneNotAvailable": "رقم هاتف المريض غير متوفر"
+  },
   "status": {
     "scheduled": "مجدول",
     "confirmed": "مؤكد",

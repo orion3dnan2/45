@@ -13,6 +13,12 @@
   "updateSuccess": "Appointment updated successfully",
   "deleteSuccess": "Appointment deleted successfully",
   "deleteConfirm": "Are you sure you want to delete this appointment?",
+  "errors": {
+    "addFailed": "Failed to add appointment",
+    "updateFailed": "Failed to update appointment",
+    "doctorPhoneNotAvailable": "Doctor's phone number is not available",
+    "patientPhoneNotAvailable": "Patient's phone number is not available"
+  },
   "status": {
     "scheduled": "Scheduled",
     "confirmed": "Confirmed",

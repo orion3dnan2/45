@@ -47,5 +47,6 @@
   "inactive": "Inactive",
   "currency": "SAR",
   "currencyKWD": "KWD",
-  "optional": "Optional"
+  "optional": "Optional",
+  "all": "All"
 }

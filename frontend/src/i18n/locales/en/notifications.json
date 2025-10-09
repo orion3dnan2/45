@@ -3,7 +3,11 @@
   "markAsRead": "Mark as Read",
   "markAllAsRead": "Mark All as Read",
   "noNotifications": "No notifications",
+  "noUnreadNotifications": "No unread notifications",
   "new": "New",
   "read": "Read",
-  "unread": "Unread"
+  "unread": "Unread",
+  "all": "All",
+  "unreadFilter": "Unread",
+  "readFilter": "Read"
 }
