@@ -40,7 +40,7 @@ const Treatments = () => {
       setTreatments(treatmentsData);
       setPatients(patientsData);
     } catch (error) {
-      console.error('خطأ في تحميل البيانات:', error);
+      console.error('Error loading data:', error);
     } finally {
       setLoading(false);
     }
@@ -68,8 +68,8 @@ const Treatments = () => {
       resetForm();
       loadData();
     } catch (error) {
-      console.error('خطأ:', error);
-      alert('فشلت العملية');
+      console.error('Error:', error);
+      alert(t('treatments:errors.operationFailed'));
     }
   };
 
@@ -89,15 +89,15 @@ const Treatments = () => {
   };
 
   const handleDelete = async (id, name) => {
-    if (!window.confirm(`هل أنت متأكد من حذف ${name}؟`)) return;
+    if (!window.confirm(t('treatments:deleteConfirmWithName', { name }))) return;
     
     try {
       await api.deleteTreatment(id);
       alert(t('treatments:deleteSuccess'));
       loadData();
     } catch (error) {
-      console.error('خطأ:', error);
-      alert('فشل حذف العلاج');
+      console.error('Error:', error);
+      alert(t('treatments:errors.deleteFailed'));
     }
   };
 
@@ -134,7 +134,7 @@ const Treatments = () => {
         <h1 style={styles.title}>🦷 {t('treatments:title')}</h1>
         {canManage && (
           <button onClick={() => setShowAddModal(true)} style={styles.addBtn}>
-            ➕ إضافة علاج جديد
+            {t('treatments:addTreatmentButton')}
           </button>
         )}
       </div>
@@ -143,7 +143,7 @@ const Treatments = () => {
         <div style={styles.searchBox}>
           <input
             type="text"
-            placeholder="🔍 ابحث عن علاج..."
+            placeholder={t('treatments:searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={styles.searchInput}
@@ -156,11 +156,11 @@ const Treatments = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
             style={styles.select}
           >
-            <option value="all">جميع الحالات</option>
-            <option value="planned">مخطط</option>
-            <option value="in_progress">جاري</option>
-            <option value="completed">مكتمل</option>
-            <option value="cancelled">ملغي</option>
+            <option value="all">{t('treatments:allStatuses')}</option>
+            <option value="planned">{t('treatments:status.planned')}</option>
+            <option value="in_progress">{t('treatments:status.in_progress')}</option>
+            <option value="completed">{t('treatments:status.completed')}</option>
+            <option value="cancelled">{t('treatments:status.cancelled')}</option>
           </select>
         </div>
       </div>
@@ -169,28 +169,28 @@ const Treatments = () => {
         {filteredTreatments.map(treatment => (
           <div key={treatment.id} style={styles.treatmentCard}>
             <div style={styles.treatmentHeader}>
-              <h3 style={styles.treatmentTitle}>🦷 {treatment.procedure_done || 'علاج'}</h3>
-              <span style={getStatusStyle(treatment.status)}>{getStatusLabel(treatment.status)}</span>
+              <h3 style={styles.treatmentTitle}>🦷 {treatment.procedure_done || t('treatments:fields.treatment')}</h3>
+              <span style={getStatusStyle(treatment.status)}>{t(`treatments:status.${treatment.status}`)}</span>
             </div>
             
             <div style={styles.treatmentBody}>
-              <p><strong>المريض:</strong> {treatment.patient_name || 'غير محدد'}</p>
-              <p><strong>الطبيب:</strong> {treatment.doctor_name}</p>
-              <p><strong>التاريخ:</strong> {treatment.treatment_date}</p>
-              {treatment.diagnosis && <p><strong>التشخيص:</strong> {treatment.diagnosis}</p>}
-              {treatment.tooth_number && <p><strong>رقم السن:</strong> {treatment.tooth_number}</p>}
-              {treatment.cost && <p><strong>التكلفة:</strong> {parseFloat(treatment.cost).toFixed(3)} د.ك</p>}
-              {treatment.notes && <p><strong>ملاحظات:</strong> {treatment.notes}</p>}
+              <p><strong>{t('treatments:fields.patient')}:</strong> {treatment.patient_name || t('common:notSpecified')}</p>
+              <p><strong>{t('treatments:fields.doctor')}:</strong> {treatment.doctor_name}</p>
+              <p><strong>{t('treatments:fields.date')}:</strong> {treatment.treatment_date}</p>
+              {treatment.diagnosis && <p><strong>{t('treatments:fields.diagnosis')}:</strong> {treatment.diagnosis}</p>}
+              {treatment.tooth_number && <p><strong>{t('treatments:fields.toothNumber')}:</strong> {treatment.tooth_number}</p>}
+              {treatment.cost && <p><strong>{t('treatments:fields.cost')}:</strong> {parseFloat(treatment.cost).toFixed(3)} {t('common:currencyKWD')}</p>}
+              {treatment.notes && <p><strong>{t('treatments:fields.notes')}:</strong> {treatment.notes}</p>}
             </div>
 
             {canManage && (
               <div style={styles.actions}>
                 <button onClick={() => handleEdit(treatment)} style={styles.editBtn}>
-                  ✏️ تعديل
+                  {t('treatments:buttons.edit')}
                 </button>
                 {['doctor', 'warehouse_manager', 'admin'].includes(user.role) && (
                   <button onClick={() => handleDelete(treatment.id, treatment.procedure_done)} style={styles.deleteBtn}>
-                    🗑️ حذف
+                    {t('treatments:buttons.delete')}
                   </button>
                 )}
               </div>
@@ -201,7 +201,7 @@ const Treatments = () => {
 
       {filteredTreatments.length === 0 && (
         <div style={styles.empty}>
-          {searchTerm ? 'لا توجد نتائج للبحث' : 'لا توجد علاجات مسجلة'}
+          {searchTerm ? t('treatments:noSearchResults') : t('treatments:noTreatmentsRecorded')}
         </div>
       )}
 
@@ -244,7 +244,7 @@ const Treatments = () => {
                   value={formData.diagnosis}
                   onChange={(e) => setFormData({...formData, diagnosis: e.target.value})}
                   style={styles.textarea}
-                  placeholder="وصف التشخيص..."
+                  placeholder={t('treatments:placeholders.diagnosis')}
                 />
               </div>
 
@@ -255,7 +255,7 @@ const Treatments = () => {
                   value={formData.procedure_done}
                   onChange={(e) => setFormData({...formData, procedure_done: e.target.value})}
                   style={styles.input}
-                  placeholder="مثال: حشو، تنظيف، خلع"
+                  placeholder={t('treatments:placeholders.procedure')}
                 />
               </div>
 
@@ -267,7 +267,7 @@ const Treatments = () => {
                     value={formData.tooth_number}
                     onChange={(e) => setFormData({...formData, tooth_number: e.target.value})}
                     style={styles.input}
-                    placeholder="مثال: 16"
+                    placeholder={t('treatments:placeholders.toothNumber')}
                   />
                 </div>
 
@@ -294,7 +294,7 @@ const Treatments = () => {
                   value={formData.cost}
                   onChange={(e) => setFormData({...formData, cost: e.target.value})}
                   style={styles.input}
-                  placeholder="0.000"
+                  placeholder={t('treatments:placeholders.cost')}
                 />
               </div>
 
@@ -304,7 +304,7 @@ const Treatments = () => {
                   value={formData.notes}
                   onChange={(e) => setFormData({...formData, notes: e.target.value})}
                   style={styles.textarea}
-                  placeholder="ملاحظات إضافية..."
+                  placeholder={t('treatments:placeholders.notes')}
                 />
               </div>
 

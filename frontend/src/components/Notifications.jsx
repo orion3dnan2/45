@@ -64,13 +64,13 @@ const Notifications = () => {
       
       <div style={styles.filters}>
         <button onClick={() => setFilter('all')} style={filter === 'all' ? styles.activeFilter : styles.filterBtn}>
-          الكل
+          {t('notifications:all')}
         </button>
         <button onClick={() => setFilter('unread')} style={filter === 'unread' ? styles.activeFilter : styles.filterBtn}>
-          غير مقروءة ({unreadCount})
+          {t('notifications:unreadFilter')} ({unreadCount})
         </button>
         <button onClick={() => setFilter('read')} style={filter === 'read' ? styles.activeFilter : styles.filterBtn}>
-          مقروءة
+          {t('notifications:readFilter')}
         </button>
       </div>
 
@@ -87,14 +87,14 @@ const Notifications = () => {
               <p style={styles.notifMessage}>{notification.message}</p>
               <p style={styles.notifTime}>{new Date(notification.created_at).toLocaleString('ar-EG')}</p>
             </div>
-            {!notification.is_read && <span style={styles.unreadBadge}>جديد</span>}
+            {!notification.is_read && <span style={styles.unreadBadge}>{t('notifications:new')}</span>}
           </div>
         ))}
       </div>
 
       {notifications.length === 0 && (
         <div style={styles.empty}>
-          {filter === 'unread' ? 'لا توجد إشعارات غير مقروءة' : 'لا توجد إشعارات'}
+          {filter === 'unread' ? t('notifications:noUnreadNotifications') : t('notifications:noNotifications')}
         </div>
       )}
     </div>

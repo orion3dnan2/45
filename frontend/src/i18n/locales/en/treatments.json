@@ -25,5 +25,27 @@
     "toothNumber": "e.g., 16",
     "cost": "0.000",
     "notes": "Additional notes..."
-  }
+  },
+  "fields": {
+    "patient": "Patient",
+    "doctor": "Doctor",
+    "date": "Date",
+    "diagnosis": "Diagnosis",
+    "toothNumber": "Tooth Number",
+    "cost": "Cost",
+    "notes": "Notes",
+    "treatment": "Treatment"
+  },
+  "buttons": {
+    "edit": "✏️ Edit",
+    "delete": "🗑️ Delete"
+  },
+  "status": {
+    "planned": "Planned",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "noSearchResults": "No search results",
+  "noTreatmentsRecorded": "No treatments recorded"
 }

@@ -35,7 +35,7 @@ const Appointments = () => {
       const data = await api.getPatients();
       setPatients(data);
     } catch (error) {
-      console.error('خطأ في تحميل المرضى:', error);
+      console.error('Error loading patients:', error);
     }
   };
 
@@ -49,7 +49,7 @@ const Appointments = () => {
       const data = await response.json();
       setDoctors(data);
     } catch (error) {
-      console.error('خطأ في تحميل الأطباء:', error);
+      console.error('Error loading doctors:', error);
     }
   };
 
@@ -66,7 +66,7 @@ const Appointments = () => {
       const data = await api.getAppointments(params);
       setAppointments(data);
     } catch (error) {
-      console.error('خطأ في تحميل المواعيد:', error);
+      console.error('Error loading appointments:', error);
     } finally {
       setLoading(false);
     }
@@ -77,7 +77,7 @@ const Appointments = () => {
       await api.updateAppointment(id, { status: newStatus });
       loadAppointments();
     } catch (error) {
-      console.error('خطأ في تحديث الموعد:', error);
+      console.error('Error updating appointment status:', error);
     }
   };
 
@@ -96,8 +96,8 @@ const Appointments = () => {
       loadAppointments();
       alert(t('appointments:addSuccess'));
     } catch (error) {
-      console.error('خطأ في إضافة الموعد:', error);
-      alert('فشل في إضافة الموعد');
+      console.error('Error adding appointment:', error);
+      alert(t('appointments:errors.addFailed'));
     }
   };
 
@@ -114,8 +114,8 @@ const Appointments = () => {
       loadAppointments();
       alert(t('appointments:updateSuccess'));
     } catch (error) {
-      console.error('خطأ في تحديث الموعد:', error);
-      alert('فشل في تحديث الموعد');
+      console.error('Error updating appointment:', error);
+      alert(t('appointments:errors.updateFailed'));
     }
   };
 
@@ -146,7 +146,7 @@ const Appointments = () => {
     const doctorPhone = appointment.doctor_phone || '';
     
     if (!doctorPhone) {
-      alert('رقم هاتف الطبيب غير متوفر');
+      alert(t('appointments:errors.doctorPhoneNotAvailable'));
       return;
     }
 
@@ -191,7 +191,7 @@ ${appointment.notes ? `▫️ ملاحظات خاصة: ${appointment.notes}` : '
     const patientPhone = appointment.patient_phone || '';
     
     if (!patientPhone) {
-      alert('رقم هاتف المريض غير متوفر');
+      alert(t('appointments:errors.patientPhoneNotAvailable'));
       return;
     }
 
